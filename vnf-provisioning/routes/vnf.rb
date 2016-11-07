@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -256,7 +257,7 @@ class Provisioning < VnfProvisioning
             # Delete the VNFR from mAPI
             logger.info 'Sending delete command to mAPI...'
             logger.debug "VNFR: " + vnfr_id
-            sendDeleteCommandToMAPI(vnfr_id)
+            # sendDeleteCommandToMAPI(vnfr_id)
         end
 
         logger.info 'Removing the VNFR from the database...'
@@ -292,6 +293,37 @@ class Provisioning < VnfProvisioning
 
         halt 200, 'mAPI not defined. No execution performed.' if settings.mapi.nil?
 
+        vim_info = {
+            'keystone' => config_info['authentication'][0]['urls']['keystone'],
+            'tenant' => config_info['authentication'][0]['tenant_name'],
+            'username' => config_info['authentication'][0]['username'],
+            'password' => config_info['authentication'][0]['password'],
+            'heat' => config_info['authentication'][0]['urls']['orch'],
+            'compute' => config_info['authentication'][0]['urls']['compute'],
+            'tenant_id' => config_info['authentication'][0]['tenant_id']
+        }
+        
+        token_info = request_auth_token(vim_info)
+        auth_token = token_info['access']['token']['id'].to_s
+        url = 
+            vim_info['compute']+'/'+
+            vim_info['tenant_id']+
+            '/servers/'+vnfr.vms_id['vdu0']+
+            '/action'
+        begin
+            amessage = { 'os-start': 'os-start' }
+            if config_info['event'] === 'stop'
+                amessage = { 'os-stop': 'os-stop' }
+            end
+            check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
+            puts check
+        rescue => e
+            logger.error 'Openstack request failed'
+            puts e.response
+            halt e.response.code, e.response
+        end
+        halt 200
+
         # Build mAPI request
         mapi_request = {
             event: config_info['event'],
@@ -300,7 +332,7 @@ class Provisioning < VnfProvisioning
         }
         logger.debug 'mAPI request: ' + mapi_request.to_json
         # Send request to the mAPI
-        code, body = sendCommandToMAPI(vnfr_id, mapi_request) unless settings.mapi.nil?
+        # code, body = sendCommandToMAPI(vnfr_id, mapi_request) unless settings.mapi.nil?
 
         # Update the VNFR event history
         vnfr.push(lifecycle_event_history: "Executed a #{mapi_request[:event]}")
@@ -510,7 +542,7 @@ class Provisioning < VnfProvisioning
 
             logger.info 'Registring values to mAPI if required...'
             # Send the VNFR to the mAPI
-            registerRequestToMAPI(vnfr) unless settings.mapi.nil?
+            # registerRequestToMAPI(vnfr) unless settings.mapi.nil?
 
             # Build message to send to the NS Manager callback
             vnfi_id = []

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -37,6 +38,38 @@ class Provisioner < NsProvisioning
     get '/:id' do
         begin
             instance = Nsr.find(params['id'])
+            vim_info = {
+                'keystone' => instance['authentication'][0]['urls']['keystone'],
+                'tenant' => instance['authentication'][0]['tenant_name'],
+                'username' => instance['authentication'][0]['username'],
+                'password' => instance['authentication'][0]['password'],
+                'heat' => instance['authentication'][0]['urls']['orch'],
+                'compute' => instance['authentication'][0]['urls']['compute'],
+                'tenant_id' => instance['authentication'][0]['tenant_id']
+            }
+            token_info = request_auth_token(vim_info)
+            auth_token = token_info[0]['access']['token']['id'].to_s
+            instance['vnfrs'].each do |vnf|
+                response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
+                response['vms'].each do |vm|
+                    vnf['vnf_id'] = { 'openstack_id': vm['physical_resource_id'] }
+                    url = 
+                        vim_info['compute']+'/'+
+                        vim_info['tenant_id']+
+                        '/servers/'+vm['physical_resource_id']
+                    begin
+                        check = RestClient.get(url, headers = {'X-Auth-Token' => auth_token,'accept' => 'json'})
+                        data = JSON.parse(check.body)
+                        vnf['server'] = { 'status': data['server']['status'], 'addresses': [] }
+                        data['server']['addresses'].each do |ad|
+                            vnf['server']['addresses'].append(ad)
+                        end
+                    rescue => e
+                        logger.error 'Openstack request failed'
+                        halt e.response.code, e.response
+                    end
+                end
+            end
         rescue Mongoid::Errors::DocumentNotFound => e
             halt 404
         end
@@ -192,8 +225,9 @@ class Provisioner < NsProvisioning
             @instance['vnfrs'].each do |vnf|
                 logger.info 'Starting VNF ' + vnf['vnfr_id'].to_s
                 event = { event: 'start' }
+                event_auth = { event: 'start', 'authentication': @nsInstance['authentication'] }
                 begin
-                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event.to_json, content_type: :json
+                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event_auth.to_json, content_type: :json
                 rescue Errno::ECONNREFUSED
                     logger.error 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'
@@ -210,8 +244,9 @@ class Provisioner < NsProvisioning
             @instance['vnfrs'].each do |vnf|
                 logger.debug vnf
                 event = { event: 'stop' }
+                event_auth = { event: 'stop', 'authentication': @nsInstance['authentication'] }
                 begin
-                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event.to_json, content_type: :json
+                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event_auth.to_json, content_type: :json
                 rescue Errno::ECONNREFUSED
                     logger.error 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'

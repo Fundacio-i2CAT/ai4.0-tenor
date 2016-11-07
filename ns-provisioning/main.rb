@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -30,6 +31,7 @@ class NsProvisioning < Sinatra::Application
     require_relative 'routes/init'
     require_relative 'helpers/init'
     require_relative 'models/init'
+    require_relative '../vnf-provisioning/helpers/vnf'
 
     register Sinatra::ConfigFile
     # Load configurations
@@ -45,6 +47,7 @@ class NsProvisioning < Sinatra::Application
         env['rack.logger'] = settings.logger
     end
 
+    helpers ProvisioningHelper
     helpers NsProvisioner
     helpers MappingHelper
     helpers MonitoringHelper

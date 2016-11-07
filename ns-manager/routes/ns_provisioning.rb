@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -47,7 +48,12 @@ class NsProvisioner < TnovaManager
     logger.info "INSTANTIATION INFO: " + instantiation_info.to_s
     pop_list = []
     if instantiation_info['pop_id'].nil?
-      pop_list = JSON.parse(getDcs())
+      puts "#########################################3"
+      puts getDcs()[0].class
+      puts "******************************************"
+      puts getDcs()[1]
+      puts "#########################################3"
+      pop_list = JSON.parse(getDcs()[1])
       if pop_list.empty?
         halt 400, "No PoPs registereds."
       end
