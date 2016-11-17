@@ -368,6 +368,12 @@ class Provisioning < VnfProvisioning
             # get stack resources
             resources = getStackResources(vnfr.stack_url, auth_token)
             resources.each do |resource|
+                if resource['resource_type'] == 'OS::Glance::Image'
+                    puts resource['resource_type']
+                    puts "AQUI ESTA LA IMAGEN DE LA MAQUINA RECIEN CREADA ..."
+                    puts resource
+                    puts "HABRIA QUE METERLA EN LA BBDD PARA SIEMPRE?"
+                end
                 # map ports to openstack_port_id
                 unless vnfr.port_instances.detect { |port| resource['resource_name'] == port['id'] }.nil?
                     vnfr.port_instances.find { |port| resource['resource_name'] == port['id'] }['physical_resource_id'] = resource['physical_resource_id']
@@ -403,6 +409,8 @@ class Provisioning < VnfProvisioning
                     end
                 end
                 next if resource['resource_type'] != 'OS::Glance::Image'
+
+
                 resource['required_by'].each do |vdu|
                     vm = vms.find { |vm| vm[:id] == vdu }
                     if vm.nil?
