@@ -370,13 +370,10 @@ class Provisioning < VnfProvisioning
             resources.each do |resource|
                 if resource['resource_type'] == 'OS::Glance::Image'
                     puts resource['resource_type']
-                    puts "AQUI ESTA LA IMAGEN DE LA MAQUINA RECIEN CREADA ..."
                     puts resource
-                    puts 'REFERENCIA A VNFD'
                     puts vnfr['vnfd_reference']
-                    puts "HABRIA QUE METERLA EN LA BBDD PARA SIEMPRE?"
-                    puts "MUY MALA IDEA; EN SERIO, DEPENDE DEL POP_ID"
-                    puts "SI OTRO POP_ID NO TIENE LA IMAGEN GUARDADA NO LA ENCUENTRA"
+                    # Good place to manage CACHED VNF images
+                    # Place to insert the image in the DB for the PoP_id
                 end
                 # map ports to openstack_port_id
                 unless vnfr.port_instances.detect { |port| resource['resource_name'] == port['id'] }.nil?
