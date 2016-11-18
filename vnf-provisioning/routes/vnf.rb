@@ -372,10 +372,13 @@ class Provisioning < VnfProvisioning
             resources = getStackResources(vnfr.stack_url, auth_token)
             resources.each do |resource|
                 if resource['resource_type'] == 'OS::Glance::Image'
-                    puts "HERE GOES THE IMAGE"
-                    puts resource['resource_type']
-                    puts resource
+                    puts "HERE GOES THE IMAGE OPENSTACK_ID"
+                    puts resource['physical_resource_id']
+                    puts "DESCRIPTOR REFERENCE="
                     puts vnfr['vnfd_reference']
+                    # vnfd = Vnf.where(vnfd.id: vnfr['vnfd_reference'])
+                    # vdu = vnfd['vdu'][0]
+                    # puts vdu['vm_image']
                     # Good place to manage CACHED VNF images
                     # Place to insert the image in the DB for the PoP_id
                     # if the cached key is set to true, store the openstack_id-PoP_id combination
