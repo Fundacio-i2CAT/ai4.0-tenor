@@ -374,6 +374,7 @@ class Provisioning < VnfProvisioning
                     puts vnfr['vnfd_reference']
                     # Good place to manage CACHED VNF images
                     # Place to insert the image in the DB for the PoP_id
+                    # if the cached key is set to true, store the openstack_id-PoP_id combination
                 end
                 # map ports to openstack_port_id
                 unless vnfr.port_instances.detect { |port| resource['resource_name'] == port['id'] }.nil?
