@@ -70,6 +70,9 @@ class Provisioning < VnfProvisioning
         logger.debug 'Instantiation info: nsd_id -> ' + instantiation_info['ns_id'].to_s + ' Vnf_id -> ' + instantiation_info['vnf_id'].to_s + ' Flavour -> ' + vnf_flavour
 
         # Verify if the VDU images are accessible to download
+        cachedimg = Cachedimg.all()
+        puts "ASLKDJLSAKJDLKSAJDLKSAJD*********************************************************"
+        puts cachedimg
         logger.debug 'Verifying VDU images'
         verify_vdu_images(vnf['vnfd']['vdu'])
 
@@ -369,6 +372,7 @@ class Provisioning < VnfProvisioning
             resources = getStackResources(vnfr.stack_url, auth_token)
             resources.each do |resource|
                 if resource['resource_type'] == 'OS::Glance::Image'
+                    puts "HERE GOES THE IMAGE"
                     puts resource['resource_type']
                     puts resource
                     puts vnfr['vnfd_reference']
