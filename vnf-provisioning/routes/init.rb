@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -17,3 +18,4 @@
 #
 require_relative 'vnf'
 require_relative 'scaling'
+require_relative '../../vnf-catalogue/models/vnf'
