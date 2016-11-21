@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -16,3 +17,4 @@
 # limitations under the License.
 #
 require_relative 'vnfr'
+require_relative 'cachedimg'

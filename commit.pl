@@ -15,6 +15,8 @@ my @files = ( "commit.pl",
 	      "vnf-provisioning/routes/vnf.rb",
 	      "vnf-provisioning/Gemfile",
 	      "vnf-provisioning/config/config.yml",
+	      "vnf-provisioning/models/init.rb",
+	      "vnf-provisioning/models/cachedimg.rb",
 	      "vnf-provisioning/README.md",
 	      "ns-provisioning/README.md"
 	    );
