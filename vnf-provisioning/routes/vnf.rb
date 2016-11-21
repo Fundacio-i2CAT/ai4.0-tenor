@@ -133,8 +133,8 @@ class Provisioning < VnfProvisioning
                 if flavour_id.nil?
                     halt 400, "No flavours available for the vdu " + vdu['id'].to_s
                 end
-                flavors << {:id => vdu['id'], :flavour_id => flavour_id}
-            end
+                flavors << {:id => vdu['id'], :flavour_id => vnf['vnfd']['deployment_flavours'][0]['flavour_key']}
+           end
             hot_generator_message['flavours'] = flavors
         end
         begin
