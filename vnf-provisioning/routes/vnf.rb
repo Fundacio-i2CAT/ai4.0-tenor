@@ -376,7 +376,9 @@ class Provisioning < VnfProvisioning
                     puts resource['physical_resource_id']
                     puts "DESCRIPTOR REFERENCE="
                     puts vnfr['vnfd_reference']
-                    # vnfd = Vnf.where(vnfd.id: vnfr['vnfd_reference'])
+                    # vnfd = Vnf.find({'vnfd.id': Integer(vnfr['vnfd_reference'])})
+                    puts 'relfksajdlkas jdlaskjd '
+                    # puts vnfd
                     # vdu = vnfd['vdu'][0]
                     # puts vdu['vm_image']
                     # Good place to manage CACHED VNF images
