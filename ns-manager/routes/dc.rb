@@ -44,6 +44,9 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
+            hola = getPopUrls(dc['extra_info'])
+            puts hola
+            
             return dc.to_json
             # instance = Nsr.find(params['id'])
             # vim_info = {
