@@ -9,6 +9,7 @@ map { $name .= " $_"; } @ARGV;
 my @files = ( "commit.pl",
  	      "fluentd/fluent.conf",
 	      "ns-manager/routes/ns_provisioning.rb",
+	      "ns-manager/routes/dc.rb",
  	      "ns-provisioning/main.rb",
 	      "ns-provisioning/routes/ns.rb",
 	      "ns-provisioning/helpers/ns.rb",

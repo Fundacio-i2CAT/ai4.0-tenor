@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -28,6 +29,39 @@ class DcController < TnovaManager
             logger.error e
             logger.error 'Error Establishing a Database Connection'
             return 500, 'Error Establishing a Database Connection'
+        end
+    end
+
+
+    # @method get_ns_flavours
+    # @overload get "/get_list_flavours/:id"
+    # Get the flavours avaliable for the sercice
+    get '/get_list_flavours/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            return dc.to_json
+            # instance = Nsr.find(params['id'])
+            # vim_info = {
+            #     'keystone' => instance['authentication'][0]['urls']['keystone'],
+            #     'tenant' => instance['authentication'][0]['tenant_name'],
+            #     'username' => instance['authentication'][0]['username'],
+            #     'password' => instance['authentication'][0]['password'],
+            #     'heat' => instance['authentication'][0]['urls']['orch'],
+            #     'compute' => instance['authentication'][0]['urls']['compute'],
+            #     'tenant_id' => instance['authentication'][0]['tenant_id']
+            # }
+            # token_info = request_auth_token(vim_info)
+            # auth_token = token_info[0]['access']['token']['id'].to_s
+            # #credentials, errors = authenticate(vim_info['keystone'], vim_info['password'], vim_info['username'], vim_info['password'])
+            # tenant_id = vim_info['tenant_id']
+            # compute_url = vim_info['compute']
+            # query_params = ""
+            # flavors = JSON.parse(get_list_flavors(compute_url, tenant_id, query_params, auth_token))
         end
     end
 
