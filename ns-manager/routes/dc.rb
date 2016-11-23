@@ -33,9 +33,9 @@ class DcController < TnovaManager
     end
 
 
-    # @method get_ns_flavours
-    # @overload get "/get_list_flavours/:id"
-    # Get the flavours avaliable for the sercice
+    # @method get dc_flavours
+    # @overload get "/get_dc_flavours/:id"
+    # Get the flavours avaliable for the vim
     get '/get_list_flavours/:id' do |id|
         begin
             begin
@@ -46,25 +46,36 @@ class DcController < TnovaManager
             end
             hola = getPopUrls(dc['extra_info'])
             puts hola
-            
-            return dc.to_json
+
+
+            #return dc.to_json
             # instance = Nsr.find(params['id'])
-            # vim_info = {
-            #     'keystone' => instance['authentication'][0]['urls']['keystone'],
-            #     'tenant' => instance['authentication'][0]['tenant_name'],
-            #     'username' => instance['authentication'][0]['username'],
-            #     'password' => instance['authentication'][0]['password'],
-            #     'heat' => instance['authentication'][0]['urls']['orch'],
-            #     'compute' => instance['authentication'][0]['urls']['compute'],
-            #     'tenant_id' => instance['authentication'][0]['tenant_id']
-            # }
-            # token_info = request_auth_token(vim_info)
-            # auth_token = token_info[0]['access']['token']['id'].to_s
-            # #credentials, errors = authenticate(vim_info['keystone'], vim_info['password'], vim_info['username'], vim_info['password'])
-            # tenant_id = vim_info['tenant_id']
-            # compute_url = vim_info['compute']
-            # query_params = ""
-            # flavors = JSON.parse(get_list_flavors(compute_url, tenant_id, query_params, auth_token))
+             vim_info = {
+                 'keystone' => hola["keystone"],
+                 'tenant' => hola["tenantname"],
+                 'username' => dc['user'],
+                 'password' => dc['password'],
+                 'compute' => hola["compute"],
+             }
+            token_info = request_auth_token(vim_info)
+            auth_token = token_info[0]['access']['token']['id'].to_s
+            tenant_id = token_info[1]
+             #credentials, errors = authenticate(vim_info['keystone'], vim_info['password'], vim_info['username'], vim_info['password'])
+            compute_url = vim_info['compute']
+            begin
+                response = RestClient.get compute_url +"/#{tenant_id}/flavors", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                # halt 500, 'VIM unreachable'
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                #logger.error e.response
+                return
+                # halt e.response.code, e.response.body
+            end
+            response
         end
     end
 
