@@ -17,7 +17,9 @@
 # limitations under the License.
 #
 # @see DcController
+
 class DcController < TnovaManager
+    require_relative '../../ns-provisioning/helpers/authentication'
 
     # @method get_pops_dc
     # @overload get '/pops/dc/:id'
@@ -44,23 +46,23 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            hola = getPopUrls(dc['extra_info'])
-            puts hola
+            popUrls = getPopUrls(dc['extra_info'])
+            puts popUrls
 
 
             #return dc.to_json
             # instance = Nsr.find(params['id'])
              vim_info = {
-                 'keystone' => hola["keystone"],
-                 'tenant' => hola["tenantname"],
+                 'keystone' => popUrls["keystone"],
+                 'tenant' => popUrls["tenantname"],
                  'username' => dc['user'],
                  'password' => dc['password'],
-                 'compute' => hola["compute"],
+                 'compute' => popUrls["compute"],
              }
-            token_info = request_auth_token(vim_info)
-            auth_token = token_info[0]['access']['token']['id'].to_s
-            tenant_id = token_info[1]
-             #credentials, errors = authenticate(vim_info['keystone'], vim_info['password'], vim_info['username'], vim_info['password'])
+            #token_info = request_auth_token(vim_info)
+            #auth_token = token_info[0]['access']['token']['id'].to_s
+            #tenant_id = token_info[1]
+            admin_credentials, errors = authenticate(vim_info["keystone"], vim_info['tenant'], vim_info['username'], vim_info['password'])
             compute_url = vim_info['compute']
             begin
                 response = RestClient.get compute_url +"/#{tenant_id}/flavors", 'X-Auth-Token' => auth_token, :accept => :json
