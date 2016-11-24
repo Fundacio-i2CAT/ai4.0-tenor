@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -261,6 +262,67 @@ class Provisioning < VnfProvisioning
         logger.info 'Removing the VNFR from the database...'
         vnfr.destroy
         halt 200 # , response.body
+    end
+
+    # @method post_vnf_provisioning_instances_id_config
+    # @overload post '/vnf-provisioning/vnf-instances/:vnfr_id/config'
+    #   Request to execute a deep config (start/stop machines)
+    #   @param [String] vnfr_id the VNFR ID
+    #   @param [JSON]
+    # Request to execute a lifecycle event
+    put '/vnf-instances/:vnfr_id/deep-config' do |vnfr_id|
+        # Return if content-type is invalid
+        halt 415 unless request.content_type == 'application/json'
+
+        # Validate JSON format
+        config_info = parse_json(request.body.read)
+
+        # Return if have an invalid event type
+        halt 400, 'Invalid event type.' unless ['start', 'stop', 'restart', 'scale-in', 'scale-out'].include? config_info['event'].downcase
+
+        # Get VNFR stack info
+        begin
+            vnfr = Vnfr.find(vnfr_id)
+        rescue Mongoid::Errors::DocumentNotFound => e
+            halt 404
+        end
+
+        # Return if event doesn't have information
+        halt 400, 'Event has no information' if vnfr.lifecycle_info['events'][config_info['event']].nil?
+
+        halt 400, 'mAPI not defined. No execution performed.' if settings.mapi.nil?
+
+        vim_info = {
+            'keystone' => config_info['authentication'][0]['urls']['keystone'],
+            'tenant' => config_info['authentication'][0]['tenant_name'],
+            'username' => config_info['authentication'][0]['username'],
+            'password' => config_info['authentication'][0]['password'],
+            'heat' => config_info['authentication'][0]['urls']['orch'],
+            'compute' => config_info['authentication'][0]['urls']['compute'],
+            'tenant_id' => config_info['authentication'][0]['tenant_id']
+        }
+        
+        token_info = request_auth_token(vim_info)
+        auth_token = token_info['access']['token']['id'].to_s
+        url = 
+            vim_info['compute']+'/'+
+            vim_info['tenant_id']+
+            '/servers/'+vnfr.vms_id['vdu0']+
+            '/action'
+        begin
+            amessage = { 'os-start': 'os-start' }
+            if config_info['event'] === 'stop'
+                amessage = { 'os-stop': 'os-stop' }
+            end
+            check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
+            puts check
+        rescue => e
+            logger.error 'Openstack request failed'
+            puts e.response
+            halt e.response.code, e.response
+        end
+        halt 200
+
     end
 
     # @method post_vnf_provisioning_instances_id_config

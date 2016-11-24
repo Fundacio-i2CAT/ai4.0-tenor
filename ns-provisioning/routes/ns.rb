@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -35,7 +36,41 @@ class Provisioner < NsProvisioning
     # Get a ns-instance
     get '/:id' do
         begin
+            # Retrieves deep info on VMs (IPs and States)
             instance = Nsr.find(params['id'])
+            vim_info = {
+                'keystone' => instance['authentication'][0]['urls']['keystone'],
+                'tenant' => instance['authentication'][0]['tenant_name'],
+                'username' => instance['authentication'][0]['username'],
+                'password' => instance['authentication'][0]['password'],
+                'heat' => instance['authentication'][0]['urls']['orch'],
+                'compute' => instance['authentication'][0]['urls']['compute'],
+                'tenant_id' => instance['authentication'][0]['tenant_id']
+            }
+            token_info = request_auth_token(vim_info)
+            puts token_info
+            auth_token = token_info[0]['access']['token']['id'].to_s
+            instance['vnfrs'].each do |vnf|
+                response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
+                response['vms'].each do |vm|
+                    vnf['vnf_id'] = { 'openstack_id': vm['physical_resource_id'] }
+                    url = 
+                        vim_info['compute']+'/'+
+                        vim_info['tenant_id']+
+                        '/servers/'+vm['physical_resource_id']
+                    begin
+                        check = RestClient.get(url, headers = {'X-Auth-Token' => auth_token,'accept' => 'json'})
+                        data = JSON.parse(check.body)
+                        vnf['server'] = { 'status': data['server']['status'], 'addresses': [] }
+                        data['server']['addresses'].each do |ad|
+                            vnf['server']['addresses'].append(ad)
+                        end
+                    rescue => e
+                        logger.error 'Openstack request failed'
+                        halt e.response.code, e.response
+                    end
+                end
+            end
         rescue Mongoid::Errors::DocumentNotFound => e
             halt 404
         end
@@ -124,7 +159,6 @@ class Provisioner < NsProvisioning
     put '/:id/:status' do
         body, errors = parse_json(request.body.read)
         @instance = body['instance']
-
         begin
             @nsInstance = Nsr.find(params['id'])
         rescue Mongoid::Errors::DocumentNotFound => e
