@@ -8,6 +8,8 @@ map { $name .= " $_"; } @ARGV;
 
 my @files = ( "commit.pl",
  	      "vnfd-validator/assets/schemas/*",
+	      "ns-manager/helpers/*.rb",
+	      "ns-manager/routes/*.rb",
 	      "ns-manager/routes/ns_provisioning.rb",
 	      "ns-provisioning/routes/ns.rb",
 	      "ns-provisioning/helpers/ns.rb",

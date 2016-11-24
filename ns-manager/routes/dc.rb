@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -28,6 +29,42 @@ class DcController < TnovaManager
             logger.error e
             logger.error 'Error Establishing a Database Connection'
             return 500, 'Error Establishing a Database Connection'
+        end
+    end
+
+    # @method get dc_flavours
+    # @overload get "/get_dc_flavours/:id"
+    # Get the flavours avaliable for the vim (ANELLA)
+    get '/flavours/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            puts admin_credentials
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            #abort("Message goes here")
+            begin
+                response = RestClient.get compute_url +"/#{tenant_id}/flavors", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                # halt 500, 'VIM unreachable'
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                #logger.error e.response
+                return
+                # halt e.response.code, e.response.body
+            end
+            response
         end
     end
 

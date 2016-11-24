@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -35,6 +36,48 @@ module VimHelper
             return 400, errors if errors
         end
         return parse_json(response)
+  end
+
+  # Authetication_v2_anella
+  def authentication_v2_anella(keystoneUrl, tenant_name, user, password)
+    puts "authorizing"
+    auth = { auth: { tenantName: tenant_name, passwordCredentials: { username: user, password: password } } }
+    begin
+      response = RestClient.post keystoneUrl + '/tokens', auth.to_json, content_type: :json
+      #puts response
+    rescue => e
+      logger.error e
+      logger.error e.response.body
+      return 400, e
+    end
+    return parse_json(response)
+  end
+
+  # Authenticate method for Anella
+  def authenticate_anella(keystone_url, tenant_name, username, password)
+    puts "vim auth"
+    keystone_version = URI(keystone_url).path.split('/').last
+    if keystone_version == 'v2.0'
+      user_authentication, errors = authentication_v2_anella(keystone_url, tenant_name, username, password)
+      logger.error errors if errors
+      return 400, errors.to_json if errors
+      tenant_id = user_authentication['access']['token']['tenant']['id']
+      user_id = user_authentication['access']['user']['id']
+      token = user_authentication['access']['token']['id']
+    elsif keystone_version == 'v3'
+      user_authentication, errors = authentication_v3(keystone_url, tenant_name, username, password)
+      logger.error errors if errors
+      return 400, errors.to_json if errors
+      if !user_authentication['token']['project'].nil?
+        tenant_id = user_authentication['token']['project']['id']
+        user_id = user_authentication['token']['user']['id']
+        token = user_authentication['token']['id']
+      else
+        errors = "No project found with the authentication."
+        return 400, errors.to_json if errors
+      end
+    end
+    {:tenant_id => tenant_id, :user_id => user_id, :token => token}
   end
 
   def authentication_v3(pop_info, extrainfo)
