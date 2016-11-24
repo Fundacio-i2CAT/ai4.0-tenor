@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -30,6 +31,9 @@ class NsProvisioning < Sinatra::Application
     require_relative 'routes/init'
     require_relative 'helpers/init'
     require_relative 'models/init'
+    # Needed in order to request_auth_token for deep info retrieval ... needs refactoring
+    # require_relative '../vnf-provisioning/helpers/vnf'
+    require_relative '../ns-manager/helpers/vim'
 
     register Sinatra::ConfigFile
     # Load configurations
@@ -57,6 +61,10 @@ class NsProvisioning < Sinatra::Application
     helpers AuthenticationHelper
     helpers Authenticationv2Helper
     helpers Authenticationv3Helper
+    helpers VimHelper
 
+    # Needed in order to request_auth_token for deep info retrieval 
+    # ... needs refactoring
+    helpers VimHelper
     Mongoid.load!('config/mongoid.yml')
 end

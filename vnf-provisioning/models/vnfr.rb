@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -17,42 +18,42 @@
 #
 # Convert BSON ID to String
 module BSON
-	class ObjectId
-		def to_json(*args)
-			to_s.to_json
-		end
+    class ObjectId
+        def to_json(*args)
+            to_s.to_json
+        end
 
-		def as_json(*args)
-			to_s.as_json
-		end
-	end
+        def as_json(*args)
+            to_s.as_json
+        end
+    end
 end
 
 class Vnfr
-	include Mongoid::Document
-	include Mongoid::Timestamps
+    include Mongoid::Document
+    include Mongoid::Timestamps
 
-	field :deployment_flavour, type: String
-	field :nsr_instance, type: String
-	field :vnfd_reference, type: String
-	field :vim_id, type: String
-	field :vlr_instances, type: Array
-	field :port_instances, type: Array
-	field :vnf_addresses, type: Hash
-	field :vnf_status, type: String
-	field :notifications, type: Array
-	field :lifecycle_event_history, type: Array
-	field :audit_log, type: Array
-	field :stack_url, type: String
-	field :vms_id, type: Hash
-	field :vms, type: Array
-	field :scale_info, type:Hash
-	field :scale_resources, type: Array
-	field :outputs, type: Array
-	field :lifecycle_info, type: Hash
-	field :lifecycle_events_values, type: Hash
-	field :vdu, type: Array
-	field :security_group_id, type: String
-	field :public_network_id, type: String
-	field :resource_stats, type: Array
+    field :deployment_flavour, type: String
+    field :nsr_instance, type: String
+    field :vnfd_reference, type: String
+    field :vim_id, type: String
+    field :vlr_instances, type: Array
+    field :port_instances, type: Array
+    field :vnf_addresses, type: Hash
+    field :vnf_status, type: String
+    field :notifications, type: Array
+    field :lifecycle_event_history, type: Array
+    field :audit_log, type: Array
+    field :stack_url, type: String
+    field :vms_id, type: Hash
+    field :vms, type: Array
+    field :scale_info, type:Hash
+    field :scale_resources, type: Array
+    field :outputs, type: Array
+    field :lifecycle_info, type: Hash
+    field :lifecycle_events_values, type: Hash
+    field :vdu, type: Array
+    field :security_group_id, type: String
+    field :public_network_id, type: String
+    field :resource_stats, type: Array
 end
