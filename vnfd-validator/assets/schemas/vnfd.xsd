@@ -14,6 +14,7 @@
                   <xs:sequence>
                     <xs:element type="xs:byte" name="id"/>
                     <xs:element type="xs:string" name="vm_image"/>
+                    <xs:element type="xs:boolean" name="cached"/>
                     <xs:element type="xs:string" name="computation_requirement"/>
                     <xs:element name="virtual_memory_resource_element">
                       <xs:complexType>

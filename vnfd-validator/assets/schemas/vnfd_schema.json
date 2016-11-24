@@ -155,6 +155,10 @@
             "id": "http://www.t-nova.eu/vdu/1/vm_image",
             "type": "string"
           },
+          "cached": {
+            "id": "http://www.t-nova.eu/vdu/1/cached",
+            "type": "boolean"
+          },
           "wc_notify": {
             "id": "http://www.t-nova.eu/vdu/1/wc_notify",
             "type": "boolean"
