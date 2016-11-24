@@ -37,26 +37,27 @@ class Provisioner < NsProvisioning
     get '/:id' do
         begin
             # Retrieves deep info on VMs (IPs and States)
+            # def authenticate_anella(keystone_url, tenant_name, username, password)
             instance = Nsr.find(params['id'])
-            vim_info = {
-                'keystone' => instance['authentication'][0]['urls']['keystone'],
-                'tenant' => instance['authentication'][0]['tenant_name'],
-                'username' => instance['authentication'][0]['username'],
-                'password' => instance['authentication'][0]['password'],
-                'heat' => instance['authentication'][0]['urls']['orch'],
-                'compute' => instance['authentication'][0]['urls']['compute'],
-                'tenant_id' => instance['authentication'][0]['tenant_id']
+            pop_urls = instance['authentication'][0]['urls']
+            dc = {
+                'tenant_name' => instance['authentication'][0]['tenant_name'],
+                'user' => instance['authentication'][0]['username'],
+                'password' => instance['authentication'][0]['password']
             }
-            token_info = request_auth_token(vim_info)
-            puts token_info
-            auth_token = token_info[0]['access']['token']['id'].to_s
+            
+            admin_credentials, errors = authenticate_anella(pop_urls['keystone'], dc["tenant_name"], dc['user'], dc['password'])
+            puts admin_credentials
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+
             instance['vnfrs'].each do |vnf|
                 response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
                 response['vms'].each do |vm|
                     vnf['vnf_id'] = { 'openstack_id': vm['physical_resource_id'] }
                     url = 
-                        vim_info['compute']+'/'+
-                        vim_info['tenant_id']+
+                        pop_urls['compute']+'/'+
+                        tenant_id+
                         '/servers/'+vm['physical_resource_id']
                     begin
                         check = RestClient.get(url, headers = {'X-Auth-Token' => auth_token,'accept' => 'json'})
