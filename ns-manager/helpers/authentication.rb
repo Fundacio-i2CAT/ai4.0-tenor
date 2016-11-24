@@ -18,6 +18,7 @@
 # @see TnovaManager
 module AuthenticationHelper
 
+
 	# Register service in Gatekeeper
 	#
   # @param [String] serviceName

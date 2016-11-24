@@ -19,7 +19,7 @@
 # @see DcController
 
 class DcController < TnovaManager
-    require_relative '../../ns-provisioning/helpers/authentication'
+    #require_relative '../../ns-provisioning/helpers/authentication'
 
     # @method get_pops_dc
     # @overload get '/pops/dc/:id'
@@ -47,27 +47,17 @@ class DcController < TnovaManager
                 return 404
             end
             popUrls = getPopUrls(dc['extra_info'])
-            puts popUrls
-
-
-            #return dc.to_json
-            # instance = Nsr.find(params['id'])
-             vim_info = {
-                 'keystone' => popUrls["keystone"],
-                 'tenant' => popUrls["tenantname"],
-                 'username' => dc['user'],
-                 'password' => dc['password'],
-                 'compute' => popUrls["compute"],
-             }
-            #token_info = request_auth_token(vim_info)
-            #auth_token = token_info[0]['access']['token']['id'].to_s
-            #tenant_id = token_info[1]
-            admin_credentials, errors = authenticate(vim_info["keystone"], vim_info['tenant'], vim_info['username'], vim_info['password'])
-            compute_url = vim_info['compute']
+            compute_url = popUrls[:compute]
+            admin_credentials, errors = authenticate(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+	    puts admin_credentials
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+                                  #abort("Message goes here")
             begin
                 response = RestClient.get compute_url +"/#{tenant_id}/flavors", 'X-Auth-Token' => auth_token, :accept => :json
             rescue Errno::ECONNREFUSED
                 # halt 500, 'VIM unreachable'
+		logger.error "VIM unreachable"
             rescue RestClient::ResourceNotFound
                 logger.error 'Already removed from the VIM.'
                 return 404

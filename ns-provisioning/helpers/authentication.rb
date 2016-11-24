@@ -24,9 +24,14 @@ module AuthenticationHelper
       user_authentication, errors = authentication_v2(keystone_url, tenant_name, username, password)
       logger.error errors if errors
       return 400, errors.to_json if errors
+      puts "authentication done"
+      puts user_authentication
+      #user_auth = JSON.parse(user_authentication)
+      #puts user_auth['access']
       tenant_id = user_authentication['access']['token']['tenant']['id']
       user_id = user_authentication['access']['user']['id']
       token = user_authentication['access']['token']['id']
+      puts user_id
     elsif keystone_version == 'v3'
       user_authentication, errors = authentication_v3(keystone_url, tenant_name, username, password)
       logger.error errors if errors
