@@ -166,6 +166,12 @@ class Provisioner < NsProvisioning
             halt 404
         end
 
+        vim_info = {
+            'tenant_name' => @nsInstance['authentication'][0]['tenant_name'],
+            'user' => @nsInstance['authentication'][0]['username'],
+            'password' => @nsInstance['authentication'][0]['password'],
+            'pop_urls' => @nsInstance['authentication'][0]['urls']
+        }
         if params[:status] === 'terminate'
             logger.info 'Starting thread for removing VNF and NS instances.'
             @nsInstance.update_attribute('status', 'DELETING')
@@ -228,9 +234,10 @@ class Provisioner < NsProvisioning
         elsif params[:status] === 'start'
             @instance['vnfrs'].each do |vnf|
                 logger.info 'Starting VNF ' + vnf['vnfr_id'].to_s
-                event = { event: 'start' }
+                event = { event: 'start', vim_info: vim_info }
+                endpoint = '/config'
                 begin
-                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event.to_json, content_type: :json
+                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint, event.to_json, content_type: :json
                 rescue Errno::ECONNREFUSED
                     logger.error 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'
@@ -246,9 +253,10 @@ class Provisioner < NsProvisioning
         elsif params[:status] === 'stop'
             @instance['vnfrs'].each do |vnf|
                 logger.debug vnf
-                event = { event: 'stop' }
+                event = { event: 'stop', vim_info: vim_info }
+                endpoint = '/config'
                 begin
-                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + '/config', event.to_json, content_type: :json
+                    response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint, event.to_json, content_type: :json
                 rescue Errno::ECONNREFUSED
                     logger.error 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'
@@ -257,7 +265,7 @@ class Provisioner < NsProvisioning
                     halt e.response.code, e.response.body
                 end
             end
-
+            
             @instance['status'] = params['status'].to_s.upcase
             @nsInstance
         end

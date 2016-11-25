@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -32,6 +33,9 @@ class VnfProvisioning < Sinatra::Application
     require_relative 'routes/init'
     require_relative 'helpers/init'
     require_relative 'models/init'
+    # Needed in order to request_auth_token for deep info retrieval ... needs refactoring
+    # require_relative '../vnf-provisioning/helpers/vnf'
+    require_relative '../ns-manager/helpers/vim'
 
     helpers ProvisioningHelper
 
@@ -44,6 +48,9 @@ class VnfProvisioning < Sinatra::Application
 	helpers MapiHelper
 	helpers HotHelper
     helpers ComputeHelper
+    # Needed in order to request_auth_token for deep info retrieval 
+    # ... needs refactoring
+    helpers VimHelper
 
     configure do
         # Configure logging
