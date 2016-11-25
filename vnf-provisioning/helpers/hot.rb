@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -67,6 +68,10 @@ module HotHelper
 
     def delete_stack_with_wait(stack_url, auth_token)
         status = 'DELETING'
+        is_cached = Cachedimg.where(stack_url: stack_url)
+        puts 'DESTROYING CACHED RECORD'
+        puts is_cached
+        puts is_cached.destroy
         count = 0
         code = deleteStack(stack_url, auth_token)
         if code == 404

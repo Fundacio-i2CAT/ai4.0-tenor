@@ -69,6 +69,18 @@ class Provisioning < VnfProvisioning
 
         logger.debug 'Instantiation info: nsd_id -> ' + instantiation_info['ns_id'].to_s + ' Vnf_id -> ' + instantiation_info['vnf_id'].to_s + ' Flavour -> ' + vnf_flavour
 
+        if vnf['vnfd']['vdu'][0]['cached']
+            is_cached = Cachedimg.where(image_url: vnf['vnfd']['vdu'][0]['vm_image'])
+            ### In the query it lacks the vim's orchestrator URL preventing to take as cached
+            if is_cached.any?
+                puts "THE IMAGE IS ALREADY CACHED"
+                puts "OPENSTACK_ID"
+                puts is_cached[0]['openstack_id']
+                vnf['vnfd']['vdu'][0]['vm_image'] = is_cached[0]['openstack_id']
+                vnf['vnfd']['vdu'][0]['vm_image_format'] = 'openstack_id'
+            end
+        end
+
         # Verify if the VDU images are accessible to download
         logger.debug 'Verifying VDU images'
         verify_vdu_images(vnf['vnfd']['vdu'])
@@ -362,6 +374,24 @@ class Provisioning < VnfProvisioning
             resources, errors = getStackResources(vnfr.stack_url, auth_token)
             logger.error errors if errors
             resources.each do |resource|
+                if resource['resource_type'] == 'OS::Glance::Image'
+                    puts "HERE GOES THE STACK"
+                    puts stack_info['vim_info']['url']['orch']
+                    puts "HERE GOES THE IMAGE OPENSTACK_ID"
+                    puts resource['physical_resource_id']
+                    puts "DESCRIPTOR REFERENCE="
+                    puts vnfr['vnfd_reference']
+                    vnfd = JSON.parse(RestClient.get("http://localhost:4000/vnfs/#{vnfr['vnfd_reference']}", :accept => :json))
+                    puts "IMAGE VM"
+                    puts vnfd['vnfd']['vdu'][0]['vm_image']
+                    puts vnfd['vnfd']['vdu'][0]['cached']
+                    if vnfd['vnfd']['vdu'][0]['cached']
+                        Cachedimg.create!(stack_url: vnfr.stack_url,
+                                          openstack_id: resource['physical_resource_id'],
+                                          vim_url: stack_info['vim_info']['url']['orch'],
+                                          image_url: vnfd['vnfd']['vdu'][0]['vm_image'])
+                    end
+                end
                 # map ports to openstack_port_id
                 unless vnfr.port_instances.detect { |port| resource['resource_name'] == port['id'] }.nil?
                     vnfr.port_instances.find { |port| resource['resource_name'] == port['id'] }['physical_resource_id'] = resource['physical_resource_id']
