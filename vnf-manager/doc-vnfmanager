@@ -1,4 +1,4 @@
-Report on  VNF manager
+Report on VNF manager - Internal 
 
 Helpers
 	file:module.rb
@@ -24,7 +24,7 @@ Routes
 			Sends request for a new vnf to the catalogue service
 
 		put '/:external_vnf_id' 
-			Receives a json vnfd and updates the VNF descriptpr in the catalogue service
+			Receives a json vnfd and updates the VNF descriptor in the catalogue service
 
 		get '/' 
 			Gets all the vnfs from the catalogue service
@@ -82,7 +82,7 @@ Routes
 			Gets the information about VIM and the VNFD ID as parameters, loads the VNF from the catalogue and sends the a provisioning request to the provisioner. 
 
 		put '/vnf-instances/:vnfr_id/config'
-			Gets the VIM parameters and sends a post rwquest to the provisioner to execute a lifecycle event.
+			Gets the VIM parameters and sends a post request to the provisioner to execute a lifecycle event.
 
 	Module health: Appart from the last function the others just redirect to the other module functions
 
