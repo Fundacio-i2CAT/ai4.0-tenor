@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Provisioning
 #
@@ -299,7 +300,8 @@ module ProvisioningHelper
             logger.debug 'Verifying image: ' + vdu['vm_image'].to_s + ' from ' + vdu['id'].to_s
             next unless vdu['vm_image_format'] != 'openstack_id'
             begin
-                unless RestClient.head(vdu['vm_image']).code == 200
+                puts vdu['vm_image']
+                unless RestClient.head(vdu['vm_image'].to_s).code == 200
                     logger.error "Image #{vdu['vm_image']} from #{vdu['id']} not found."
                     halt 400, "Image #{vdu['vm_image']} from #{vdu['id']} not found."
                 end
