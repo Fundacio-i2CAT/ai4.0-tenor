@@ -136,10 +136,12 @@ class Provisioning < VnfProvisioning
             dns_server: instantiation_info['reserved_resources']['dns_server'],
             flavours: []
         }
+
         unless vim_info['is_admin']
             flavors = []
             vnf['vnfd']['vdu'].each do |vdu|
                 flavour_id, errors = get_vdu_flavour(vdu, vim_info['compute'], vim_info['tenant_id'], vim_info['token'])
+                flavour_id = instantiation_info['flavour']
                 logger.error errors if errors
                 if errors == 'Flavor not found.'
                     halt 400, 'No flavours available for the vdu ' + vdu['id'].to_s
