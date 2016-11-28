@@ -1,0 +1,98 @@
+Report on  VNF manager
+
+Helpers
+	file:module.rb
+	ServiceConfigurationHelper
+		def self.get_module(name)
+			Loads a tenor modulein order to access modile info like the host ip 
+	file:vnfs.rb
+	ManagerHelper
+		def is_port_open?(ip, port)
+	  	def parse_json(message)
+	  	def interfaces_list
+			Listing all the api end points
+
+Models
+	file:service.rb
+	class Service
+		Keeping all the info related to the network service
+
+Routes
+	file:catalogue.rb
+	class Catalogue < VNFManager     
+		post '/' 
+			Sends request for a new vnf to the catalogue service
+
+		put '/:external_vnf_id' 
+			Receives a json vnfd and updates the VNF descriptpr in the catalogue service
+
+		get '/' 
+			Gets all the vnfs from the catalogue service
+
+  		get '/:external_vnf_id' do |external_vnf_id|
+			Get a vnf by id from the catalogue
+
+  		delete '/:external_vnf_id' 
+			Deletes a vnf by id from the catalogue
+
+	Module Health: There are functions here that are just calling the catalogue, we have to check why we use them in this layer and not hit the catalogue directly
+
+
+
+	file:configs.rb
+	class ServiceConfiguration < VNFManager		
+		get '/services'
+			Get the services directly from the database of the module
+
+		get '/services/:id'
+			Get the service by id from the db
+
+		post '/services'
+			Register a sevice
+
+	Module Health: This module is very ok as it only interacts with the local DB
+
+
+	file:monitoring.rb
+	class Monitoring < VNFManager
+		post '/:vnfr_id/monitoring-parameters'
+			Sends monitoring parameters info to the monitoring service. Gets the VNF records from the provisioning and VNF Decriptors from the catalogue and sends them to the monitoring service.
+
+		post '/:vnfr_id/readings'
+			Posts monitoring data to monitoring module, There is an error on this function as the response from the provisioning module is not used and it directly forwards to the monitoring
+
+		get '/:vnfi_id/monitoring-data/'
+			Get the monitoring data for this id
+
+ 		delete '/:vnfr_id/monitoring-data'
+			Deletes the monitoring data
+
+	Module health: Since there is not any interaction with the database data some methods can be moved to monitoring as well. 
+
+
+	file: provisioning.rb
+	class Provisioning < VNFManager
+		get '/network-service/:ns_id'
+			Calls the VNF provisioner module to get all the VNFRs of a specific NS id
+
+		get '/vnf-instances' 
+			Calls the VNF provisioner module to get all the VNFRs
+
+		post '/vnf-instances' 
+			Gets the information about VIM and the VNFD ID as parameters, loads the VNF from the catalogue and sends the a provisioning request to the provisioner. 
+
+		put '/vnf-instances/:vnfr_id/config'
+			Gets the VIM parameters and sends a post rwquest to the provisioner to execute a lifecycle event.
+
+	Module health: Appart from the last function the others just redirect to the other module functions
+
+
+	file: scaling.rb
+	class Scaling < VNFManager
+		post '/:vnfr_id/scale_out'
+			Gets the VNF instance from the provisioner module and the VNF descriptor from the catalogue and sends the scaling request to the provisioner
+
+		post '/:vnfr_id/scale_in'
+			Same but for scale out
+
+	Module health: The functions are calling more than one modules but the code is repeated.
