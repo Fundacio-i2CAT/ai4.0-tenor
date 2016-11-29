@@ -50,8 +50,10 @@ class DcController < TnovaManager
             tenant_id = admin_credentials[:tenant_id]
             auth_token = admin_credentials[:token]
             #abort("Message goes here")
+            puts compute_url
+	    puts tenant_id
             begin
-                response = RestClient.get compute_url +"/#{tenant_id}/flavors", 'X-Auth-Token' => auth_token, :accept => :json
+                response = RestClient.get compute_url +"/#{tenant_id}/flavors/detail", 'X-Auth-Token' => auth_token, :accept => :json
             rescue Errno::ECONNREFUSED
                 # halt 500, 'VIM unreachable'
                 logger.error "VIM unreachable"
