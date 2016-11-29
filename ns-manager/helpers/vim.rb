@@ -53,6 +53,36 @@ module VimHelper
     return parse_json(response)
   end
 
+
+  # Authetication_v3_anella
+  def authentication_v3_anella(keystoneUrl, tenant_name, user, password)
+    auth = {
+      auth: {
+        identity: {
+          methods: ['password'],
+          password: {
+            user:{
+              name: user,
+              domain: { "name": tenant_name },
+              password: password
+            }
+          }
+        }
+      }
+    }
+    begin
+      response = RestClient.post keystoneUrl + 'auth/tokens', auth.to_json, content_type: :json
+      #puts response
+    rescue => e
+      logger.error e
+      logger.error e.response.body
+      return 400, e
+    end
+    return parse_json(response)
+  end
+
+
+
   # Authenticate method for Anella
   def authenticate_anella(keystone_url, tenant_name, username, password)
     puts "vim auth"
@@ -65,7 +95,7 @@ module VimHelper
       user_id = user_authentication['access']['user']['id']
       token = user_authentication['access']['token']['id']
     elsif keystone_version == 'v3'
-      user_authentication, errors = authentication_v3(keystone_url, tenant_name, username, password)
+      user_authentication, errors = authentication_v3_anella(keystone_url, tenant_name, username, password)
       logger.error errors if errors
       return 400, errors.to_json if errors
       if !user_authentication['token']['project'].nil?
