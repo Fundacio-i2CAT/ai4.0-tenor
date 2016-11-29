@@ -33,7 +33,7 @@ class DcController < TnovaManager
     end
 
     # @method get dc_flavours
-    # @overload get "/get_dc_flavours/:id"
+    # @overload get "/flavours/:id"
     # Get the flavours avaliable for the vim (ANELLA)
     get '/flavours/:id' do |id|
         begin
@@ -49,9 +49,6 @@ class DcController < TnovaManager
             puts admin_credentials
             tenant_id = admin_credentials[:tenant_id]
             auth_token = admin_credentials[:token]
-            #abort("Message goes here")
-            puts compute_url
-	    puts tenant_id
             begin
                 response = RestClient.get compute_url +"/#{tenant_id}/flavors/detail", 'X-Auth-Token' => auth_token, :accept => :json
             rescue Errno::ECONNREFUSED
