@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - HOT Generator
 #
@@ -51,7 +52,7 @@ class HotGenerator < Sinatra::Application
         halt 400, 'DNS server not found' if dns_server.nil?
 
         public_network_id = provision_info['public_network_id']
-        halt 400, 'Public Network ID not found' if public_network_id.nil?
+        # halt 400, 'Public Network ID not found' if public_network_id.nil?
 
         flavours = provision_info['flavours']
         # TODO: if flavour is not an array, return 400
@@ -85,7 +86,7 @@ class HotGenerator < Sinatra::Application
         halt 400, 'NSD not found' if nsd.nil?
 
         public_net_id = networkInfo['public_net_id']
-        halt 400, 'Public network ID not found' if public_net_id.nil?
+        # halt 400, 'Public network ID not found' if public_net_id.nil?
 
         dns_server = networkInfo['dns_server']
         halt 400, 'DNS server not found' if dns_server.nil?
@@ -141,7 +142,7 @@ class HotGenerator < Sinatra::Application
         halt 400, 'VDUs info not found' if vdus_deployed_info.nil?
 
         public_network_id = provision_info['public_network_id']
-        halt 400, 'Public Network ID not found' if public_network_id.nil?
+        # halt 400, 'Public Network ID not found' if public_network_id.nil?
 
         logger.debug 'Networks IDs: ' + networks_id.to_json
         logger.debug 'Security Group ID: ' + security_group_id.to_json

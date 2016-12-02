@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - HOT Generator
 #
@@ -75,25 +76,25 @@ module CommonMethods
 	# @param [String] flavour the T-NOVA flavour
 	# @return [Hash] the generated networks hot template
 	def self.generate_network_hot_template(nsd, public_net_id, dns_server, flavour, nsr_id)
-		hot = NsdToHot.new(nsd['id'], nsd['name'])
-
-    begin
-      hot.build(nsd, public_net_id, dns_server, flavour, nsr_id)
-    rescue CustomException::NoExtensionError => e
-      logger.error e.message
-      halt 400, e.message
-    rescue CustomException::InvalidExtensionError => e
-      logger.error e.message
-      halt 400, e.message
-    rescue CustomException::InvalidTemplateFileFormat => e
-      logger.error e.message
-      halt 400, e.message
-    rescue CustomException::NoFlavorError => e
-      logger.error e.message
-      halt 400, e.message
-    end
+            hot = NsdToHot.new(nsd['id'], nsd['name'])
+            
+            begin
+                hot.build(nsd, public_net_id, dns_server, flavour, nsr_id)
+            rescue CustomException::NoExtensionError => e
+                logger.error e.message
+                halt 400, e.message
+            rescue CustomException::InvalidExtensionError => e
+                logger.error e.message
+                halt 400, e.message
+            rescue CustomException::InvalidTemplateFileFormat => e
+                logger.error e.message
+                halt 400, e.message
+            rescue CustomException::NoFlavorError => e
+                logger.error e.message
+                halt 400, e.message
+            end
 	end
-
+        
 	# Generate a WICM HOT template
 	#
 	# @param [Hash] provider_info information about the provider networks

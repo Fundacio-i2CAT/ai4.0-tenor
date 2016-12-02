@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -307,8 +308,8 @@ module NsProvisioner
             popUrls = pop_auth['urls']
 
             publicNetworkId, errors = publicNetworkId(popUrls[:neutron], tenant_token)
+            publicNetworkId = nil
             return handleError(@instance, errors) if errors
-
             hot_generator_message = {
                 nsr_id: @instance['id'],
                 nsd: nsd,
@@ -321,7 +322,32 @@ module NsProvisioner
 
             logger.info 'Sending network template to HEAT Orchestration'
             stack_name = 'network_' + @instance['id'].to_s
+            
+            # hot = {
+            #     "heat_template_version"=>"2015-04-30", 
+            #     "description"=>"rEpO", 
+            #     "parameters"=>{}, 
+            #     "resources"=>{"1903_0"=>{"type"=>"OS::Neutron::Router", 
+            #             "properties"=>{
+            #                 # "external_gateway_info"=>{
+            #                 #     "external_fixed_ips": [{"ip_address": "87.236.219.22"}],
+            #                 #     "network"=>"71257860-3085-40bb-b009-5f12c688cdfb"
+            #                 # }, 
+            #                 "name"=>"Tenor_58414414df67b54f51000000"}}, 
+            #         "vld0"=>{"type"=>"OS::Neutron::Net", "properties"=>{"name"=>"management"}}, 
+            #         "1903_2"=>{"type"=>"OS::Neutron::Subnet", 
+            #             "properties"=>{"network_id"=>{"get_resource"=>"vld0"}, 
+            #                 "ip_version"=>4, "cidr"=>"192.30.0.0/24", 
+            #                 "dns_nameservers"=>["8.8.8.8"]}}, 
+            #         "1903_3"=>{
+            #             "type"=>"OS::Neutron::RouterInterface", 
+            #             "properties"=>{
+            #                 "router_id"=>{"get_resource"=>"1903_0"}, 
+            #                 "subnet_id"=>{"get_resource"=>"1903_2"}}}}, 
+            #     "outputs"=>{}}
             template = { stack_name: stack_name, template: hot }
+            puts
+            puts hot
             stack, errors = sendStack(popUrls[:orch], pop_auth['tenant_id'], template, tenant_token)
             return handleError(@instance, errors) if errors
 
