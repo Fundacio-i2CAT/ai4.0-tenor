@@ -70,7 +70,11 @@ class Provisioning < VnfProvisioning
         logger.debug 'Instantiation info: nsd_id -> ' + instantiation_info['ns_id'].to_s + ' Vnf_id -> ' + instantiation_info['vnf_id'].to_s + ' Flavour -> ' + vnf_flavour
 
         if vnf['vnfd']['vdu'][0]['cached']
-            is_cached = Cachedimg.where(image_url: vnf['vnfd']['vdu'][0]['vm_image'])
+            vim_info = instantiation_info['auth']
+            is_cached = Cachedimg.where(image_url: vnf['vnfd']['vdu'][0]['vm_image'],
+                                        vim_url: vim_info['url']['heat'])
+            puts vim_info['url']['heat']
+            puts vnf['vnfd']['vdu'][0]['vm_image']
             ### In the query it lacks the vim's orchestrator URL preventing to take as cached
             if is_cached.any?
                 puts "THE IMAGE IS ALREADY CACHED"
