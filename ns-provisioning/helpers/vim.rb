@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -55,6 +56,7 @@ module VimHelper
             network = networks['networks'].find { |role| role['router:external'] }
         end
         return 400, 'No external network defined in Openstack.' if network.nil?
+        # network['id'] = '71257860-3085-40bb-b009-5f12c688cdfb'
         network['id']
     end
 
