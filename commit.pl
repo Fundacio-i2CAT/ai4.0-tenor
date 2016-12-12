@@ -7,6 +7,7 @@ my $name = shift @ARGV || die "\nLack of commit name\n\n";
 map { $name .= " $_"; } @ARGV;
 
 my @files = ( "commit.pl",
+	      "invoker.ini",
  	      "vnfd-validator/assets/schemas/*",
 	      "ns-manager/helpers/*.rb",
 	      "ns-manager/routes/*.rb",

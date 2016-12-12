@@ -119,7 +119,7 @@ class Provisioner < NsProvisioning
             lifecycle_event_history: ['INIT'],
             audit_log: [],
             marketplace_callback: instantiation_info['callback_url'],
-            authentication: [],
+            authentication: []
         }
 
         @instance = Nsr.new(instance)
