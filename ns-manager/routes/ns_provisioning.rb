@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -83,7 +84,8 @@ class NsProvisioner < TnovaManager
         :flavour => instantiation_info['flavour'],
         :pop_list => pop_list,
         :mapping => mapping_info,
-        :infr_repo_url => infr_repo_url
+        :infr_repo_url => infr_repo_url,
+        :public_network_id => instantiation_info['public_network_id']
       }
     begin
       response = RestClient.post provisioner.host + request.fullpath, provisioning.to_json, 'X-Auth-Token' => provisioner.token, :content_type => :json

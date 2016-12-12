@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -307,6 +308,11 @@ module NsProvisioner
             popUrls = pop_auth['urls']
 
             publicNetworkId, errors = publicNetworkId(popUrls[:neutron], tenant_token)
+            if !instantiation_info['public_network_id'].nil?
+                errors = nil
+                publicNetworkId = instantiation_info['public_network_id']
+            end
+
             return handleError(@instance, errors) if errors
 
             hot_generator_message = {

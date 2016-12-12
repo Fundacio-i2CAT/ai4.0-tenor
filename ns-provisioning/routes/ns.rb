@@ -103,6 +103,7 @@ class Provisioner < NsProvisioning
             connection_points: nsd['connection_points'],
             monitoring_parameters: nsd['monitoring_parameters'],
             service_deployment_flavour: instantiation_info['flavour'],
+            public_network_id: instantiation_info['public_network_id'],
             vendor: nsd['vendor'],
             version: nsd['version'],
             # vlr
@@ -118,7 +119,7 @@ class Provisioner < NsProvisioning
             lifecycle_event_history: ['INIT'],
             audit_log: [],
             marketplace_callback: instantiation_info['callback_url'],
-            authentication: []
+            authentication: [],
         }
 
         @instance = Nsr.new(instance)
