@@ -14,6 +14,8 @@ from tenor_client.tenor_pop import TenorPoP
 from pymongo import MongoClient
 import ConfigParser
 import datetime
+import requests
+from tenor_client.callback import Callback
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -339,14 +341,15 @@ class Log(flask_restful.Resource):
         # print json.dumps(data, indent=4, sort_keys=True)
         # print "#############################"
         if 'descriptor_reference' in data:
+            callback = Callback(data)
             ns_instance_id = data['id']
             nsi = TenorNSI(ns_instance_id)
             nsi.configure()
+            callback = Callback()
 
     def get(self):
         """Log get"""
-        data = request.get_json()
-        return data
+        return 200
 
 class Enotification(flask_restful.Resource):
     """TeNOR error management"""
