@@ -7,4 +7,5 @@ tmp
 **/puma.pid
 **/puma.state
 fluentd
-
+*.pyc
+venv

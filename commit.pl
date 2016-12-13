@@ -7,6 +7,7 @@ my $name = shift @ARGV || die "\nLack of commit name\n\n";
 map { $name .= " $_"; } @ARGV;
 
 my @files = (
+	     ".gitignore",
 	     "Gemfile",
 	     "./anella/Vagrantfile",
 	     "./anella/dcs.json",
