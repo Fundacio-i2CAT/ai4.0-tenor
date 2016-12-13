@@ -6,5 +6,4 @@ tmp
 .vagrant
 **/puma.pid
 **/puma.state
-fluentd
 
