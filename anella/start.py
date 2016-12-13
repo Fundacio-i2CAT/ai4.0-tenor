@@ -348,7 +348,21 @@ class Log(flask_restful.Resource):
         data = request.get_json()
         return data
 
+class Enotification(flask_restful.Resource):
+    """TeNOR error management"""
+    def __init__(self):
+        pass
+
+    def post(self):
+        """Log post"""
+        data1 = request.get_json()
+        data2 = request.data
+        print "ERROR =>"
+	print data1
+	print data2
+
 API_V2.add_resource(Log, '/log')
+API_V2.add_resource(Enotification, '/enotification')
 API_V2.add_resource(ServiceInstance,
                     '/service/instance',
                     '/service/instance/<ns_id>',
