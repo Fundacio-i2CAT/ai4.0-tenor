@@ -18,4 +18,5 @@ class Callback(object):
         resp = requests.post(callback_url,
                              headers={'Content-Type': 'application/json'},
                              json=data)
+        print data['id']
         print resp

@@ -345,7 +345,7 @@ class Log(flask_restful.Resource):
             ns_instance_id = data['id']
             nsi = TenorNSI(ns_instance_id)
             nsi.configure()
-            callback = Callback()
+            callback = Callback(data)
 
     def get(self):
         """Log get"""
