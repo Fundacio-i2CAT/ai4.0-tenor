@@ -6,11 +6,13 @@
 		"desc" : "sssssss"
             }
 	],
-	"name_image" : "Miercoles",
+	"pop_id": 21,
+	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
+	"name_image" : "Stack por HTTP",
 	"vm_image_format" : "QCOW2",
 	"tenor_url" : "http://localhost:4000",
-	"vm_image" : "http://10.8.0.10/omupi40b.img",
-	"flavor" : "m1.medium",
+	"vm_image" : "http://dev.anella.i2cat.net/omupi40b.img",
+	"flavor" : "VM.M1",
 	"consumer_params" : [
             {
 		"path" : "/var/www/html/index.html",

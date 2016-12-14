@@ -11,6 +11,7 @@ my @files = (
 	     "Gemfile",
 	     "./anella/Vagrantfile",
 	     "./anella/dcs.json",
+	     "./anella/aux/templates/own.html",
 	     "./anella/aux/wsockets/static/index.html",
 	     "./anella/aux/wsockets/static/scripts.js",
 	     "./anella/aux/wsockets/ioServer.py",

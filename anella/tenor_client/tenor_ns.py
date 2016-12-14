@@ -104,7 +104,7 @@ class TenorNS(object):
                     flavour=DEFAULT_FLAVOUR):
         """Instantiates the NS on openstack"""
         ns_data = {'ns_id': self._dummy_id, 'pop_id': pop_id,
-                   'callbackUrl': callback_url, 'flavour': flavour, 
+                   'callbackUrl': callback_url, 'flavour': flavour,
                    'public_network_id': public_network_id}
         print ns_data
         try:

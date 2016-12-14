@@ -1,28 +1,66 @@
-// var socket = io.connect('http://localhost:9999', { 'forceNew': true });
 
 // socket.on('news', function (data) {
 //     socket.emit('my other event', { my: 'data' });
 // });
 
-var orchestrator_url = "http://localhost:8082/orchestrator/api/v0.1/service/instance";
+var catalog_url = "http://localhost:5000/launch";
+
+$("#name_image").focus();
+alert(document.domain+":"+location.port);
+
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+socket.on('connect', function () {
+    alert(this.socket.sessionid);
+});
+
+// socket.on('echo', function(data){
+//     $('#progress').html('<p>'+data.echo+'</p>');
+// });
+function send(){
+    socket.emit('send_message', {message : $('#name').val()});
+}
 
 function do_the_things(e) {
+    send();
+    instantiation_request['context']['consumer_params'][0]['fields'] =
+	[
+            {
+		"required" : true,
+		"name" : "name",
+		"desc" : "Name of the consumer",
+		"value" : $("#name").val()
+            },
+            {
+		"required" : true,
+		"name" : "picture",
+		"desc" : "Consumer server Picture",
+		"value" : $("#picture").val()
+            },
+            {
+		"required" : true,
+			"name" : "cv",
+		"desc" : "CV del consumer",
+		"value" : $("#cv").val()
+            }
+	];
+ 
     $.ajax({
-	url: orchestrator_url,
+	url: catalog_url,
 	type: "POST",
 	data: JSON.stringify(instantiation_request),
 	dataType: "json",
 	contentType: "application/json; charset=utf-8",
 	success: function(){
-	    alert("SUCCESS");
+	    $("#progress").html("SUCCESS");
 	},
 	error: function(){
-	    alert("ERROR");
+	    $("#progress").html("ERROR");
 	}});
 }
 
 var launch = $('#launch');
 launch.on("click", do_the_things);
+
 
 var instantiation_request = {
     "context" : {
@@ -34,10 +72,10 @@ var instantiation_request = {
 	],
 	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
 	"pop_id": 21,
-	"name_image" : "Miercoles",
-	"vm_image_format" : "QCOW2",
+	"name_image" : "sOcKeTs",
+	"vm_image_format" : "openstack_id",
 	"tenor_url" : "http://localhost:4000",
-	"vm_image" : "http://10.8.0.10/omupi40b.img",
+	"vm_image" : "5d4fdb85-3e7a-4e92-be67-72214a61275d",
 	"flavor" : "VM.M1",
 	"consumer_params" : [
             {
