@@ -392,4 +392,4 @@ if __name__ == "__main__":
         API_V2_BP,
         url_prefix=URL_PREFIX
     )
-    APP.run(debug=False, host=HOST, port=PORT)
+    APP.run(debug=False, host=HOST, port=PORT, threaded=True)
