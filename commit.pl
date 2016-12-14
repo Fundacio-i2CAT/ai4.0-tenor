@@ -14,6 +14,7 @@ my @files = (
 	     "./anella/aux/wsockets/static/index.html",
 	     "./anella/aux/wsockets/static/scripts.js",
 	     "./anella/aux/wsockets/ioServer.py",
+	     "./anella/aux/wsockets/requirements.txt",
 	     "./anella/aux/chunkUploader/repoServer.py",
 	     "./anella/aux/chunkUploader/send.pl",
 	     "./anella/aux/chunkUploader/requirements.txt",
