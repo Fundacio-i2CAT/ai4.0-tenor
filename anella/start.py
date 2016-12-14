@@ -341,11 +341,13 @@ class Log(flask_restful.Resource):
         # print json.dumps(data, indent=4, sort_keys=True)
         # print "#############################"
         if 'descriptor_reference' in data:
-            callback = Callback(data)
             ns_instance_id = data['id']
             nsi = TenorNSI(ns_instance_id)
             nsi.configure()
-            callback = Callback(data)
+            try:
+                callback = Callback(data)
+            except:
+                pass
 
     def get(self):
         """Log get"""
