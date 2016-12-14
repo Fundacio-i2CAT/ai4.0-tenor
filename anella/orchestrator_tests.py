@@ -17,10 +17,10 @@ POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
-    "name": "omupi",
+    "name": "omupi40B",
     "vdu":
     {
-        "vm_image": "52f07518-3b32-4dfa-b067-2b0f53ceb0e1",
+        "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
         "vm_image_format": "OpenstacK_id",
         "shell": "#!/bin/bash\\necho 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCTyrMs/iliz2PPAGACyGWwC7OqoIDgoStpiiXcJIAElaLiiAhlOdhCJP6okE2WzkuMf4XD80fVm/yikrjSRTVwph981KEEcAH+mRWThkoItaPqDLPh79AJfT1Ud48FQbG8MZu91X+E4ecnYQH/1bPRxiumWQLNrHmIhY8aIKv/xPCF8zZBYjG6BK/g2L22h4Ky6VI07uyzHyIk78OxUZTpQcb+jnFpJlVOZreRLc8RE6pDF17h4ZhrEmv0tvdWiubk46cbEUwOvGq9wWxFKReEQubC+7/2WNcQnkAylDxzbR9pF/RlomuwcBWSycQ8RVpmr8T1cydaBpi9cbBB2DOn alfonso@knightmare' >> /root/.ssh/authorized_keys",
         "storage_amount": 6,
@@ -37,9 +37,9 @@ CATALOG_EXAMPLE = {
 		"desc" : "sssssss"
             }
 	],
-	"name_image" : "OMPUPI40",
+	"name_image" : "OMPUPI40B",
 	"tenor_url" : "http://localhost:4000",
-        "vm_image": "52f07518-3b32-4dfa-b067-2b0f53ceb0e1",
+        "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
         "vm_image_format": "openstack_id",
 	"flavor" : "m1.medium",
 	"consumer_params" : [
@@ -56,7 +56,7 @@ CATALOG_EXAMPLE = {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Foto del consumer",
-			"value" : "https://upload.wikimedia.org/wikipedia/commons/c/ce/Documents_stacks_in_a_repository_at_The_National_Archives.jpg"
+			"value" : "http://lorempixel.com/400/200/"
                     },
                     {
 			"required" : True,
@@ -103,7 +103,7 @@ ADAM_EXAMPLE = {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Consumer server Picture",
-			"value" : "http://vignette2.wikia.nocookie.net/creepypasta/images/2/27/Finn-El-Humano-Cuerpo-Entero-psd84986.png/revision/latest?cb=20130822044826&path-prefix=es"
+			"value" : "http://lorempixel.com/400/200/"
                     },
                     {
 			"required" : True,

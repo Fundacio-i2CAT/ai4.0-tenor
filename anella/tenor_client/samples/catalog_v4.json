@@ -27,7 +27,7 @@
 			"required" : true,
 			"name" : "picture",
 			"desc" : "Consumer server Picture",
-			"value" : "http://vignette2.wikia.nocookie.net/creepypasta/images/2/27/Finn-El-Humano-Cuerpo-Entero-psd84986.png/revision/latest?cb=20130822044826&path-prefix=es"
+			"value" : "http://lorempixel.com/400/200/"
                     },
                     {
 			"required" : true,
