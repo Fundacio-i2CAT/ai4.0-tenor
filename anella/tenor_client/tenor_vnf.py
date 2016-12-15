@@ -53,8 +53,9 @@ class TenorVNF(object):
         except:
             raise ValueError('Decoding last_vnf_id json resp failed')
         ids = sorted([x['vnfd']['id'] for x in vnfs])
+        print ids
         if len(ids) == 0:
-            return TenorDummyId(1898)
+            return TenorDummyId(1899)
         return TenorDummyId(ids[-1])
 
     def get_from_catalogue(self, vnf_id):
@@ -93,7 +94,7 @@ class TenorVNF(object):
 
     def register(self, name, bootstrap_script=None):
         """Registers a VNF in TeNOR"""
-        self._dummy_id = self.get_last_vnf_id()+1
+        self._dummy_id = self.get_last_vnf_id()+3
         if not bootstrap_script:
             bootstrap_script = self._vdu.shell
         try:
@@ -151,5 +152,5 @@ if __name__ == "__main__":
     VNF.register("Prueba3")
     VNF = TenorVNF(1899)
     print VNF.get_dummy_id()
-    print VNF
     print VNF.get_vnf_ids()
+    print VNF.get_last_vnf_id()
