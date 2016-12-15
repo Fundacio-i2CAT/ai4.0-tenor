@@ -94,7 +94,7 @@ class TenorVNF(object):
 
     def register(self, name, bootstrap_script=None):
         """Registers a VNF in TeNOR"""
-        self._dummy_id = self.get_last_vnf_id()+3
+        self._dummy_id = self.get_last_vnf_id()+1
         if not bootstrap_script:
             bootstrap_script = self._vdu.shell
         try:
