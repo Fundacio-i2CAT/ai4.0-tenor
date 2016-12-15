@@ -56,7 +56,7 @@ CATALOG_EXAMPLE = {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Foto del consumer",
-			"value" : "http://lorempixel.com/400/200/"
+			"value" : "http://www.gstatic.com/tv/thumb/tvbanners/10810505/p10810505_b_v8_aa.jpg"
                     },
                     {
 			"required" : True,
@@ -103,7 +103,7 @@ ADAM_EXAMPLE = {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Consumer server Picture",
-			"value" : "http://lorempixel.com/400/200/"
+			"value" : "https://dimoniko.files.wordpress.com/2011/01/hora-de-aventura.jpg"
                     },
                     {
 			"required" : True,
