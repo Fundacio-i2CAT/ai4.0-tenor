@@ -152,6 +152,14 @@ class TenorNSI(object):
                                            'value': ipif['addr']})
                 addresses.append({'OS-EXT-IPS:type': ipif['OS-EXT-IPS:type'],
                                   'addr': ipif['addr']})
+        
+        client = MongoClient()
+        log_db = client.orchestrator_logs
+        errors = log_db.errors
+        failed = errors.find_one({'service_instance_id': self._nsi_id})
+        client.close()
+        if failed:
+            self._state = "FAILED"
         if self._image_id:
             return {'service_instance_id': self._nsi_id,
                     'state': self._state,

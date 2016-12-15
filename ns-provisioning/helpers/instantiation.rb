@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -163,6 +164,7 @@ module InstantiationHelper
                 end
             end
             logger.error 'Handle error.'
+            generateMarketplaceResponse(@instance['notification'], { status: 'error', service_instance_id: @instance['id'] })
             return 400, 'Error with the VNF: ' + e.response
         end
 

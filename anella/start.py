@@ -337,9 +337,17 @@ class Log(flask_restful.Resource):
     def post(self):
         """Log post"""
         data = request.get_json()
-        # print "#############################"
-        # print json.dumps(data, indent=4, sort_keys=True)
-        # print "#############################"
+        if 'status' in data:
+            if data['status'] == 'error':
+                log_db_client = MongoClient()
+                log_db = log_db_client.orchestrator_logs
+                errors = log_db.errors
+                errors.insert_one({'method': 'POST',
+                                   'service_instance_id': data['service_instance_id'],
+                                   'date': datetime.datetime.utcnow()})
+                log_db_client.close()
+                print "ERROR {0}".format(data['service_instance_id'])
+
         if 'descriptor_reference' in data:
             ns_instance_id = data['id']
             nsi = TenorNSI(ns_instance_id)
