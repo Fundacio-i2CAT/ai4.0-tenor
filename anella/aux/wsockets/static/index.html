@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Websockets</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://cdn.socket.io/socket.io-1.4.5.js"></script>
+  </head>
+  <body>
+    <center>
+      <br/>
+      <br/>
+      <h1>WEBSOCKETS</h1>
+      <br/>
+      <br/>
+      <form name="upload_form" id="upload_form">
+	<input name="name_image" id="name_image" style="width:200px;" type="text" class="form-control" placeholder="Image name ..." required></input>
+	<br/>
+	<input name="name" id="name" style="width:200px;" type="text" class="form-control" placeholder="Name" required></input>
+	<br/>
+	<input name="picture" id="picture" style="width:200px;" type="text" class="form-control" placeholder="Picture url" required></input>
+	<br/>
+	<input name="cv" id="cv" style="width:200px;" type="text" class="form-control" placeholder="Cv" required></input>
+	<br/>
+      	<input name="launch" id="launch" style="width:200px;" type="submit" class="submit"></input>
+      </form>
+      <br/>
+      <p name="init" id="init"></p>
+      <p name="progress" id="progress"></p>
+      <p name="end" id="end"></p>
+      <p name="md5" id="md5"></p>
+      <p name="upload" id="upload"></p>
+
+      <!-- <script src="./scripts.js"></script> -->
+
+    </center>
+  </body>
+</html>

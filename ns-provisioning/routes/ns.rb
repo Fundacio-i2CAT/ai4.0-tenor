@@ -103,6 +103,7 @@ class Provisioner < NsProvisioning
             connection_points: nsd['connection_points'],
             monitoring_parameters: nsd['monitoring_parameters'],
             service_deployment_flavour: instantiation_info['flavour'],
+            public_network_id: instantiation_info['public_network_id'],
             vendor: nsd['vendor'],
             version: nsd['version'],
             # vlr

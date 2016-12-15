@@ -107,7 +107,7 @@ module VimHelper
       user_authentication, headers, errors = authentication_v3_anella(keystone_url, tenant_name, username, password)
       logger.error errors if errors
       return 400, errors.to_json if errors
-      user_authentication = parse_json(user_authentication)[0]
+      user_authentication = JSON.parse(user_authentication.body)
       project = user_authentication['token']['project']
       if !project.nil?
         puts "parsing v3 res"

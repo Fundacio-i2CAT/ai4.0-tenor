@@ -1,0 +1,49 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Flask-SocketIO Test</title>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      $(document).ready(function() {
+      var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+      alert("LKAJSD");
+      // Event handler for new connections.
+      // The callback function is invoked when a connection with the
+      // server is established.
+      socket.on('connect', function() {
+      socket.emit('my_event', {data: 'I\'m connected!'});
+      });
+      });
+    </script>
+  </head>
+  <body>
+    <center>
+      <br/>
+      <br/>
+      <h1>WEBSOCKETS</h1>
+      <br/>
+      <br/>
+      <form name="upload_form" id="upload_form">
+	<input name="name_image" id="name_image" style="width:200px;" type="text" class="form-control" placeholder="Image name ..." required></input>
+	<br/>
+	<input name="name" id="name" style="width:200px;" type="text" class="form-control" placeholder="Name" required></input>
+	<br/>
+	<input name="picture" id="picture" style="width:200px;" type="text" class="form-control" placeholder="Picture url" required></input>
+	<br/>
+	<input name="cv" id="cv" style="width:200px;" type="text" class="form-control" placeholder="Cv" required></input>
+	<br/>
+      	<input name="launch" id="launch" style="width:200px;" type="submit" class="submit"></input>
+      </form>
+      <br/>
+      <p name="init" id="init"></p>
+      <p name="progress" id="progress"></p>
+      <p name="end" id="end"></p>
+      <p name="md5" id="md5"></p>
+      <p name="upload" id="upload"></p>
+
+      <!-- <script src="./scripts.js"></script> -->
+
+    </center>
+  </body>
+</html>

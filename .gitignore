@@ -6,4 +6,10 @@ tmp
 .vagrant
 **/puma.pid
 **/puma.state
+<<<<<<< HEAD
 
+=======
+fluentd
+*.pyc
+venv
+>>>>>>> master
