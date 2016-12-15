@@ -14,7 +14,7 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 
-BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
+BASE_URL = 'http://dev.anella.i2cat.net:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
     "name": "omupi40B",
@@ -37,7 +37,7 @@ CATALOG_EXAMPLE = {
 		"desc" : "sssssss"
             }
 	],
-	"name_image" : "OMPUPI40B",
+	"name_image" : "OMUPI40B",
 	"tenor_url" : "http://localhost:4000",
         "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
         "vm_image_format": "openstack_id",
