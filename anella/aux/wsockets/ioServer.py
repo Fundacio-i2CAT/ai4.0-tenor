@@ -35,13 +35,12 @@ def send_js(path):
 
 @SOCKETIO.on('connected')
 def connected():
-    print "%s connected" % (request.namespace)
+    print "{0} connected".format(request.sid)
     CLIENTS.append(request.namespace)
 
 @SOCKETIO.on('disconnect')
 def disconnect():
-    print request
-    print "%s disconnected" % (request.namespace)
+    print "{0} disconnected".format(request.sid)
     CLIENTS.remove(request.namespace)
 
 @SOCKETIO.on('my_event')
