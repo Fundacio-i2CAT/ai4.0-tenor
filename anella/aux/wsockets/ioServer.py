@@ -43,7 +43,7 @@ def disconnect():
     print "{0} disconnected".format(request.sid)
     CLIENTS.remove(request.namespace)
 
-@SOCKETIO.on('my_event')
+@SOCKETIO.on('launch')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     print "MY_EVENT"
@@ -55,4 +55,3 @@ def test_message(message):
 if __name__ == "__main__":
     print "IO server"
     SOCKETIO.run(APP, debug=True)
-

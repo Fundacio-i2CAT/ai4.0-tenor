@@ -121,7 +121,6 @@ ADAM_EXAMPLE = {
     }
 }
 
-
 class OrchestratorTestCase(unittest.TestCase):
     """Full test"""
 
