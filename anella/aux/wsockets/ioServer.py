@@ -23,6 +23,8 @@ SOCKETIO = SocketIO(APP, async_mode=None)
 
 ORCHESTRATOR_URL = 'http://localhost:8082/orchestrator/api/v0.1/service/instance'
 
+CLIENTS = []
+
 @APP.route('/')
 def index():
     return render_template('own.html', async_mode=SOCKETIO.async_mode)
@@ -31,9 +33,22 @@ def index():
 def send_js(path):
     return send_from_directory('static', path)
 
+@SOCKETIO.on('connected')
+def connected():
+    print "%s connected" % (request.namespace)
+    CLIENTS.append(request.namespace)
+
+@SOCKETIO.on('disconnect')
+def disconnect():
+    print request
+    print "%s disconnected" % (request.namespace)
+    CLIENTS.remove(request.namespace)
+
 @SOCKETIO.on('my_event')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
+    print "MY_EVENT"
+    print request.sid
     print message['data']
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']})
