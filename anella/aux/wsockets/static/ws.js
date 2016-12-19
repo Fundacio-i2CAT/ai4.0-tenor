@@ -5,9 +5,8 @@ $(document).ready(function() {
 	socket.emit('connected');
     });
     
-    socket.on('running', function() {
-	alert('HOLA');
-	$('#init').html('<h1>INSTANCE RUNNING</h1>');
+    socket.on('running', function(message) {
+	$('#init').html('<h1>INSTANCE '+message['msg']+' RUNNING</h1>');
     });
 
     var launch = $('#launch');
@@ -34,6 +33,7 @@ $(document).ready(function() {
 		     'picture': $("#picture").val(),
 		     'cv': $("#cv").val()
 		   };
+	$('#init').html('<img src="https://stanfy.com/wp-content/uploads/2015/09/1-V3h-VWthi5lL0QySF6qZPw.gif"/>');
 	socket.emit("launch", {"data": data});
     });
     socket.on('my_response', function(message) {
