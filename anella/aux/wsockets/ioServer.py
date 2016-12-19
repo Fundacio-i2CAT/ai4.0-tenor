@@ -92,6 +92,7 @@ def test_08(name_image, name, picture, cv):
     resp = requests.post(url, headers={'Content-Type': 'application/json'},
                          json=aexample)
     response = json.loads(resp.text)
+    print response
     print response['service_instance_id']
     return response['service_instance_id']
 
@@ -143,6 +144,7 @@ def test_message(message):
     client_ids.insert_one({'service_instance_id': service_instance_id,
                            'client_sid': request.sid})
     client.close()
+
 
 
 if __name__ == "__main__":
