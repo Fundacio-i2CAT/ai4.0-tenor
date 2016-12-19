@@ -153,10 +153,10 @@ class OrchestratorTestCase(unittest.TestCase):
                                 json={'state': nxt})
             assert resp.status_code == expected
 
-    def test_03(self):
-        """Testing start/stop"""
-        self.start_stop('RUNNING', 'DEPLOYED', 200)
-        self.start_stop('DEPLOYED', 'RUNNING', 200)
+    # def test_03(self):
+    #     """Testing start/stop"""
+    #     self.start_stop('RUNNING', 'DEPLOYED', 200)
+    #     self.start_stop('DEPLOYED', 'RUNNING', 200)
 
     def post_vnf(self, preserve=False):
         """Posts a new VNF"""

@@ -5,6 +5,11 @@ $(document).ready(function() {
 	socket.emit('connected');
     });
     
+    socket.on('running', function() {
+	alert('HOLA');
+	$('#init').html('<h1>INSTANCE RUNNING</h1>');
+    });
+
     var launch = $('#launch');
     launch.on("click",function(event) {
 	if ($('#name_image').val() === '') {
@@ -24,9 +29,13 @@ $(document).ready(function() {
 	    return;
 	}
 	$('#init').html('');
-	socket.emit("launch", {data: $("#name_image").val()});
+	var data = { 'name_image': $("#name_image").val(),
+		     'name': $("#name").val(),
+		     'picture': $("#picture").val(),
+		     'cv': $("#cv").val()
+		   };
+	socket.emit("launch", {"data": data});
     });
-    
     socket.on('my_response', function(message) {
 	$('#init').html(message['data']);
     });
