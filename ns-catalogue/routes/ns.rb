@@ -21,7 +21,7 @@ class Catalogue < NsCatalogue
     # Returns a list of NSs
     get '/' do
         params[:offset] ||= 1
-        params[:limit] ||= 3000
+        params[:limit] ||= Ns.count()+1
 
         # Only accept positive numbers
         params[:offset] = 1 if params[:offset].to_i < 1
