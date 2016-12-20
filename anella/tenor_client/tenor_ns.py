@@ -78,19 +78,20 @@ class TenorNS(object):
                 templ = Template(fhandle.read())
         except:
             raise IOError('Template {0} IOError'.format(self._template))
-        self._nsd = templ.render(ns_id=self._dummy_id,
-                                 vnf_id=self._vnf.get_dummy_id(),
-                                 flavor=self._vnf.get_vdu().flavor,
-                                 name=name)
-        try:
-            resp = requests.post('{0}/network-services'.format(self._tenor_url),
-                                 headers={'Content-Type': 'application/json'},
-                                 json=json.loads(self._nsd))
-            return resp
-        except IOError:
-            raise IOError('{0} instance unreachable'.format(self._tenor_url))
-        except ValueError:
-            raise ValueError('Json encoding error registering NSD')
+        resp = None
+        while (resp == None) or (not resp.status_code in (200,201)):
+            self._nsd = templ.render(ns_id=self._dummy_id,
+                                     vnf_id=self._vnf.get_dummy_id(),
+                                     flavor=self._vnf.get_vdu().flavor,
+                                     name=name)
+            try:
+                resp = requests.post('{0}/network-services'.format(self._tenor_url),
+                                     headers={'Content-Type': 'application/json'},
+                                     json=json.loads(self._nsd))
+                if resp.status_code == 409:
+                    self._dummy_id = str(int(self._dummy_id)+1)
+            except IOError:
+                raise IOError('{0} instance unreachable'.format(self._tenor_url))
         try:
             json.loads(resp.text)
         except:
