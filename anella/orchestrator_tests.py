@@ -14,7 +14,7 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 
-BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
+BASE_URL = 'http://dev.anella.i2cat.net:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
     "name": "omupi40B",
@@ -138,7 +138,7 @@ class OrchestratorTestCase(unittest.TestCase):
         if len(instances) > 0:
             assert 'service_instance_id' in instances[0]
             for ins in instances:
-                assert ins['state'].upper() in ('RUNNING', 'DEPLOYED', 'UNKNOWN')
+                assert ins['state'].upper() in ('RUNNING', 'DEPLOYED', 'UNKNOWN', 'FAILED')
         return instances
 
     def start_stop(self, prv, nxt, expected):
