@@ -9,6 +9,8 @@ map { $name .= " $_"; } @ARGV;
 my @files = (
 	     ".gitignore",
 	     "Gemfile",
+	     "./anella/stress/vnfd.json",
+	     "./anella/stress/stress.pl",
 	     "./anella/cleanvim.pl",
 	     "./anella/Vagrantfile",
 	     "./anella/dcs.json",
