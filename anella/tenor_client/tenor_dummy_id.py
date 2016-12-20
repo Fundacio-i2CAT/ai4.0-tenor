@@ -11,10 +11,10 @@ class TenorDummyId(object):
 
     def __add__(self, other):
         if type(self._id) is int:
-            return str(self._id+random.randint(10,50))
+            return str(self._id+1)
         elif type(self._id) is unicode:
             number = int(self._id)
-            return str(number+random.randint(10,50)).decode('unicode-escape')
+            return str(number+1).decode('unicode-escape')
 
     def __repr__(self):
         return str(self._id)
