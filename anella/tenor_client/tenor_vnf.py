@@ -8,6 +8,7 @@ from jinja2 import Template
 from tenor_dummy_id import TenorDummyId
 from tenor_vdu import TenorVDU
 import ConfigParser
+import random
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -102,23 +103,30 @@ class TenorVNF(object):
                 templ = Template(fhandle.read())
         except:
             raise IOError('Template {0} IOError'.format(self._template))
-        self._vnfd = templ.render(vnf_id=self._dummy_id,
-                                  vm_image=self._vdu.vm_image,
-                                  vm_image_format=self._vdu.vm_image_format.lower(),
-                                  name=name,
-                                  bootstrap_script=bootstrap_script,
-                                  storage_amount=self._vdu.storage_amount,
-                                  vcpus=self._vdu.vcpus,
-                                  flavor=self._vdu.flavor,
-                                  cached=self._vdu.cached)
-        try:
-            resp = requests.post('{0}/vnfs'.format(self._tenor_url),
-                                 headers={'Content-Type': 'application/json'},
-                                 json=json.loads(self._vnfd))
-        except IOError:
-            raise IOError('{0} instance unreachable'.format(self._tenor_url))
-        except ValueError:
-            raise ValueError('Json encoding error registering VNF')
+        resp = None
+        # TeNOR references VNFs with integer IDs
+        #     in addition to mongodb sync issues sometimes
+        #     there are collisions ... this while prevents them
+        while (not resp) or (not resp.status_code in (200,201)): 
+            self._vnfd = templ.render(vnf_id=self._dummy_id,
+                                      vm_image=self._vdu.vm_image,
+                                      vm_image_format=self._vdu.vm_image_format.lower(),
+                                      name=name,
+                                      bootstrap_script=bootstrap_script,
+                                      storage_amount=self._vdu.storage_amount,
+                                      vcpus=self._vdu.vcpus,
+                                      flavor=self._vdu.flavor,
+                                      cached=self._vdu.cached)
+            try:
+                resp = requests.post('{0}/vnfs'.format(self._tenor_url),
+                                     headers={'Content-Type': 'application/json'},
+                                     json=json.loads(self._vnfd))
+                if resp.status_code == 409:
+                    self._dummy_id = str(int(self._dummy_id)+random.randint(1,500000))
+            except IOError:
+                raise IOError('{0} instance unreachable'.format(self._tenor_url))
+            except ValueError:
+                raise ValueError('Json encoding error registering VNF')
         try:
             json.loads(resp.text)
         except:
