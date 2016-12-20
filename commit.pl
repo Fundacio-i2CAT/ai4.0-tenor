@@ -39,6 +39,8 @@ my @files = (
  	     "commit.pl",
 	     "invoker.ini",
 	     "vnfd-validator/assets/schemas/*",
+	     "ns-catalogue/routes/*.rb",
+	     "vnf-catalogue/routes/*.rb",
 	     "ns-manager/helpers/*.rb",
 	     "ns-manager/routes/*.rb",
 	     "ns-manager/*.rb",

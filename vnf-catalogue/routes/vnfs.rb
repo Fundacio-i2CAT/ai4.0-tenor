@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Catalogue
 #
@@ -82,7 +83,7 @@ class VnfCatalogue < Sinatra::Application
     # List all VNFs
     get '/vnfs' do
         params[:offset] ||= 1
-        params[:limit] ||= 20
+        params[:limit] ||= 3000
 
         # Only accept positive numbers
         params[:offset] = 1 if params[:offset].to_i < 1
