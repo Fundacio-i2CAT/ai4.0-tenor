@@ -307,7 +307,8 @@ class ServiceInstance(flask_restful.Resource):
                 abort(409,
                       message='Conflict: {0} stopped(running)'.format(ns_id))
             if resp.status_code in (200, 201):
-                return {'message': 'Successfully sent state signal'}
+                return {'message': 'Successfully sent state signal',
+                        'state': 'UNKNOWN'}
             else:
                 print resp.text
                 abort(404, message='{0} NS not found'.format(ns_id))

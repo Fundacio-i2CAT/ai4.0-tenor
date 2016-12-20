@@ -9,7 +9,7 @@ use JSON::Parse 'parse_json';;
 my $ua = LWP::UserAgent->new;
 my $server = shift @ARGV || die "\nLack of orchestrator\n\n";
 
-die "NOOO" if $server =~ m/dev/gi;
+# die "NOOO" if $server =~ m/dev/gi;
 
 print "Cleaning $server\n";
 
