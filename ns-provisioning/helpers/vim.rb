@@ -52,11 +52,22 @@ module VimHelper
         end
         networks, errors = parse_json(response)
         network = networks['networks'].find { |role| role['name'] == 'public' }
+        external_networks = networks['networks'].find_all { |role| role['name'] == 'public' }
+
         if network.nil?
             network = networks['networks'].find { |role| role['router:external'] }
+            external_networks = networks['networks'].find_all { |role| role['router:external'] }
         end
+
         return 400, 'No external network defined in Openstack.' if network.nil?
-        # network['id'] = '71257860-3085-40bb-b009-5f12c688cdfb'
+        puts "NUMBER OF NETWORKS"
+        puts networks['networks'].length
+        puts external_networks.length
+        if external_networks.length > 1
+        # network_id de Adam ext-clientes_demo-net en caso de haber más de una disponible
+        #	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
+            network['id'] = '71257860-3085-40bb-b009-5f12c688cdfb'
+        end
         network['id']
     end
 

@@ -7,7 +7,6 @@
             }
 	],
 	"pop_id": 21,
-	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
 	"name_image" : "Stack por HTTP",
 	"vm_image_format" : "QCOW2",
 	"tenor_url" : "http://localhost:4000",
