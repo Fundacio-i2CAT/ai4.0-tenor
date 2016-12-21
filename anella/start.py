@@ -195,7 +195,7 @@ class PoP(flask_restful.Resource):
                 abort(404, message='{0} PoP not found or resource {1} not in (networks,flavors)'.format(pop_id,resource))
         for pop_sid in ids:
             my_pop = TenorPoP(pop_sid)
-            result.append({'pop_id': pop_sid,
+            result.append({'pop_id': int(pop_sid),
                            'name': my_pop.get_name()})
         return result
 
