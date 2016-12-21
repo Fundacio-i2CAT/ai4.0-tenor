@@ -11,7 +11,7 @@ class TenorPoP(object):
     """Represents a TeNOR PoP"""
 
     def __init__(self, pop_id=None, tenor_url=DEFAULT_TENOR_URL):
-        self._pop_id = pop_id
+        self._pop_id = int(pop_id)
 
     def get_name(self):
         url = '{0}/pops/dc/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
@@ -76,7 +76,7 @@ class TenorPoP(object):
             raise ValueError('Decoding PoP response json response failed')
         ids = []
         for pop in json.loads(resp.text):
-            ids.append(pop['id'])
+            ids.append(int(pop['id']))
         return ids
 
 if __name__ == "__main__":
