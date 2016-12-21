@@ -136,9 +136,6 @@ class NS(flask_restful.Resource):
                 tns.set_dummy_id(ns_id)
                 if not 'pop_id' in data:
                     abort(400, message='Lack of PoP id')
-                available_pops = TenorPoP().get_pop_ids()
-                if not data['pop_id'] in available_pops:
-                    abort(404, message='PoP {0} not found'.format(data['pop_id']))
                 resp = tns.instantiate(data['pop_id'])
                 nsdata = json.loads(resp.text)
                 client = MongoClient()
@@ -310,7 +307,6 @@ class ServiceInstance(flask_restful.Resource):
                 return {'message': 'Successfully sent state signal',
                         'state': 'UNKNOWN'}
             else:
-                print resp.text
                 abort(404, message='{0} NS not found'.format(ns_id))
         else:
             abort(500,
