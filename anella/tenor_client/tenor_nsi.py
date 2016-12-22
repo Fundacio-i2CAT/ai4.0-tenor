@@ -168,7 +168,8 @@ class TenorNSI(object):
             return {'service_instance_id': self._nsi_id,
                     'state': self._state,
                     'addresses': addresses,
-                    'created_image': {'openstack_id': self._image_id},
+                    'created_image': {'vm_image': self._image_id,
+                                      'vm_image_format': 'openstack_id'},
                     'runtime_params': runtime_params}
         return {'service_instance_id': self._nsi_id,
                 'state': self._state,
