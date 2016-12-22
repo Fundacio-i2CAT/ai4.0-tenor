@@ -397,7 +397,7 @@ class Provisioner < NsProvisioning
                 begin
                     response = RestClient.put settings.wicm + '/vnf-connectivity/' + nsr_id, '', content_type: :json, accept: :json
                 rescue => e
-                    logger.error e
+                    logger.info e
                 end
                 logger.info response
             end
