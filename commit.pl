@@ -11,6 +11,7 @@ my @files = (
 	     "Gemfile",
 	     "./anella/stress/vnfd.json",
 	     "./anella/stress/stress.pl",
+	     "./anella/stress/superstress.pl",
 	     "./anella/cleanvim.pl",
 	     "./anella/Vagrantfile",
 	     "./anella/dcs.json",

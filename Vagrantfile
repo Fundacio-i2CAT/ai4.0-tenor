@@ -2,6 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
+    config.vm.synced_folder ".", "/home/vagrant/tenor"
     config.vm.box = 'ubuntu/trusty64'
 
     config.vm.provider :virtualbox do |vb|
@@ -11,9 +12,14 @@ Vagrant.configure(2) do |config|
         vb.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
     end
 
-    config.vm.network :forwarded_port, guest: 4000, host: 4000 # tenor port
-    config.vm.network :forwarded_port, guest: 9000, host: 9000 # tenor UI port
-    config.vm.network :forwarded_port, guest: 27017, host: 27017 # tenor UI port
+    config.vm.network :forwarded_port, guest: 4000, host: 4000, # tenor port
+     auto_correct: true
+    config.vm.network :forwarded_port, guest: 9000, host: 9000, # tenor UI port
+     auto_correct: true
+    config.vm.network :forwarded_port, guest: 27017, host: 27017, # tenor UI port
+     auto_correct: true
+    config.vm.network :forwarded_port, guest: 8082, host: 8082, # orchestrator port
+     auto_correct: true
 
     $script = <<-SCRIPT
     sudo apt-get update
@@ -23,24 +29,35 @@ Vagrant.configure(2) do |config|
     rm -rf ~/.rvm* ~/.gem/ ~/.bundle*
     echo 'gem: --no-rdoc --no-ri' >> ~/.gemrc
     echo "export rvm_max_time_flag=20" >> ~/.rvmrc
-
     echo "[[ -s '${HOME}/.rvm/scripts/rvm' ]] && source '${HOME}/.rvm/scripts/rvm'" >> ~/.bashrc
     gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
     curl -L https://get.rvm.io | bash -s stable --ruby
-
     source /home/vagrant/.rvm/scripts/rvm
     #rvm install 2.2.5
     gem install bundler
     gem install compass
+    gem install invoker
     rvm group add rvm vagrant
     rvm fix-permissions
     cd ~
-    git clone https://github.com/T-NOVA/TeNOR.git
-    cd TeNOR/
-    ./dependencies/install_dependencies.sh y y n
-
+    #git clone https://github.com/T-NOVA/TeNOR.git
+    cd tenor/
+    ./dependencies/install_dependencies.sh y y y
+    ./dependencies/install_mongodb.sh
     #. ~/.rvm/scripts/rvm
     ./tenor_install.sh 1 localhost
+    cd ~
+    cd tenor/anella/
+    #orchestrator install
+    sudo apt-get update
+    sudo apt-get install -y git
+    sudo apt-get install -y libjpeg-dev
+    sudo apt-get install -y python-pip python-dev
+    sudo apt-get install -y libffi-dev libssl-dev libxml2-dev libxslt1-dev libjpeg8-dev zlib1g-dev
+    sudo pip install pytz
+    sudo pip install -r requirements.txt
+    sudo pip install scp
+
   SCRIPT
 
     config.vm.provision 'shell', inline: $script, privileged: false
@@ -63,3 +80,4 @@ Vagrant.configure(2) do |config|
     #   push.app = "YOUR_ATLAS_USERNAME/YOUR_APPLICATION_NAME"
     # end
 end
+

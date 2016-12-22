@@ -1,0 +1,9 @@
+Two new no-core modules are used for fluentd
+
+'fluent-plugin-out-http'
+This module is used to send a received log message as an http post to a backlog point.
+
+'fluent-plugin-grep'
+This module is used to parse the log and add extra tags, for better parsing.
+
+Install them using their gemfiles by running 'bundle install' in the tenor initial directory.
