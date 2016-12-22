@@ -334,16 +334,6 @@ class Log(flask_restful.Resource):
     def post(self):
         """Log post"""
         data = request.get_json()
-        if 'status' in data:
-            if data['status'] == 'error':
-                log_db_client = MongoClient()
-                log_db = log_db_client.orchestrator_logs
-                errors = log_db.errors
-                errors.insert_one({'method': 'POST',
-                                   'service_instance_id': data['service_instance_id'],
-                                   'date': datetime.datetime.utcnow()})
-                log_db_client.close()
-                print "ERROR {0}".format(data['service_instance_id'])
 
         if 'descriptor_reference' in data:
             ns_instance_id = data['id']
@@ -352,6 +342,19 @@ class Log(flask_restful.Resource):
             try:
                 to_service_manager = nsi.get_state_and_addresses()
                 callback = Callback(to_service_manager)
+            except:
+                pass
+
+        if 'status' in data:
+            try:
+                if data['status'] == 'error':
+                    log_db_client = MongoClient()
+                    log_db = log_db_client.orchestrator_logs
+                    errors = log_db.errors
+                    errors.insert_one({'method': 'POST',
+                                       'service_instance_id': data['service_instance_id'],
+                                       'date': datetime.datetime.utcnow()})
+                    log_db_client.close()
             except:
                 pass
 

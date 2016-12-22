@@ -258,7 +258,7 @@ class OrchestratorTestCase(unittest.TestCase):
         self.post_ns(False)
         self.instantiate_ns()
 
-    def test_07(self):
+    def atest_07(self):
         """Posts service/instance one round mode"""
         url = '{0}/service/instance'.format(BASE_URL)
         for i in range(0,1):
@@ -266,7 +266,7 @@ class OrchestratorTestCase(unittest.TestCase):
                                  json=CATALOG_EXAMPLE)
             assert resp.status_code == 200
 
-    def test_08(self):
+    def atest_08(self):
         """Posts service/instance one round mode at Adam with fixed network/pop"""
         url = '{0}/service/instance'.format(BASE_URL)
         resp = requests.post(url, headers={'Content-Type': 'application/json'},
