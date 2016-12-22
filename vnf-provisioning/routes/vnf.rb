@@ -261,8 +261,9 @@ class Provisioning < VnfProvisioning
 
         # Requests the VIM to delete the stack
         response, errors = delete_stack_with_wait(vnfr.stack_url, vim_info['token'])
-        logger.error errors if errors
+        logger.info errors if errors
         if response == 400
+            logger.error errors if errors
             halt 400, errors if errors
         end
 
@@ -327,7 +328,7 @@ class Provisioning < VnfProvisioning
                 check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
                 puts check
             rescue => e
-                logger.error 'Openstack request failed'
+                logger.info 'Openstack request failed'
                 halt 409
             end
             halt 200
