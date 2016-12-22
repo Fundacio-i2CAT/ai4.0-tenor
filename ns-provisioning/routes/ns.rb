@@ -374,7 +374,7 @@ class Provisioner < NsProvisioning
             begin
                 RestClient.post settings.manager + '/statistics/performance_stats', @instance.to_json, content_type: :json
             rescue => e
-                logger.error e
+                logger.info e
             end
         end
 
@@ -387,7 +387,7 @@ class Provisioner < NsProvisioning
                 logger.error 'Connection refused with the NS Manager'
             rescue => e
                 logger.error e.response
-                logger.error 'Error with the start command'
+                logger.info 'Error with the start command'
             end
         end
 
