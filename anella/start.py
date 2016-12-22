@@ -350,7 +350,8 @@ class Log(flask_restful.Resource):
             nsi = TenorNSI(ns_instance_id)
             nsi.configure()
             try:
-                callback = Callback(data)
+                to_service_manager = nsi.get_state_and_addresses()
+                callback = Callback(to_service_manager)
             except:
                 pass
 

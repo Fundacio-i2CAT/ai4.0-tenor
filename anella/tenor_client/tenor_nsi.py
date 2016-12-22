@@ -93,7 +93,11 @@ class TenorNSI(object):
                 print 'Getting {0}'.format(filename)
                 template_id = str(uuid.uuid4())
                 template_filename = '/tmp/{0}'.format(template_id)
-                scp.get(filename, template_filename)
+                try:
+                    scp.get(filename, template_filename)
+                except:
+                    # DO NOT FORGET TO RAISE ERROR!!!
+                    continue
                 keyvalues = {}
                 for item in cfile['fields']:
                     keyvalues[item['name']] = item['value']
@@ -164,7 +168,7 @@ class TenorNSI(object):
             return {'service_instance_id': self._nsi_id,
                     'state': self._state,
                     'addresses': addresses,
-                    'image_id': self._image_id,
+                    'created_image': {'openstack_id': self._image_id},
                     'runtime_params': runtime_params}
         return {'service_instance_id': self._nsi_id,
                 'state': self._state,
