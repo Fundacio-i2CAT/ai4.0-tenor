@@ -370,10 +370,12 @@ class Enotification(flask_restful.Resource):
     def post(self):
         """Log post"""
         data1 = request.get_json()
-        data2 = request.data
-        print "ERROR =>"
 	print data1
-	print data2
+        if 'severity' in data1:
+            if data1['severity'].upper() == 'ERROR':
+                print "ERROR =>"
+                print data1['msg']
+                print "ERROR =>"
 
 API_V2.add_resource(Log, '/log')
 API_V2.add_resource(Enotification, '/enotification')
