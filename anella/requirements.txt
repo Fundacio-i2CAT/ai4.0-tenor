@@ -21,6 +21,7 @@ itsdangerous==0.24
 Jinja2==2.8
 keystoneauth1==2.8.0
 MarkupSafe==0.23
+mongoengine==0.11.0
 monotonic==1.1
 netaddr==0.7.18
 netifaces==0.10.4
@@ -39,6 +40,8 @@ pyasn1==0.1.9
 pycparser==2.14
 pymongo==3.2.2
 python-dateutil==2.5.3
+python-engineio==1.1.0
+python-socketio==1.6.1
 pytz==2016.4
 PyYAML==3.11
 requests==2.10.0
