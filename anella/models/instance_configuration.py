@@ -10,6 +10,7 @@ class InstanceConfiguration(Document):
 
     service_instance_id = StringField(required=True)
     consumer_params = ListField(EmbeddedDocumentField(ConsumerParam))
+    timestamp = DateTimeField(default=datetime.datetime.now)
 
 def build_instance_configuration(service_instance_id,consumer_params):
     """Building it from array"""
