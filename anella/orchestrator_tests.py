@@ -14,7 +14,7 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 
-BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
+BASE_URL = 'http://dev.anella.i2cat.net:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
     "name": "omupi40B",
@@ -151,7 +151,7 @@ class OrchestratorTestCase(unittest.TestCase):
             resp = requests.put(url,
                                 headers={'Content-Type': 'application/json'},
                                 json={'state': nxt})
-            assert resp.status_code == expected
+            assert resp.status_code in (200,409)
 
     def test_03(self):
         """Testing start/stop"""
