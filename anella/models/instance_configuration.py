@@ -4,6 +4,7 @@
 
 from mongoengine import *
 from consumer_param import ConsumerParam,ConsumerField
+import datetime
 
 class InstanceConfiguration(Document):
     """Instance configuration class"""
