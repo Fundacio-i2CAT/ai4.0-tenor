@@ -10,7 +10,9 @@ debtcollector==1.5.0
 decorator==4.0.10
 enum34==1.1.6
 Flask==0.11.1
+flask-mongoengine==0.8.2
 Flask-RESTful==0.3.5
+Flask-WTF==0.13.1
 funcsigs==1.0.2
 idna==2.1
 ipaddress==1.0.16
@@ -53,3 +55,4 @@ stevedore==1.15.0
 traitlets==4.2.1
 Werkzeug==0.11.10
 wrapt==1.10.8
+WTForms==2.1
