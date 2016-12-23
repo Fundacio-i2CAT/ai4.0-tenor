@@ -8,6 +8,7 @@ from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import InstanceConfiguration
 from models.instance_configuration import build_instance_configuration
+from models.api_log import ApiLog
 
 import flask_restful
 from flask_restful import abort
@@ -44,14 +45,9 @@ class ServiceInstance(flask_restful.Resource):
 
     def post(self):
         """Post a new NSI"""
+        apilog = ApiLog(method='POST', data=request.data)
+        apilog.save()
         data = request.get_json()
-        # log_db_client = MongoClient()
-        # log_db = log_db_client.orchestrator_logs
-        # logs = log_db.logs
-        # logs.insert_one({'method': 'POST',
-        #                  'request': data,
-        #                  'date': datetime.datetime.utcnow()})
-        # log_db_client.close()
         context = data['context']
         name = context['name_image']
         cached = "true"
@@ -90,16 +86,11 @@ class ServiceInstance(flask_restful.Resource):
 
     def put(self, ns_id=None):
         """Starting/Stopping NSIs"""
+        apilog = ApiLog(method='PUT', data=request.data)
+        apilog.save()
         if not ns_id:
             abort(500, message="You should provide a NS id")
         state = request.get_json()
-        # log_db_client = MongoClient()
-        # log_db = log_db_client.orchestrator_logs
-        # logs = log_db.logs
-        # logs.insert_one({'method': 'PUT',
-        #                  'request': state,
-        #                  'date': datetime.datetime.utcnow()})
-        # log_db_client.close()
         nsi = TenorNSI(ns_id)
         resp = None
         try:
