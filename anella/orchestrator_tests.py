@@ -14,7 +14,7 @@ CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 
-BASE_URL = 'http://dev.anella.i2cat.net:{0}{1}'.format(PORT, URL_PREFIX)
+BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
     "name": "omupi40B",
@@ -50,25 +50,25 @@ CATALOG_EXAMPLE = {
 			"required" : True,
 			"name" : "name",
 			"desc" : "Name of the consumer",
-			"value" : "rEpO"
+			"value" : "yo voté a kodos"
                     },
                     {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Foto del consumer",
-			"value" : "http://www.gstatic.com/tv/thumb/tvbanners/10810505/p10810505_b_v8_aa.jpg"
+			"value" : "http://mongoengine.org/assets/themes/metromongo/images/helpwanted.jpg"
                     },
                     {
 			"required" : True,
 			"name" : "cv",
 			"desc" : "CV del consumer",
-			"value" : "Para guardar imágenes en /var/www/html/"
+			"value" : "wiLL cOdE HtML for FOOD"
                     }
 		]
             },
             {
 		"path" : "/root/chequeo.txt",
-		"content" : "YO ESTUVE AQUI!!!!!!!!!!!!!!!!!!!!!!!!!"
+		"content" : "YO ESTUVE AQUI CON MONGOENGINE!!!!!!!!!!!!!!!!!!!!!!!!!"
 	    }
 	]
     }

@@ -58,7 +58,9 @@ my @files = (
 	     "vnf-provisioning/Gemfile",
 	     "vnf-provisioning/*.rb",
 	     "vnf-provisioning/README.md",
-	     "ns-provisioning/README.md"
+	     "ns-provisioning/README.md",
+	     "anella/api/*.py",
+	     "anella/models/*.py"
 	    );
 
 map { system("git add $_\n"); } @files;

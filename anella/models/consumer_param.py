@@ -4,15 +4,26 @@
 
 from mongoengine import *
 
-class Field(EmbeddedDocument):
+class ConsumerField(EmbeddedDocument):
+    """Consumer field class"""
+
     name = StringField(required=True)
     value = StringField(required=True)
     desc = StringField(required=True)
 
+class ConsumerParam(EmbeddedDocument):
+    """Consumer param class"""
 
-class InstanceConfiguration(EmbeddedDocument):
     path = StringField(required=True)
     content = StringField(required=False)
+    fields = ListField(EmbeddedDocumentField(ConsumerField),required=False)
 
 if __name__ == "__main__":
-    print "HOLA"
+    FNAME = ConsumerField(name="name",
+                          value="Alfonso Egio",
+                          desc="Mi nombre")
+    FPICTURE = ConsumerField(name="picture",
+                          value="http://example.com/hola.jpg",
+                          desc="URL de la foto")
+    CP1 = ConsumerParam(path="/var/www/html", fields=[FNAME,FPICTURE])
+    CP2 = ConsumerParam(path="/root/chequeo.txt", content="YO ESTUVE AQuÏ")

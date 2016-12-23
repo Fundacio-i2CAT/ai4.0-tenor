@@ -5,11 +5,11 @@
 import requests
 import json
 import paramiko
-from pymongo import MongoClient
 import uuid
 from tenor_vnfi import TenorVNFI
 from template_management import create_ssh_client
 from template_management import render_template
+from models.instance_configuration import InstanceConfiguration
 from scp import SCPClient
 import os
 import ConfigParser
@@ -63,33 +63,30 @@ class TenorNSI(object):
                         self._addresses = vnfr['server']['addresses']
         return nsi
 
-    def configure(self, server_ip=None, config=None):
+    def configure(self):
         """Configures the instance according to consumer needs"""
-        if not server_ip:
-            for addr in self._addresses[0][1]:
-                if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
-                    server_ip = addr['addr']
-        if not config:
-            client = MongoClient()
-            mdb = client.custom_conf
-            confs = mdb.confs
-            config = confs.find_one({'ns_instance_id': self._nsi_id})
-            client.close()
+        for addr in self._addresses[0][1]:
+            if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
+                server_ip = addr['addr']
         ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
         scp = SCPClient(ssh.get_transport())
-        if (not config) or (not 'consumer_params' in config):
+        icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
+
+        if len(icds) < 1:
+            print "ICD NOT FOUND"
             return
-        for cfile in config['consumer_params']:
-            filename = cfile['path']
-            if 'content' in cfile:
-                content = cfile['content'].encode('utf-8')
+
+        for cp in icds[0].consumer_params:
+            filename = cp.path
+            if 'content' in cp:
+                content = cp.content.encode('utf-8')
                 command = 'echo \'{0}\' > {1}'.format(content,
                                                       filename)
                 print command
                 stdin, stdout, stderr = ssh.exec_command(command)
                 print stdout.readlines()
                 print stderr.readlines()
-            if 'fields' in cfile:
+            if 'fields' in cp:
                 print 'Getting {0}'.format(filename)
                 template_id = str(uuid.uuid4())
                 template_filename = '/tmp/{0}'.format(template_id)
@@ -99,9 +96,8 @@ class TenorNSI(object):
                     # DO NOT FORGET TO RAISE ERROR!!!
                     continue
                 keyvalues = {}
-                for item in cfile['fields']:
-                    keyvalues[item['name']] = item['value']
-                print 'Templating with {0}'.format(cfile['fields'])
+                for item in cp.fields:
+                    keyvalues[item.name] = item.value.encode('utf-8')
                 result = render_template(template_id, keyvalues)
                 render_filename = '/tmp/{0}'.format(uuid.uuid4())
                 with open(render_filename, 'w') as fhandle:
@@ -111,6 +107,7 @@ class TenorNSI(object):
                 print 'Removing temporary files'
                 os.remove(template_filename)
                 os.remove(render_filename)
+
         print 'Closing ssh client'
         ssh.close()
 
@@ -156,12 +153,13 @@ class TenorNSI(object):
                                            'value': ipif['addr']})
                 addresses.append({'OS-EXT-IPS:type': ipif['OS-EXT-IPS:type'],
                                   'addr': ipif['addr']})
-        
-        client = MongoClient()
-        log_db = client.orchestrator_logs
-        errors = log_db.errors
-        failed = errors.find_one({'service_instance_id': self._nsi_id})
-        client.close()
+
+        failed = False
+        # client = MongoClient()
+        # log_db = client.orchestrator_logs
+        # errors = log_db.errors
+        # failed = errors.find_one({'service_instance_id': self._nsi_id})
+        # client.close()
         if failed:
             self._state = "FAILED"
         if self._image_id:

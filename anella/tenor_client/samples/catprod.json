@@ -16,6 +16,22 @@
             {
 		"path" : "/root/chequeo.txt",
 		"content" : "PRUEBA IMAGEN POR HTTP EN ADAM DESDE SERVIDOR DE PRODUCCION"
+	    },
+            {
+		"path" : "/root/hola.txt",
+		"fields" :
+		[
+		    {
+			"name": "name",
+			"desc": "nombre",
+			"value": "yo mismo"
+		    },
+		    {
+			"name": "laskjd",
+			"desc": "lkajsdlkajsdlk",
+			"value": "20918302198"
+		    }
+		]
 	    }
 	]
     }

@@ -107,7 +107,6 @@ class TenorNS(object):
         ns_data = {'ns_id': self._dummy_id, 'pop_id': pop_id,
                    'callbackUrl': callback_url, 'flavour': flavour,
                    'public_network_id': public_network_id}
-        print ns_data
         try:
             resp = requests.post('{0}/ns-instances'.format(self._tenor_url),
                                  headers={'Content-Type': 'application/json'},
