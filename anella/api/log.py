@@ -7,6 +7,7 @@ from tenor_client.tenor_nsi import TenorNSI
 from tenor_client.tenor_vnf import TenorVNF
 from tenor_client.tenor_vdu import TenorVDU
 from tenor_client.callback import Callback
+from models.tenor_messages import CriticalError
 
 import flask_restful
 from flask_restful import abort
@@ -32,18 +33,16 @@ class Log(flask_restful.Resource):
             except:
                 pass
 
-        # if 'status' in data:
-            # try:
-            #     # if data['status'] == 'error':
-            #         # log_db_client = MongoClient()
-            #         # log_db = log_db_client.orchestrator_logs
-            #         # errors = log_db.errors
-            #         # errors.insert_one({'method': 'POST',
-            #         #                    'service_instance_id': data['service_instance_id'],
-            #         #                    'date': datetime.datetime.utcnow()})
-            #         # log_db_client.close()
-            # except:
-            #     pass
+        if 'status' in data:
+            print data['status']
+            message = ''
+            if 'message' in data:
+                print data['message']
+                message = data['message']
+            if str(data['status']) == 'error':
+                crite = CriticalError(service_instance_id=data['service_instance_id'],
+                                      message=message)
+                crite.save()
 
     def get(self):
         """Log get"""

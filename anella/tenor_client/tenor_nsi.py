@@ -10,6 +10,8 @@ from tenor_vnfi import TenorVNFI
 from template_management import create_ssh_client
 from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
+from models.tenor_messages import CriticalError
+
 from scp import SCPClient
 import os
 import ConfigParser
@@ -155,11 +157,10 @@ class TenorNSI(object):
                                   'addr': ipif['addr']})
 
         failed = False
-        # client = MongoClient()
-        # log_db = client.orchestrator_logs
-        # errors = log_db.errors
-        # failed = errors.find_one({'service_instance_id': self._nsi_id})
-        # client.close()
+        crites = CriticalError.objects(service_instance_id=self._nsi_id)
+        if len(crites) > 0:
+            failed = True
+
         if failed:
             self._state = "FAILED"
         if self._image_id:

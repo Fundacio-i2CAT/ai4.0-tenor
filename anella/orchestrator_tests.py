@@ -50,7 +50,7 @@ CATALOG_EXAMPLE = {
 			"required" : True,
 			"name" : "name",
 			"desc" : "Name of the consumer",
-			"value" : "yo voté a kodos"
+			"value" : "yo vot a kodos"
                     },
                     {
 			"required" : True,
