@@ -9,7 +9,7 @@ class ConsumerField(EmbeddedDocument):
 
     name = StringField(required=True)
     value = StringField(required=True)
-    desc = StringField(required=True)
+    desc = StringField(required=False)
 
 class ConsumerParam(EmbeddedDocument):
     """Consumer param class"""

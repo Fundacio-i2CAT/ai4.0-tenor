@@ -23,8 +23,11 @@ def build_instance_configuration(service_instance_id,consumer_params):
         if 'fields' in cp:
             fields = []
             for fp in cp['fields']:
+                desc = None
+                if 'desc' in fp:
+                    desc = fp['desc']
                 fields.append(ConsumerField(name=fp['name'],
-                                            desc=fp['desc'],
+                                            desc=desc,
                                             value=fp['value']))
             cpds.append(ConsumerParam(path=cp['path'], fields=fields))
     return InstanceConfiguration(service_instance_id=service_instance_id,
