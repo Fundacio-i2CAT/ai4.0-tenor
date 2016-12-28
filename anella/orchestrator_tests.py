@@ -151,7 +151,7 @@ class OrchestratorTestCase(unittest.TestCase):
             resp = requests.put(url,
                                 headers={'Content-Type': 'application/json'},
                                 json={'state': nxt})
-            assert resp.status_code in (200,409)
+            assert resp.status_code == expected
 
     def test_03(self):
         """Testing start/stop"""
