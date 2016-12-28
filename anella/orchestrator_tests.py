@@ -17,7 +17,7 @@ POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
 BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
 
 OVNFD_EXAMPLE = {
-    "name": "omupi40B",
+    "name": "TEST",
     "vdu":
     {
         "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
@@ -37,7 +37,7 @@ CATALOG_EXAMPLE = {
 		"desc" : "sssssss"
             }
 	],
-	"name_image" : "OMUPI40B",
+	"name_image" : "TEST",
 	"tenor_url" : "http://localhost:4000",
         "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
         "vm_image_format": "openstack_id",
@@ -83,7 +83,7 @@ ADAM_EXAMPLE = {
             }
 	],
 	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
-	"name_image" : "LuNESs",
+	"name_image" : "TEST",
 	"pop_id": 21,
         "vm_image_format" : "openstack_id",
 	"tenor_url" : "http://localhost:4000",
