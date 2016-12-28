@@ -53,7 +53,11 @@ class Provisioner < NsProvisioning
             auth_token = admin_credentials[:token]
 
             instance['vnfrs'].each do |vnf|
-                response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
+                begin
+                    response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
+                rescue e
+                    halt 404
+                end
                 response['vms'].each do |vm|
                     vnf['vnf_id'] = { 'openstack_id': vm['physical_resource_id'] }
                     url = 
@@ -245,7 +249,7 @@ class Provisioner < NsProvisioning
                     logger.error operationId, 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'
                 rescue => e
-                    logger.error operationId, e.response
+                    logger.info operationId, e.response.code.to_s
                     halt e.response.code, e.response.body
                 end
                 @nsInstance.push(lifecycle_event_history: 'Executed a start')
@@ -255,7 +259,7 @@ class Provisioner < NsProvisioning
             @nsInstance.update_attributes(@instance)
         elsif params[:status] === 'stop'
             @instance['vnfrs'].each do |vnf|
-                logger.debug vnf
+                logger.info operationId, 'Stopping VNF ' + vnf['vnfr_id'].to_s
                 event = { event: 'stop', vim_info: vim_info }
                 endpoint = '/config'
                 begin
@@ -264,7 +268,7 @@ class Provisioner < NsProvisioning
                     logger.error operationId, 'VNF Manager unreachable.'
                     halt 500, 'VNF Manager unreachable'
                 rescue => e
-                    logger.error operationId, e.response
+                    logger.info operationId, e.response.code.to_s
                     halt e.response.code, e.response.body
                 end
             end
@@ -328,7 +332,7 @@ class Provisioner < NsProvisioning
         instance.update_attributes(@instance)
 
         # for each VNF instantiated, read the connection point in the NSD and extract the resource id
-        logger.error operationId, 'VNFR Stack Resources: ' + callback_response['stack_resources'].to_s
+        logger.info operationId, 'VNFR Stack Resources: ' + callback_response['stack_resources'].to_s
         vnfr_resources = callback_response['stack_resources']
         nsd['vld']['virtual_links'].each do |vl|
             vl['connections'].each do |conn|

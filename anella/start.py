@@ -6,6 +6,7 @@ from api.pop import PoP
 from api.vnf import VNF
 from api.ns import NS
 from api.service_instance import ServiceInstance
+from api.service_instance import ServiceInstanceHistory
 from api.log import Log
 from api.enotification import Enotification
 
@@ -41,6 +42,9 @@ API_V2.add_resource(ServiceInstance,
                     '/service/instance',
                     '/service/instance/<ns_id>',
                     '/service/instance/<ns_id>/state')
+
+API_V2.add_resource(ServiceInstanceHistory,
+                    '/service/instance/<ns_id>/history')
 
 API_V2.add_resource(VNF,
                     '/vnf',

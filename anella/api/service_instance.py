@@ -8,8 +8,10 @@ from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import InstanceConfiguration
 from models.instance_configuration import build_instance_configuration
+from models.tenor_messages import RegularMessage
 from models.api_log import ApiLog
 
+from bson import json_util
 import flask_restful
 from flask_restful import abort
 from flask import request
@@ -130,3 +132,19 @@ class ServiceInstance(flask_restful.Resource):
             except Exception as exc:
                 msg = 'Error deleting NS instance: {0}'.format(str(exc))
                 abort(500, message=msg)
+
+class ServiceInstanceHistory(flask_restful.Resource):
+    """Service instance history resources"""
+    def __init__(self):
+        pass
+
+    def get(self, ns_id):
+        """Gets NSI history"""
+        events = []
+        history = RegularMessage.objects(service_instance_id=ns_id).order_by('timestamp')
+        for h in history:
+            data = str(h.message)
+            info = (data[:75] + '...') if len(data) > 75 else data 
+            events.append({'time': str(h.timestamp), 'message': info,
+                           'severity': str(h.severity)})
+        return events
