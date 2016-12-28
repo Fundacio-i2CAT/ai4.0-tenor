@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Provisioning
 #
@@ -46,7 +45,7 @@ class Provisioner < NsProvisioning
                 'user' => instance['authentication'][0]['username'],
                 'password' => instance['authentication'][0]['password']
             }
-            operationId = params['id'].to_s
+            operationId = id
             admin_credentials, errors = authenticate_anella(pop_urls['keystone'], dc["tenant_name"], dc['user'], dc['password'])
             puts admin_credentials
             tenant_id = admin_credentials[:tenant_id]
@@ -125,7 +124,7 @@ class Provisioner < NsProvisioning
 
         @instance = Nsr.new(instance)
         @instance.save!
-        operationId = @instance.id.to_s
+        operationId = @instance.id
         logger.info operationId, 'Instanciating NS instance.'
         # call thread to process instantiation
         Thread.new do
@@ -168,7 +167,7 @@ class Provisioner < NsProvisioning
         rescue Mongoid::Errors::DocumentNotFound => e
             halt 404
         end
-        operationId = @nsInstance.id.to_s
+        operationId = @nsInstance.id
         vim_info = {
             'tenant_name' => @nsInstance['authentication'][0]['tenant_name'],
             'user' => @nsInstance['authentication'][0]['username'],
@@ -299,6 +298,7 @@ class Provisioner < NsProvisioning
 
         callback_response = response['callback_response']
         @instance = response['instance']
+        operationId = @instance.id
         begin
             instance = Nsr.find(@instance['id'])
         rescue Mongoid::Errors::DocumentNotFound => e
