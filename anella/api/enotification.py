@@ -15,7 +15,10 @@ class Enotification(flask_restful.Resource):
     def post(self):
         """Log post"""
         data1 = request.get_json()
-	# print data1
+        print "ENOTIFICATION ENDPOINT INFO"
+	print data1
+        with open("log.json","a") as log:
+            log.write('{0}\n'.format(json.dumps(data1)))
         if 'severity' in data1:
             if data1['severity'].upper() == 'ERROR':
                 pass

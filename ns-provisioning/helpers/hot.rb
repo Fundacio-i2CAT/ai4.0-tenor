@@ -24,14 +24,14 @@ module HotHelper
             error = { 'info' => 'HOT Generator unrechable.' }
             return 500, error
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  'E IS NIL' if e.nil?
-            logger.error  'RESPONSE IS NIL?' if e.response.nil?
-            # logger.error operationId, e.response
+            logger.error e
+            logger.error 'E IS NIL' if e.nil?
+            logger.error 'RESPONSE IS NIL?' if e.response.nil?
+            # logger.error e.response
             return 500, e
         end
         hot, errors = parse_json(response)
@@ -48,12 +48,12 @@ module HotHelper
             recoverState(popInfo, vnf_info, @instance, error)
             return
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  e.response
+            logger.error e
+            logger.error e.response
             error = { 'info' => 'Error creating the network stack.' }
             recoverState(popInfo, vnf_info, @instance, error)
             return
@@ -71,9 +71,9 @@ module HotHelper
             error = { 'info' => 'VIM unrechable.' }
             return 500, error
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response
-            logger.error  e.response.body if e.response
+            logger.error e
+            logger.error e.response
+            logger.error e.response.body if e.response
             error = { 'info' => 'Error creating the network stack.' }
             return 500, error
         end
@@ -91,12 +91,12 @@ module HotHelper
             recoverState(popInfo, vnf_info, @instance, error)
             return
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  e.response
+            logger.error e
+            logger.error e.response
             error = { 'info' => 'Error creating the network stack.' }
             recoverState(popInfo, vnf_info, @instance, error)
             return
@@ -115,12 +115,12 @@ module HotHelper
             recoverState(popInfo, vnf_info, @instance, error)
             return
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  e.response
+            logger.error e
+            logger.error e.response
             error = { 'info' => 'Error creating the network stack.' }
             recoverState(popInfo, vnf_info, @instance, error)
             return
@@ -139,12 +139,12 @@ module HotHelper
             recoverState(popInfo, vnf_info, @instance, error)
             return
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  e.response
+            logger.error e
+            logger.error e.response
             error = { 'info' => 'Error creating the network stack.' }
             recoverState(popInfo, vnf_info, @instance, error)
             return
@@ -161,11 +161,11 @@ module HotHelper
           error = { 'info' => 'VIM unrechable.' }
           return
       rescue RestClient::ResourceNotFound
-          logger.error  'Already removed from the VIM.'
+          logger.error 'Already removed from the VIM.'
           return 404
       rescue => e
-          logger.error  e
-          logger.error  e.response
+          logger.error e
+          logger.error e.response
           return
       end
 
@@ -177,7 +177,7 @@ module HotHelper
             return 500, error
         rescue => e
             puts e
-            logger.error  e.response
+            logger.error e.response
             return 500, e
         end
         hot, errors = parse_json(response)
@@ -198,9 +198,9 @@ module HotHelper
         end
         if status == 'CREATE_FAILED'
             error = 'Error creating the stack: ' + type
-            logger.error  error
-            logger.error  stack_info
-            logger.error  errors
+            logger.error error
+            logger.error stack_info
+            logger.error errors
             @instance.push(lifecycle_event_history: 'ERROR_CREATING the ' + type)
             @instance.update_attribute('status', 'ERROR_CREATING')
             @instance.push(audit_log: stack_info)
@@ -230,13 +230,13 @@ module HotHelper
                 error = { 'info' => 'VIM unrechable.' }
                 return
             rescue RestClient::ResourceNotFound
-                logger.info  'Stack already removed.'
+                logger.info 'Stack already removed.'
                 status = 'DELETE_COMPLETE'
             rescue => e
                 puts 'If no exists means that is deleted correctly'
                 status = 'DELETE_COMPLETE'
-                logger.error  e
-                logger.error  e.response
+                logger.error e
+                logger.error e.response
             end
 
             logger.debug 'Try: ' + count.to_s + ', status: ' + status.to_s
@@ -247,7 +247,7 @@ module HotHelper
             break if status == 'DELETE_COMPLETE'
             count += 1
             if count > 20
-                logger.error  'Stack can not be removed'
+                logger.error 'Stack can not be removed'
                 return 400, 'Stack can not be removed'
             end
         end
@@ -261,14 +261,14 @@ module HotHelper
             error = { 'info' => 'HOT Generator unrechable.' }
             return 500, error
         rescue RestClient::ExceptionWithResponse => e
-            logger.error  e
-            logger.error  e.response.body
+            logger.error e
+            logger.error e.response.body
             return e.response.code, e.response.body
         rescue => e
-            logger.error  e
-            logger.error  'E IS NIL' if e.nil?
-            logger.error  'RESPONSE IS NIL?' if e.response.nil?
-            # logger.error operationId, e.response
+            logger.error e
+            logger.error 'E IS NIL' if e.nil?
+            logger.error 'RESPONSE IS NIL?' if e.response.nil?
+            # logger.error e.response
             return 500, e
         end
         hot, errors = parse_json(response)

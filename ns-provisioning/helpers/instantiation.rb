@@ -28,8 +28,8 @@ module InstantiationHelper
     # @return [Hash, String] if the parsed message is an invalid JSON
     def create_authentication(instance, _nsd_id, pop_info, _callback_url)
         @instance = instance
-        operationId = @instance.id
-        logger.info operationId, 'Authentication not created for this PoP. Starting creation of credentials.'
+
+        logger.info 'Authentication not created for this PoP. Starting creation of credentials.'
 
         pop_auth = {}
         pop_auth['pop_id'] = pop_info['id'].to_s
@@ -47,7 +47,7 @@ module InstantiationHelper
         keystone_url = popUrls[:keystone]
         if @instance['project'].nil?
             credentials, errors = authenticate(keystone_url, pop_info['tenant_name'], pop_info['user'], pop_info['password'])
-            logger.error operationId, errors if errors
+            logger.error errors if errors
             @instance.update_attribute('status', 'ERROR_CREATING') if errors
             @instance.push(audit_log: errors) if errors
             return 400, errors.to_json if errors
@@ -83,8 +83,7 @@ module InstantiationHelper
     # @return [Hash, String] if the parsed message is an invalid JSON
     def instantiate_vnf(instance, nsd_id, vnf, slaInfo)
         @instance = instance
-        operationId = @instance.id
-        logger.info operationId, 'Start instantiation process of ' + vnf.to_s
+        logger.info 'Start instantiation process of ' + vnf.to_s
         pop_id = vnf['maps_to_PoP'].gsub('/pop/', '')
         vnf_id = vnf['vnf'].delete('/')
         pop_auth = @instance['authentication'].find { |pop| pop['pop_id'] == pop_id }
@@ -93,7 +92,7 @@ module InstantiationHelper
         # needs to be migrated to the VNFGFD
         sla_info = slaInfo['constituent_vnf'].find { |cvnf| cvnf['vnf_reference'] == vnf_id }
         if sla_info.nil?
-            logger.error operationId, 'NO SLA found with the VNF ID that has the NSD.'
+            logger.error 'NO SLA found with the VNF ID that has the NSD.'
             error = { 'info' => 'Error with the VNF ID. NO SLA found with the VNF ID that has the NSD.' }
             recoverState(@instance, error)
         end
@@ -130,22 +129,22 @@ module InstantiationHelper
         #        rescue RestClient::ExceptionWithResponse => e
         #             puts "Excepion with response"
         #             puts e
-        #             logger.error operationId, e
-        #             logger.error operationId, e.response
+        #             logger.error e
+        #             logger.error e.response
         #             if !e.response.nil?
-        #                 logger.error operationId, e.response.body
+        #                 logger.error e.response.body
         #             end
         #             #return e.response.code, e.response.body
-        #             logger.error operationId, 'Handle error.'
+        #             logger.error 'Handle error.'
         #             return
         rescue => e
             @instance.push(lifecycle_event_history: 'ERROR_CREATING ' + vnf_id.to_s + ' VNF')
             @instance.update_attribute('status', 'ERROR_CREATING')
-            logger.error operationId, e.response
+            logger.error e.response
             if e.response.nil?
                 if e.response.code.nil?
-                    logger.error operationId, e
-                    logger.error operationId, 'Response code not defined.'
+                    logger.error e
+                    logger.error 'Response code not defined.'
                 else
                     error = ''
                     if e.response.code == 404
@@ -159,18 +158,18 @@ module InstantiationHelper
                             error = 'Instantiation error. Response from the VNF Manager: ' + e.response.body
                         end
                     end
-                    logger.error operationId, error
+                    logger.error error
                     generateMarketplaceResponse(callback_url, generateError(nsd_id, 'FAILED', error))
                     return 400, error
                 end
             end
-            logger.error operationId, 'Handle error.'
+            logger.error 'Handle error.'
             generateMarketplaceResponse(@instance['notification'], { status: 'error', service_instance_id: @instance['id'] })
             return 400, 'Error with the VNF: ' + e.response
         end
 
         vnf_manager_response, errors = parse_json(response)
-        logger.error operationId, errors if errors
+        logger.error errors if errors
 
         vnf_manager_response['pop_id'] = pop_id
         vnf_manager_response

@@ -14,7 +14,7 @@
 	"consumer_params" : [
             {
 		"path" : "/root/chequeo.txt",
-		"content" : "PRUEBA IMAGEN POR HTTP EN ADAM"
+		"content" : "PRUEBA IMAGEN POR HTTP EN i2cat"
 	    }
 	]
     }
