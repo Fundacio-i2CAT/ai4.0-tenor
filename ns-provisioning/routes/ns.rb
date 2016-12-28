@@ -381,18 +381,18 @@ class Provisioner < NsProvisioning
             end
         end
 
-        logger.info operationId, 'Sending start command'
-        Thread.new do
-            sleep(5)
-            begin
-                RestClient.put settings.manager + '/ns-instances/' + nsr_id + '/start', {}.to_json, content_type: :json
-            rescue Errno::ECONNREFUSED
-                logger.error operationId, 'Connection refused with the NS Manager'
-            rescue => e
-                logger.error operationId, e.response
-                logger.error operationId, 'Error with the start command'
-            end
-        end
+        # logger.info operationId, 'Sending start command'
+        # Thread.new do
+        #     sleep(5)
+        #     begin
+        #         RestClient.put settings.manager + '/ns-instances/' + nsr_id + '/start', {}.to_json, content_type: :json
+        #     rescue Errno::ECONNREFUSED
+        #         logger.error operationId, 'Connection refused with the NS Manager'
+        #     rescue => e
+        #         logger.info operationId, e.response
+        #         logger.info operationId, 'Error with the start command'
+        #     end
+        # end
 
         if @instance['resource_reservation'].find { |resource| resource.has_key?('wicm_stack')}
             logger.info operationId, 'Starting traffic redirection in the WICMi'

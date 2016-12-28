@@ -20,8 +20,10 @@ class Enotification(flask_restful.Resource):
 	print data
         if 'op_id' in data:
             if type(data['op_id']) is unicode:
-                regm = RegularMessage(service_instance_id=data['op_id'],
-                                      message=data['msg'],
-                                      module=data['module'],
-                                      severity=data['severity'])
-                regm.save()
+                if 'msg' in data:
+                    if (type(data['msg']) is unicode) or (type(data['msg']) is str):
+                        regm = RegularMessage(service_instance_id=data['op_id'],
+                                              message=data['msg'],
+                                              module=data['module'],
+                                              severity=data['severity'])
+                        regm.save()
