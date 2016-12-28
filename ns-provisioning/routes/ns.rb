@@ -53,11 +53,7 @@ class Provisioner < NsProvisioning
             auth_token = admin_credentials[:token]
 
             instance['vnfrs'].each do |vnf|
-                begin
-                    response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
-                rescue => e
-                    halt 404
-                end
+                response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
                 response['vms'].each do |vm|
                     vnf['vnf_id'] = { 'openstack_id': vm['physical_resource_id'] }
                     url = 
