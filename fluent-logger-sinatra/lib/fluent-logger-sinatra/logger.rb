@@ -16,24 +16,28 @@ module FluentLoggerSinatra
       logger_console.post_text("D, [#{Time.now}]  DEBUG -- : #{message}")
       logger.post(tag, { module: @tag, severity: 'debug', msg: message })
     end
-    def info(message)
+    def info(id = 0, message)
       logger_console.post_text("I, [#{Time.now}]  INFO -- : #{message}")
-      logger.post(tag, { module: @tag, severity: 'info', msg: message })
+      logger.post(tag, { module: @tag, severity: 'info', msg: message, op_id: id })
     end
     def warn(message)
       logger_console.post_text("W, [#{Time.now}]  WARN -- : #{message}")
       logger.post(tag, { module: @tag, severity: 'warn', msg: message })
     end
-    def error(message)
+    def error(id=0 , message)
       logger_console.post_text("R, [#{Time.now}]  ERROR -- : #{message}")
-      logger.post(tag, { module: @tag, severity: 'error', msg: message })
+      logger.post(tag, { module: @tag, severity: 'error', msg: message, op_id: id })
     end
-    def fatal(message)
+    def fatal(id=0, message)
       logger_console.post_text("F, [#{Time.now}]  FATAL -- : #{message}")
       logger.post(tag, { module: @tag, severity: 'fatal', msg: message })
     end
     def write(message)
       logger.post(tag, { write: message })
+    end
+    def completed(id = 0, message)
+      #logger_console.post_text("W, [#{Time.now}]  WARN -- : #{message}")
+      logger.post(tag, { module: @tag, severity: 'done', msg: message, op_id: id })
     end
   end
 end
