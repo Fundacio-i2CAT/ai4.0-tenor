@@ -99,7 +99,7 @@ class TenorNSI(object):
                     continue
                 keyvalues = {}
                 for item in cp.fields:
-                    keyvalues[item.name] = item.value.encode('utf-8')
+                    keyvalues[item.name] = item.value
                 result = render_template(template_id, keyvalues)
                 render_filename = '/tmp/{0}'.format(uuid.uuid4())
                 with open(render_filename, 'w') as fhandle:
