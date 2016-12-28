@@ -5,7 +5,6 @@
 import flask_restful
 from flask_restful import abort
 from flask import request
-from models.tenor_messages import RegularMessage
 import json
 
 class Enotification(flask_restful.Resource):
@@ -18,10 +17,11 @@ class Enotification(flask_restful.Resource):
         data1 = request.get_json()
         print "ENOTIFICATION ENDPOINT INFO"
 	print data1
-        if 'op_id' in data1:
-            if type(data1['op_id']) is unicode:
-                regm = RegularMessage(service_instance_id=data1['op_id'],
-                                      message=data1['msg'],
-                                      module=data1['module'],
-                                      severity=data1['severity'])
-                regm.save()
+        with open("log.json","a") as log:
+            log.write('{0}\n'.format(json.dumps(data1)))
+        if 'severity' in data1:
+            if data1['severity'].upper() == 'ERROR':
+                pass
+                # print "ERROR =>"
+                # print data1['msg']
+                # print "ERROR =>"
