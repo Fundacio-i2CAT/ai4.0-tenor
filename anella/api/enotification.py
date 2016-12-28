@@ -15,13 +15,13 @@ class Enotification(flask_restful.Resource):
 
     def post(self):
         """Log post"""
-        data1 = request.get_json()
+        data = request.get_json()
         print "ENOTIFICATION ENDPOINT INFO"
-	print data1
-        if 'op_id' in data1:
-            if type(data1['op_id']) is unicode:
-                regm = RegularMessage(service_instance_id=data1['op_id'],
-                                      message=data1['msg'],
-                                      module=data1['module'],
-                                      severity=data1['severity'])
+	print data
+        if 'op_id' in data:
+            if type(data['op_id']) is unicode:
+                regm = RegularMessage(service_instance_id=data['op_id'],
+                                      message=data['msg'],
+                                      module=data['module'],
+                                      severity=data['severity'])
                 regm.save()
