@@ -328,7 +328,7 @@ class Provisioner < NsProvisioning
         instance.update_attributes(@instance)
 
         # for each VNF instantiated, read the connection point in the NSD and extract the resource id
-        logger.info operationId, 'VNFR Stack Resources: ' + callback_response['stack_resources'].to_s
+        logger.error operationId, 'VNFR Stack Resources: ' + callback_response['stack_resources'].to_s
         vnfr_resources = callback_response['stack_resources']
         nsd['vld']['virtual_links'].each do |vl|
             vl['connections'].each do |conn|
@@ -381,18 +381,18 @@ class Provisioner < NsProvisioning
             end
         end
 
-        # logger.info operationId, 'Sending start command'
-        # Thread.new do
-        #     sleep(5)
-        #     begin
-        #         RestClient.put settings.manager + '/ns-instances/' + nsr_id + '/start', {}.to_json, content_type: :json
-        #     rescue Errno::ECONNREFUSED
-        #         logger.error operationId, 'Connection refused with the NS Manager'
-        #     rescue => e
-        #         logger.error operationId, e.response
-        #         logger.error operationId, 'Error with the start command'
-        #     end
-        # end
+        logger.info operationId, 'Sending start command'
+        Thread.new do
+            sleep(5)
+            begin
+                RestClient.put settings.manager + '/ns-instances/' + nsr_id + '/start', {}.to_json, content_type: :json
+            rescue Errno::ECONNREFUSED
+                logger.error operationId, 'Connection refused with the NS Manager'
+            rescue => e
+                logger.error operationId, e.response
+                logger.error operationId, 'Error with the start command'
+            end
+        end
 
         if @instance['resource_reservation'].find { |resource| resource.has_key?('wicm_stack')}
             logger.info operationId, 'Starting traffic redirection in the WICMi'
