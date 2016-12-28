@@ -9,6 +9,7 @@ map { $name .= " $_"; } @ARGV;
 my @files = (
 	     ".gitignore",
 	     "Gemfile",
+	     "./fluentd/fluent.conf",
 	     "./anella/models/*.py",
 	     "./anella/stress/vnfd.json",
 	     "./anella/stress/stress.pl",
