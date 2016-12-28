@@ -24,9 +24,10 @@ class Scaling < VnfProvisioning
     post '/:vnfr_id/scale_out' do |vnfr_id|
         # Return if content-type is invalid
         halt 415 unless request.content_type == 'application/json'
-
+        operationId = 0
         begin
             vnfr = Vnfr.find(vnfr_id)
+            operationId = vnfr.nsr_instance
         rescue Mongoid::Errors::DocumentNotFound => e
             logger.error 'VNFR record not found'
             halt 404
@@ -113,14 +114,15 @@ class Scaling < VnfProvisioning
     # @param [JSON]
     post '/:vnfr_id/scale_in' do |vnfr_id|
         halt 415 unless request.content_type == 'application/json'
-
+        operationId = 0
         begin
             vnfr = Vnfr.find(vnfr_id)
+            operationId = vnfr.nsr_instance
         rescue Mongoid::Errors::DocumentNotFound => e
             logger.error 'VNFR record not found'
             halt 404
         end
-
+        
         # Validate JSON format
         scale_info = parse_json(request.body.read)
         # logger.debug 'Scale out: ' + scale_info.to_json
@@ -188,7 +190,7 @@ class Scaling < VnfProvisioning
         vnfr = scale_info['vnfr']
         lifecycle_events_values = {}
         event = 'scaling_out'
-
+        operationId = vnfr['nsr_instance']
         vnfr['scale_resources'].each do |resource|
             logger.debug resource
             logger.info 'Sending request to Openstack for Scale OUT'

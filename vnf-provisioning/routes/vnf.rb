@@ -57,6 +57,7 @@ class Provisioning < VnfProvisioning
 
         # Validate JSON format
         instantiation_info = parse_json(request.body.read)
+        operationId = instantiation_info['nsr_id']
         halt 400, 'NS Manager callback URL not found' unless instantiation_info.key?('callback_url')
 
         vnf = instantiation_info['vnf']
@@ -146,7 +147,7 @@ class Provisioning < VnfProvisioning
             vnf['vnfd']['vdu'].each do |vdu|
                 flavour_id, errors = get_vdu_flavour(vdu, vim_info['compute'], vim_info['tenant_id'], vim_info['token'])
                 flavour_id = instantiation_info['flavour']
-                logger.error errors if errors
+                logger.error operationId, errors if errors
                 if errors == 'Flavor not found.'
                     halt 400, 'No flavours available for the vdu ' + vdu['id'].to_s
                 elsif errors == 'Error getting flavours.'
@@ -163,8 +164,8 @@ class Provisioning < VnfProvisioning
         rescue Errno::ECONNREFUSED
             halt 500, 'HOT Generator unreachable'
         rescue => e
-            logger.error e
-            logger.error e.response if e.response
+            logger.error operationId, e
+            logger.error operationId, e.response if e.response
             halt e.response.code, e.response.body if e.response
             halt 500, e
         end
@@ -205,7 +206,7 @@ class Provisioning < VnfProvisioning
 
         #    if vnf['type'] != 'vSA'
         create_thread_to_monitor_stack(vnfr.id, vnfr.stack_url, vim_info, instantiation_info['callback_url'])
-        logger.info 'Created thread to monitor stack'
+        logger.info operationId, 'Created thread to monitor stack'
         #    end
 
         halt 201, vnfr.to_json
@@ -245,6 +246,7 @@ class Provisioning < VnfProvisioning
             halt 404
         end
 
+        operationId = vnfr.nsr_instance
         # Request an auth token from the VIM
         vim_info = destroy_info['auth']
         vim_info['keystone'] = vim_info['url']['keystone']
@@ -253,15 +255,15 @@ class Provisioning < VnfProvisioning
         # if the stack contains nested templates, remove nesed before
         vnfr['scale_resources'].each do |resource|
             stack_url = resource['stack_url']
-            logger.info 'Sending request to Openstack for Remove scaled resource'
+            logger.info operationId, 'Sending request to Openstack for Remove scaled resource'
             response, errors = delete_stack_with_wait(stack_url, vim_info['token'])
             vnfr.pull(scale_resources: resource)
-            logger.info 'Removed scaled resources.'
+            logger.info operationId, 'Removed scaled resources.'
         end
 
         # Requests the VIM to delete the stack
         response, errors = delete_stack_with_wait(vnfr.stack_url, vim_info['token'])
-        logger.error errors if errors
+        logger.error operationId, errors if errors
         if response == 400
             halt 400, errors if errors
         end
@@ -269,15 +271,15 @@ class Provisioning < VnfProvisioning
         logger.debug 'VIM response to destroy: ' + response.to_json
 
         if settings.mapi.nil?
-            logger.info 'mAPI not defined. No action performed to mAPI.'
+            logger.info operationId, 'mAPI not defined. No action performed to mAPI.'
         else
             # Delete the VNFR from mAPI
-            logger.info 'Sending delete command to mAPI...'
+            logger.info operationId, 'Sending delete command to mAPI...'
             logger.debug 'VNFR: ' + vnfr_id
             sendDeleteCommandToMAPI(vnfr_id)
         end
 
-        logger.info 'Removing the VNFR from the database...'
+        logger.info operationId, 'Removing the VNFR from the database...'
         vnfr.destroy
         halt 200 # , response.body
     end
@@ -304,7 +306,7 @@ class Provisioning < VnfProvisioning
         rescue Mongoid::Errors::DocumentNotFound => e
             halt 404
         end
-
+        operationId = vnfr.nsr_instance
         # Return if event doesn't have information
         halt 400, 'Event has no information' if vnfr.lifecycle_info['events'][config_info['event']].nil?
 
@@ -327,7 +329,7 @@ class Provisioning < VnfProvisioning
                 check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
                 puts check
             rescue => e
-                logger.error 'Openstack request failed'
+                logger.error operationId, 'Openstack request failed'
                 halt 409
             end
             halt 200
@@ -362,23 +364,24 @@ class Provisioning < VnfProvisioning
         stack_info = parse_json(request.body.read)
         logger.debug 'Stack info: ' + stack_info.to_json
         auth_token = stack_info['vim_info']['token']
-
+        operationId = 0
         begin
             vnfr = Vnfr.find(params[:vnfr_id])
         rescue Mongoid::Errors::DocumentNotFound => e
-            logger.error 'VNFR record not found'
+            operationId = vnfr.nsr_instance
+            logger.error operationId, 'VNFR record not found'
             halt 404
         end
 
         # If stack is in create complete state
         if params[:status] == 'create_complete'
-            logger.info 'Create complete'
+            logger.info operationId, 'Create complete'
 
             vms = []
             vms_id = {}
             # get stack resources
             resources, errors = getStackResources(vnfr.stack_url, auth_token)
-            logger.error errors if errors
+            logger.error operationId, errors if errors
             resources.each do |resource|
                 if resource['resource_type'] == 'OS::Glance::Image'
                     puts "HERE GOES THE STACK"
@@ -408,8 +411,8 @@ class Provisioning < VnfProvisioning
                 unless resource['resource_type'] != 'OS::Heat::AutoScalingGroup'
                     stack_url = resource['links'].find { |link| link['rel'] == 'nested' }['href']
                     nested_resources = getStackResources(stack_url, auth_token)
-                    logger.info 'VIM response of AutoScalingGroup: ' + nested_resources.to_json
-                    logger.info resource['links']
+                    logger.info operationId, 'VIM response of AutoScalingGroup: ' + nested_resources.to_json
+                    logger.info operationId, resource['links']
                     # scale_resources << {:vdu => output['output_key'].match(/^(.*)#scale_in_url/i)[1], :scale_in => output['output_value']}
                     # scale_resources << {:id => output['output_value']}
                 end
@@ -530,13 +533,13 @@ class Provisioning < VnfProvisioning
 
             if vnfr.lifecycle_info['authentication_type'] == 'PubKeyAuthentication'
                 if vnfr.lifecycle_info['authentication'] == ''
-                    logger.info 'Public Authentication is empty. Included the key generated by Openstack.'
+                    logger.info operationId, 'Public Authentication is empty. Included the key generated by Openstack.'
                     #        vnfr.lifecycle_info["authentication"] = private_key
                     #        vnfr.update_attributes!(lifecycle_info["authentication"] = private_key)
                 end
             end
 
-            logger.info 'Registring values to mAPI if required...'
+            logger.info operationId, 'Registring values to mAPI if required...'
             # Send the VNFR to the mAPI
             registerRequestToMAPI(vnfr) unless settings.mapi.nil?
 
@@ -563,16 +566,16 @@ class Provisioning < VnfProvisioning
                 rescue Errno::ECONNREFUSED
                     halt 500, 'VIM unreachable'
                 rescue => e
-                    logger.error e.response
+                    logger.error operationId, e.response
                     halt e.response.code, e.response.body
                 end
                 puts response
-                logger.error 'Response from the VIM about the error: ' + response.to_s
+                logger.error operationId, 'Response from the VIM about the error: ' + response.to_s
 
                 # Request VIM to delete the stack
                 # response, errors = delete_stack_with_wait(stack_url, auth_token)
                 # logger.debug 'Response from VIM to destroy allocated resources: ' + response.to_json
-                logger.error 'VIM ERROR: ' + response['stack']['stack_status_reason'].to_s
+                logger.error operationId, 'VIM ERROR: ' + response['stack']['stack_status_reason'].to_s
                 vnfr.push(lifecycle_event_history: stack_info['stack']['stack_status'])
                 vnfr.update_attributes!(
                     vnf_status: 2
