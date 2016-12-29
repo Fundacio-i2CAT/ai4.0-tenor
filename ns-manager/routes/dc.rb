@@ -32,6 +32,42 @@ class DcController < TnovaManager
         end
     end
 
+    # @method get dc_quotas
+    # @overload get "/quotas/:id"
+    # Get the quotas avaliable for the vim (ANELLA)
+    get '/quotas/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                # After checking this https://bugs.launchpad.net/openstack-api-site/+bug/1264043
+                #      should be: GET {tenant_id}/os-quota-sets/{tenant_id_to_query}
+                response = RestClient.get compute_url +"/#{tenant_id}/os-quota-sets/#{tenant_id}", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                # halt 500, 'VIM unreachable'
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                #logger.error e.response
+                return
+                # halt e.response.code, e.response.body
+            end
+            response
+        end
+    end
+
     # @method get dc_networks
     # @overload get "/networks/:id"
     # Get the networks avaliable for the vim (ANELLA)
