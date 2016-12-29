@@ -62,7 +62,19 @@ class DcController < TnovaManager
                 return
                 # halt e.response.code, e.response.body
             end
-            response
+            servers = JSON.parse(response.body)
+            servers['servers'].each do |server|
+                if server['flavor']['links'].kind_of? Array
+                    begin
+                        flavor_uri = URI(server['flavor']['links'][0]['href'])
+                        flavor = RestClient.get compute_url+flavor_uri.path, 'X-Auth-Token' => auth_token, :accept => :json
+                        server['flavor']['detail'] = JSON.parse(flavor.body)
+                    rescue => e
+                        logger.info e
+                    end
+                end
+            end
+            servers.to_json()
         end
     end
 

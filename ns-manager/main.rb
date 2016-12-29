@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -23,6 +24,7 @@ require 'sinatra/config_file'
 require 'yaml'
 require "bcrypt"
 require 'jwt'
+require 'uri'
 
 # Require the bundler gem and then call Bundler.require to load in all gems listed in Gemfile.
 require 'bundler'
