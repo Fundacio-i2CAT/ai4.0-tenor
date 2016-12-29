@@ -70,6 +70,7 @@ module InstantiationHelper
                 pop_auth = pop_auth.merge(credentials)
             end
         end
+        logger.completed operationId, 'Auth creation Completed'
         pop_auth
     end
 
@@ -172,6 +173,7 @@ module InstantiationHelper
         vnf_manager_response, errors = parse_json(response)
         logger.error operationId, errors if errors
 
+        logger.completed operationId, 'Vnf instatiated: ' + vnf_id
         vnf_manager_response['pop_id'] = pop_id
         vnf_manager_response
     end

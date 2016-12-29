@@ -21,13 +21,12 @@ class Provisioner < NsProvisioning
     # @overload get "/ns-instances"
     # Gets all ns-instances
     get '/' do
-        #logger.info 666,'Getting NS instances.'
+        logger.info 'Getting NS instances.'
         instances = if params[:status]
                         Nsr.where(status: params[:status])
                     else
                         Nsr.all
                        end
-
         return instances.to_json
     end
 
@@ -38,14 +37,23 @@ class Provisioner < NsProvisioning
         begin
             # Retrieves deep info on VMs (IPs and States)
             # def authenticate_anella(keystone_url, tenant_name, username, password)
+            #if !params['id'].nil?
+            #    logger.info "Id not found"
+            #    return "non existing id"
+            #end
+
             instance = Nsr.find(params['id'])
+	    #if !instance.nil?
+            #    logger.info "Instance not found"
+            #	return "not found"
+	    #end
             pop_urls = instance['authentication'][0]['urls']
             dc = {
                 'tenant_name' => instance['authentication'][0]['tenant_name'],
                 'user' => instance['authentication'][0]['username'],
                 'password' => instance['authentication'][0]['password']
             }
-            operationId = id
+            operationId = params['id']
             admin_credentials, errors = authenticate_anella(pop_urls['keystone'], dc["tenant_name"], dc['user'], dc['password'])
             puts admin_credentials
             tenant_id = admin_credentials[:tenant_id]
@@ -67,7 +75,7 @@ class Provisioner < NsProvisioning
                             vnf['server']['addresses'].append(ad)
                         end
                     rescue => e
-                        logger.error operationId, 'Openstack request failed',id
+                        logger.error operationId, 'Openstack request failed'
                         halt e.response.code, e.response
                     end
                 end
@@ -271,7 +279,7 @@ class Provisioner < NsProvisioning
             @instance['status'] = params['status'].to_s.upcase
             @nsInstance
         end
-
+        logger.completed operationId, 'Status updated'
         halt 200
     end
 
@@ -298,7 +306,7 @@ class Provisioner < NsProvisioning
 
         callback_response = response['callback_response']
         @instance = response['instance']
-        operationId = @instance.id
+        #operationId = @instance.id
         begin
             instance = Nsr.find(@instance['id'])
         rescue Mongoid::Errors::DocumentNotFound => e
@@ -450,6 +458,7 @@ class Provisioner < NsProvisioning
                 logger.error operationId, 'Error generating Netfloc template.' if errors
                 return 400, errors.to_json if errors
 
+                logger.completed operationId, 'Ns service hot template generated'
                 logger.info operationId, 'Send Netfloc HOT to Openstack'
                 stack_name = 'Netfloc_' + @instance['id'].to_s
                 template = { stack_name: stack_name, template: hot_template }

@@ -170,7 +170,7 @@ class Provisioning < VnfProvisioning
             halt 500, e
         end
 
-        logger.debug 'HEAT template generated'
+        logger.completed operationId, 'HEAT template generated'
 
         # Request VIM to provision a VNF
         response = provision_vnf(vim_info, vnf['vnfd']['name'].delete(' ') + '_' + vnfr.id, hot)
@@ -281,6 +281,7 @@ class Provisioning < VnfProvisioning
 
         logger.info operationId, 'Removing the VNFR from the database...'
         vnfr.destroy
+        logger completed operationId, 'Delete completed'
         halt 200 # , response.body
     end
 

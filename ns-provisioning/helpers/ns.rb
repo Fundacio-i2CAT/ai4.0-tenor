@@ -364,7 +364,7 @@ module NsProvisioner
             stack_info, errors = create_stack_wait(popUrls[:orch], pop_auth['tenant_id'], stack_name, tenant_token, 'NS Network')
             return handleError(@instance, errors) if errors
 
-            logger.info operationId, 'Network stack CREATE_COMPLETE. Reading network information from stack...'
+            logger.completed operationId, 'Network stack CREATE_COMPLETE. Reading network information from stack...'
             sleep(3)
             network_resources, errors = getStackResources(popUrls[:orch], pop_auth['tenant_id'], stack_name, tenant_token)
             return handleError(@instance, errors) if errors
