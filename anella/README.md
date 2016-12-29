@@ -245,3 +245,30 @@ $ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/21/networks
     ]
 }
 ```
+
+## Get Quota sets available on a PoP for the tenant configured in TeNOR
+
+
+```
+$ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/21/quotas
+200
+{
+    "quotas": {
+        "cores": 20,
+        "fixed_ips": -1,
+        "floating_ips": 10,
+        "id": "579eaa7245d04e778f0effd77565794c",
+        "injected_file_content_bytes": 10240,
+        "injected_file_path_bytes": 255,
+        "injected_files": 5,
+        "instances": 10,
+        "key_pairs": 100,
+        "metadata_items": 128,
+        "ram": 51200,
+        "security_group_rules": 20,
+        "security_groups": 10,
+        "server_group_members": 10,
+        "server_groups": 10
+    }
+}
+```
