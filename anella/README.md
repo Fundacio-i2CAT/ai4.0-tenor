@@ -272,3 +272,91 @@ $ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/21/quotas
     }
 }
 ```
+
+## Get server instances on a PoP for the tenant configured in TeNOR
+
+
+```
+$ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/21/servers
+200
+{
+    "servers": [
+        {
+            "OS-DCF:diskConfig": "MANUAL",
+            "OS-EXT-AZ:availability_zone": "nova",
+            "OS-EXT-SRV-ATTR:host": "ubuntu",
+            "OS-EXT-SRV-ATTR:hypervisor_hostname": "ubuntu",
+            "OS-EXT-SRV-ATTR:instance_name": "instance-00000887",
+            "OS-EXT-STS:power_state": 1,
+            "OS-EXT-STS:task_state": null,
+            "OS-EXT-STS:vm_state": "active",
+            "OS-SRV-USG:launched_at": "2016-12-29T11:48:08.000000",
+            "OS-SRV-USG:terminated_at": null,
+            "accessIPv4": "",
+            "accessIPv6": "",
+            "addresses": {
+                "management": [
+                    {
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:4f:63:37",
+                        "OS-EXT-IPS:type": "fixed",
+                        "addr": "192.83.221.3",
+                        "version": 4
+                    },
+                    {
+                        "OS-EXT-IPS-MAC:mac_addr": "fa:16:3e:4f:63:37",
+                        "OS-EXT-IPS:type": "floating",
+                        "addr": "172.24.4.94",
+                        "version": 4
+                    }
+                ]
+            },
+            "config_drive": "True",
+            "created": "2016-12-29T11:45:33Z",
+            "flavor": {
+                "id": "4",
+                "links": [
+                    {
+                        "href": "http://84.88.40.75:8774/277ba4bedd824eabbf26b3ae997f4cbe/flavors/4",
+                        "rel": "bookmark"
+                    }
+                ]
+            },
+            "hostId": "32d8b4e94ea0c2d8a4880d0b13691e6e8b87336fed4b5bb31edc2253",
+            "id": "af2e2fbb-a3e8-4bf0-bd00-5e36f8421c80",
+            "image": {
+                "id": "d178f602-7d57-402f-a2c3-fc125411a98a",
+                "links": [
+                    {
+                        "href": "http://84.88.40.75:8774/277ba4bedd824eabbf26b3ae997f4cbe/images/d178f602-7d57-402f-a2c3-fc125411a98a",
+                        "rel": "bookmark"
+                    }
+                ]
+            },
+            "key_name": "UamQ1Ra0U3cU",
+            "links": [
+                {
+                    "href": "http://84.88.40.75:8774/v2.1/277ba4bedd824eabbf26b3ae997f4cbe/servers/af2e2fbb-a3e8-4bf0-bd00-5e36f8421c80",
+                    "rel": "self"
+                },
+                {
+                    "href": "http://84.88.40.75:8774/277ba4bedd824eabbf26b3ae997f4cbe/servers/af2e2fbb-a3e8-4bf0-bd00-5e36f8421c80",
+                    "rel": "bookmark"
+                }
+            ],
+            "metadata": {},
+            "name": "In-form4.0_5864f704df67b5181900000f-vdu0-hotmmvxamnor",
+            "os-extended-volumes:volumes_attached": [],
+            "progress": 0,
+            "security_groups": [
+                {
+                    "name": "default"
+                }
+            ],
+            "status": "ACTIVE",
+            "tenant_id": "277ba4bedd824eabbf26b3ae997f4cbe",
+            "updated": "2016-12-29T13:45:11Z",
+            "user_id": "675373c1f44647c0926d7999dec67c98"
+        }
+    ]
+}
+```

@@ -27,6 +27,18 @@ class TenorPoP(object):
         pop = json.loads(resp.text)
         return pop['name']
 
+    def get_server_details(self):
+        url = '{0}/pops/servers/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            servers = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        return servers['servers']
+
     def get_quota_details(self):
         url = '{0}/pops/quotas/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
         try:
