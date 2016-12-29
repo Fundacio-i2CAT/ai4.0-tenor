@@ -360,3 +360,19 @@ $ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/21/servers
     ]
 }
 ```
+
+## Get PoP RAM details depending on quota and usage
+
+
+```
+$ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/1/ram
+200
+{
+    "ram": {
+        "quota": 51200,
+        "ratio": 0.16,
+        "units": "MB",
+        "used": 8192
+    }
+}
+```

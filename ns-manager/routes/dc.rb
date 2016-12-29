@@ -68,7 +68,7 @@ class DcController < TnovaManager
                     begin
                         flavor_uri = URI(server['flavor']['links'][0]['href'])
                         flavor = RestClient.get compute_url+flavor_uri.path, 'X-Auth-Token' => auth_token, :accept => :json
-                        server['flavor']['detail'] = JSON.parse(flavor.body)
+                        server['flavor']['detail'] = JSON.parse(flavor.body)['flavor']
                     rescue => e
                         logger.info e
                     end

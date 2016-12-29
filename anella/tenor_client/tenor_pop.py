@@ -68,6 +68,18 @@ class TenorPoP(object):
                                    'router_external': network['router:external']})
         return network_details
 
+    def get_ram_details(self):
+        servers = self.get_server_details()
+        quota = self.get_quota_details()
+        print quota['ram']
+        ram = int(quota['ram'])
+        used_ram = 0
+        for server in servers:
+            if server['status'].upper() == 'ACTIVE':
+                used_ram = used_ram+int(server['flavor']['detail']['ram'])
+        return {'quota': ram, 'used': used_ram, 'ratio': float(used_ram)/float(ram),
+                'units': 'MB'}
+
     def get_flavor_details(self):
         url = '{0}/pops/flavours/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
         try:
