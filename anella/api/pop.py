@@ -22,6 +22,8 @@ class PoP(flask_restful.Resource):
                         return {'pop_id': pop_id, 'name': tpop.get_name()}
                     if resource == 'flavors':
                         return {'flavors': tpop.get_flavor_details()}
+                    if resource == 'quotas':
+                        return {'quotas': tpop.get_quota_details()}
                     elif resource == 'networks':
                         return {'networks': tpop.get_network_details()}
             if resource:
