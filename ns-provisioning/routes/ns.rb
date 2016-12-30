@@ -57,7 +57,6 @@ class Provisioner < NsProvisioning
             }
             operationId = params['id']
             admin_credentials, errors = authenticate_anella(pop_urls['keystone'], dc["tenant_name"], dc['user'], dc['password'])
-            puts admin_credentials
             tenant_id = admin_credentials[:tenant_id]
             auth_token = admin_credentials[:token]
 
