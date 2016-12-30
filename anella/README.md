@@ -376,3 +376,18 @@ $ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/1/ram
     }
 }
 ```
+
+## Get PoP Core details depending on quota and usage
+
+
+```
+$ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/1/cores
+200
+{
+    "cores": {
+        "quota": 20,
+        "ratio": 0.2,
+        "used": 4
+    }
+}
+```
