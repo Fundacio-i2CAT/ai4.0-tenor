@@ -40,11 +40,9 @@ module VimHelper
 
   # Authetication_v2_anella
   def authentication_v2_anella(keystoneUrl, tenant_name, user, password)
-    puts "authorizing"
     auth = { auth: { tenantName: tenant_name, passwordCredentials: { username: user, password: password } } }
     begin
       response = RestClient.post keystoneUrl + '/tokens', auth.to_json, content_type: :json
-      #puts response
     rescue => e
       logger.error e
       logger.error e.response.body
@@ -56,9 +54,6 @@ module VimHelper
 
   # Authetication_v3_anella
   def authentication_v3_anella(keystoneUrl, tenant_name, user, password)
-    puts "v3_auth"
-    puts keystoneUrl
-
     auth = {
         "auth": {
              "identity": {
@@ -79,8 +74,6 @@ module VimHelper
     }
     begin
       response = RestClient.post keystoneUrl + "/auth/tokens" , auth.to_json, {:content_type => :json, :accept => :json}
-      #puts response
-      puts response.headers
     rescue => e
       logger.error "failure to auth3"
       logger.error e 
@@ -94,7 +87,6 @@ module VimHelper
 
   # Authenticate method for Anella
   def authenticate_anella(keystone_url, tenant_name, username, password)
-    puts "vim auth"
     keystone_version = URI(keystone_url).path.split('/').last
     if keystone_version == 'v2.0'
       user_authentication, errors = authentication_v2_anella(keystone_url, tenant_name, username, password)
@@ -110,7 +102,6 @@ module VimHelper
       user_authentication = JSON.parse(user_authentication.body)
       project = user_authentication['token']['project']
       if !project.nil?
-        puts "parsing v3 res"
         tenant_id = user_authentication['token']['project']['id']
         user_id = user_authentication['token']['user']['id']
         token = headers[:x_subject_token] #  user_authentication['token']['id']

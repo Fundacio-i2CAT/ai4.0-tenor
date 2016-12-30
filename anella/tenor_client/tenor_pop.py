@@ -68,10 +68,19 @@ class TenorPoP(object):
                                    'router_external': network['router:external']})
         return network_details
 
+    def get_core_details(self):
+        servers = self.get_server_details()
+        quota = self.get_quota_details()
+        cores = int(quota['cores'])
+        used_cores = 0
+        for server in servers:
+            if server['status'].upper() == 'ACTIVE':
+                used_cores = used_cores+int(server['flavor']['detail']['vcpus'])
+        return {'quota': cores, 'used': used_cores, 'ratio': float(used_cores)/float(cores)}
+
     def get_ram_details(self):
         servers = self.get_server_details()
         quota = self.get_quota_details()
-        print quota['ram']
         ram = int(quota['ram'])
         used_ram = 0
         for server in servers:

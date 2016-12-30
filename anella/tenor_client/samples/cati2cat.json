@@ -9,7 +9,7 @@
 	"name_image" : "Stack por HTTP",
 	"vm_image_format" : "QCOW2",
 	"tenor_url" : "http://localhost:4000",
-	"vm_image" : "http://dev.anella.i2cat.net/zesty-server-cloudimg-amd64.img",
+	"vm_image" : "https://cloud-images.ubuntu.com/zesty/current/zesty-server-cloudimg-amd64.img",
 	"flavor" : "m1.medium",
 	"consumer_params" : [
             {

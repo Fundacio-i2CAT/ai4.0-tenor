@@ -148,6 +148,10 @@ class TenorNS(object):
         if target_flavor:
             if target_flavor['ram']+ram['used'] > ram['quota']:
                 value = 'ram quota limit reached'
+        cores = pop.get_core_details()
+        if target_flavor:
+            if target_flavor['vcpus']+cores['used'] > cores['quota']:
+                value = 'core quota limit reached'
         return value
 
     def set_dummy_id(self, dummy_id):

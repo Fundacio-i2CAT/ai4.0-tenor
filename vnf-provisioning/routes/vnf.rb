@@ -80,6 +80,7 @@ class Provisioning < VnfProvisioning
                 puts "THE IMAGE IS ALREADY CACHED"
                 puts "OPENSTACK_ID"
                 puts is_cached[0]['openstack_id']
+                logger.info instantiation_info['nsr_id'], 'The Image is cached ... openstack_id: '+is_cached[0]['openstack_id'].to_s
                 vnf['vnfd']['vdu'][0]['vm_image'] = is_cached[0]['openstack_id']
                 vnf['vnfd']['vdu'][0]['vm_image_format'] = 'openstack_id'
             end

@@ -63,7 +63,7 @@ class Provisioner < NsProvisioning
             instance['vnfrs'].each do |vnf|
                 begin
                     response = JSON.parse(RestClient.get settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'],:accept => :json)
-                rescue e
+                rescue => e
                     halt 404
                 end
                 response['vms'].each do |vm|
