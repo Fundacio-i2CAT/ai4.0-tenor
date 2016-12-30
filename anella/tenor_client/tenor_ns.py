@@ -152,6 +152,11 @@ class TenorNS(object):
         if target_flavor:
             if target_flavor['vcpus']+cores['used'] > cores['quota']:
                 value = 'core quota limit reached'
+        floating_ips = pop.get_floating_ip_details()
+        # The +1 below should be +some_variable in services
+        #               requiring more than one floating_ip
+        if floating_ips['used']+1 > floating_ips['quota']:
+            value = 'floating ips limit reached'
         return value
 
     def set_dummy_id(self, dummy_id):

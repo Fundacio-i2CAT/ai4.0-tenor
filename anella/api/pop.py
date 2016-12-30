@@ -30,6 +30,8 @@ class PoP(flask_restful.Resource):
                         return {'ram': tpop.get_ram_details()}
                     if resource == 'cores':
                         return {'cores': tpop.get_core_details()}
+                    if resource == 'floating_ips':
+                        return {'floating_ips': tpop.get_floating_ip_details()}
                     elif resource == 'networks':
                         return {'networks': tpop.get_network_details()}
             if resource:

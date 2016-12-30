@@ -391,3 +391,18 @@ $ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/1/cores
     }
 }
 ```
+
+## Get PoP floatin_ip details depending on quota and usage
+
+
+```
+$ curl -XGET http://localhost:8082/orchestrator/api/v0.1/pop/1/floating_ips
+200
+{
+    "floating_ips": {
+        "quota": 10,
+        "ratio": 0.2,
+        "used": 2
+    }
+}
+```

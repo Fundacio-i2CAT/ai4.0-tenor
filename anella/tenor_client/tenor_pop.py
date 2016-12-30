@@ -68,6 +68,18 @@ class TenorPoP(object):
                                    'router_external': network['router:external']})
         return network_details
 
+    def get_floating_ip_details(self):
+        servers = self.get_server_details()
+        quota = self.get_quota_details()
+        floating_ips = int(quota['floating_ips'])
+        used_floating_ips = 0
+        for server in servers:
+            for key in server['addresses'].keys():
+                for address in server['addresses'][key]:
+                    if address['OS-EXT-IPS:type'].upper() == 'FLOATING':
+                        used_floating_ips = used_floating_ips+1
+        return {'quota': floating_ips, 'used': used_floating_ips, 'ratio': float(used_floating_ips)/float(floating_ips)}
+
     def get_core_details(self):
         servers = self.get_server_details()
         quota = self.get_quota_details()
