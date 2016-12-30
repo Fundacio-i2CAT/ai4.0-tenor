@@ -40,7 +40,16 @@ class Provisioner < NsProvisioning
             # Retrieves deep info on VMs (IPs and States)
             # def authenticate_anella(keystone_url, tenant_name, username, password)
             instance = Nsr.find(params['id'])
-            pop_urls = instance['authentication'][0]['urls']
+            pop_urls = nil
+            begin
+                pop_urls = instance['authentication'][0]['urls']
+            rescue => e
+                # Destroys documents corresponding to instances out of control in the database
+                #     it seems a good idea today but who knows ...
+                logger.error params['id'], "Destroying instance out of control document"
+                instance.destroy
+                halt 500
+            end
             dc = {
                 'tenant_name' => instance['authentication'][0]['tenant_name'],
                 'user' => instance['authentication'][0]['username'],

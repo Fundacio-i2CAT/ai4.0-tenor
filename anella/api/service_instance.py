@@ -75,12 +75,15 @@ class ServiceInstance(flask_restful.Resource):
             if not 'public_network_id' in context:
                 resp = tns.instantiate(pop_id)
             else:
-                print context['public_network_id']
                 resp = tns.instantiate(pop_id, context['public_network_id'])
             nsdata = json.loads(resp.text)
         except Exception as exc:
             abort(500,
                   message="Error posting NS instance: {0}".format(str(exc)))
+        if resp.status_code == 403:
+            edata = json.loads(resp.text)
+            abort(403, message=edata['message'])
+
         icd = build_instance_configuration(nsdata['id'],
                                            data['context']['consumer_params'])
         icd.save()
