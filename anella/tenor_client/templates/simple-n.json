@@ -122,7 +122,7 @@
 			"vnf_reference": "{{ vnf_id }}"
 		    }
 		],
-		"sla_key": "basic"
+		"sla_key": "{{ flavor }}"
 	    }
 	],
 	"auto_scale_policy": {

@@ -8,12 +8,14 @@ from jinja2 import Template
 from tenor_dummy_id import TenorDummyId
 from tenor_vnf import TenorVNF
 from tenor_vdu import TenorVDU
+from tenor_pop import TenorPoP
 
 import ConfigParser
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 
+POP_ID = int(CONFIG.get('tenor', 'default_pop'))
 DEFAULT_TENOR_URL = format('{0}:{1}'.format(
     CONFIG.get('tenor', 'url'),
     CONFIG.get('tenor', 'port')))
@@ -21,7 +23,7 @@ DEFAULT_TENOR_URL = format('{0}:{1}'.format(
 DEFAULT_TEMPLATE = './tenor_client/templates/simple-f.json'
 DEFAULT_CALLBACK_URL = 'http://localhost:8082/orchestrator/api/v0.1/log'
 DEFAULT_TEMPLATE = './tenor_client/templates/simple-n.json'
-DEFAULT_FLAVOUR = 'basic'
+DEFAULT_FLAVOR = 'basic'
 
 class TenorNS(object):
     """Represents a TeNOR NS"""
@@ -102,11 +104,21 @@ class TenorNS(object):
                     pop_id=None,
                     public_network_id=None,
                     callback_url=DEFAULT_CALLBACK_URL,
-                    flavour=DEFAULT_FLAVOUR):
+                    flavor=None):
         """Instantiates the NS on openstack"""
+        vdu = self._vnf.get_vdu()
+        if vdu.flavor:
+            flavor = vdu.flavor
+        else:
+            flavor = DEFAULT_FLAVOR
         ns_data = {'ns_id': self._dummy_id, 'pop_id': pop_id,
-                   'callbackUrl': callback_url, 'flavour': flavour,
+                   'callbackUrl': callback_url, 'flavour': flavor,
                    'public_network_id': public_network_id}
+        quota = self.check_quota(pop_id, flavor)
+        if quota:
+            resp = type('',(object,),{'text': json.dumps({"message": quota}),
+                                      'status_code': 403})()
+            return resp
         try:
             resp = requests.post('{0}/ns-instances'.format(self._tenor_url),
                                  headers={'Content-Type': 'application/json'},
@@ -120,6 +132,23 @@ class TenorNS(object):
         except:
             raise ValueError('Decoding new NSI resp json resp failed')
         return resp
+
+    def check_quota(self, pop_id, flavor):
+        """Check resource quotas on the VIM"""
+        if not pop_id:
+            pop_id = POP_ID
+        pop = TenorPoP(pop_id)
+        flavors_available = pop.get_flavor_details()
+        target_flavor = None
+        value = None
+        for flava in flavors_available:
+            if flava['name'] == flavor:
+                target_flavor = flava
+        ram = pop.get_ram_details()
+        if target_flavor:
+            if target_flavor['ram']+ram['used'] > ram['quota']:
+                value = 'ram quota limit reached'
+        return value
 
     def set_dummy_id(self, dummy_id):
         """Sets dummy_id"""
