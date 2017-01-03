@@ -3,7 +3,7 @@
 """Consumer Param model"""
 
 from mongoengine import EmbeddedDocument, StringField, ListField
-from mongoengine import EmbeddedDocumentField
+from mongoengine import EmbeddedDocumentField, BooleanField
 
 class ConsumerField(EmbeddedDocument):
     """Consumer field class"""
@@ -11,6 +11,8 @@ class ConsumerField(EmbeddedDocument):
     name = StringField(required=True)
     value = StringField(required=True)
     desc = StringField(required=False)
+    runtime = BooleanField(required=False)
+    required = BooleanField(required=False)
 
 class ConsumerParam(EmbeddedDocument):
     """Consumer param class"""

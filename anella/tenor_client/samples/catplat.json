@@ -1,0 +1,47 @@
+{
+    "context" : {
+	"name_image" : "Stack por HTTP",
+	"vm_image_format" : "openstack_id",
+	"tenor_url" : "http://localhost:4000",
+	"vm_image" : "c3e47e71-8ce2-43d6-a04a-14d6ca1b4404",
+	"flavor" : "m1.medium",
+	"consumer_params" : [
+            {
+		"path" : "/var/www/html/index.html",
+		"fields" : [
+                    {
+			"required": true,
+			"name" : "floating_ip",
+			"desc" : "Instance's floating IP",
+			"value" : "floating_ip",
+			"runtime" : true
+		    },
+		    {
+			"required" : true,
+			"name" : "name",
+			"desc" : "Name of the consumer",
+			"value" : "Example deployment"
+                    },
+                    {
+			"required" : true,
+			"name" : "picture",
+			"desc" : "Consumer server Picture",
+			"value" : "https://upload.wikimedia.org/wikipedia/en/d/d4/Mickey_Mouse.png"
+                    },
+                    {
+			"required" : true,
+			"name" : "cv",
+			"desc" : "CV del consumer",
+			"value" : "laksjd laksdj laksjd laks jdlkas jdlkas jd"
+                    }
+		]
+            },
+            {
+		"path" : "/root/chequeo.txt",
+		"content" : "PRUEBA IMAGEN CON RUNTIME PARAMS"
+	    }
+	]
+    }
+}
+
+

@@ -40,7 +40,7 @@ CATALOG_EXAMPLE = {
 	],
 	"name_image" : "TEST",
 	"tenor_url" : "http://localhost:4000",
-        "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
+        "vm_image": "c3e47e71-8ce2-43d6-a04a-14d6ca1b4404",
         "vm_image_format": "openstack_id",
 	"flavor" : "m1.medium",
 	"consumer_params" : [
@@ -48,16 +48,23 @@ CATALOG_EXAMPLE = {
 		"path" : "/var/www/html/index.html",
 		"fields" : [
                     {
+			"required": True,
+			"name" : "floating_ip",
+			"desc" : "Instance's floating IP",
+			"value" : "floating_ip",
+			"runtime" : True
+		    },
+                    {
 			"required" : True,
 			"name" : "name",
 			"desc" : "Name of the consumer",
-			"value" : "yo vot a kodos"
+			"value" : "yo vot&eacute; a kodos"
                     },
                     {
 			"required" : True,
 			"name" : "picture",
 			"desc" : "Foto del consumer",
-			"value" : "http://mongoengine.org/assets/themes/metromongo/images/helpwanted.jpg"
+			"value" : "https://upload.wikimedia.org/wikipedia/en/d/d4/Mickey_Mouse.png"
                     },
                     {
 			"required" : True,

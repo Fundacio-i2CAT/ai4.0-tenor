@@ -23,6 +23,15 @@ DEFAULT_TENOR_URL = format('{0}:{1}'.format(
     CONFIG.get('tenor', 'url'),
     CONFIG.get('tenor', 'port')))
 
+def runtime_mapping(name, tenor_nsi):
+    addresses = tenor_nsi.get_addresses()
+    for addr in addresses:
+        if (name.upper() == 'FLOATING_IP') and (addr['OS-EXT-IPS:type'].upper() == 'FLOATING'):
+            return addr['addr']
+        if (name.upper() == 'FIXED_IP') and (addr['OS-EXT-IPS:type'].upper() == 'FIXED'):
+            return addr['addr']
+    return None
+
 class TenorNSI(object):
     """Represents a TeNOR NS Instance"""
 
@@ -42,8 +51,6 @@ class TenorNSI(object):
         try:
             resp = requests.get('{0}/ns-instances/{1}'.format(
                 self._tenor_url, self._nsi_id))
-            print "LKJASDLKJSD"
-            print resp.text
         except IOError:
             raise IOError('{0} instance unreachable'.format(self._tenor_url))
         try:
@@ -84,6 +91,9 @@ class TenorNSI(object):
         # returns the private key
         return key.exportKey('PEM')
 
+    def get_addresses(self):
+        return self._addresses[0][1]
+
     def configure(self):
         """Configures the instance according to consumer needs"""
         for addr in self._addresses[0][1]:
@@ -118,7 +128,12 @@ class TenorNSI(object):
                     continue
                 keyvalues = {}
                 for item in cpar.fields:
-                    keyvalues[item.name] = item.value
+                    if item.runtime:
+                        runtime_value = runtime_mapping(item.name, self)
+                        if runtime_value:
+                            keyvalues[item.name] = runtime_value
+                    else:
+                        keyvalues[item.name] = item.value
                 result = render_template(template_id, keyvalues)
                 render_filename = '/tmp/{0}'.format(uuid.uuid4())
                 with open(render_filename, 'w') as fhandle:
