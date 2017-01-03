@@ -7,6 +7,7 @@ from api.vnf import VNF
 from api.ns import NS
 from api.service_instance import ServiceInstance
 from api.service_instance import ServiceInstanceHistory
+from api.service_instance import ServiceInstanceKey
 from api.log import Log
 from api.enotification import Enotification
 
@@ -45,6 +46,9 @@ API_V2.add_resource(ServiceInstance,
 
 API_V2.add_resource(ServiceInstanceHistory,
                     '/service/instance/<ns_id>/history')
+
+API_V2.add_resource(ServiceInstanceKey,
+                    '/service/instance/<ns_id>/key')
 
 API_V2.add_resource(VNF,
                     '/vnf',

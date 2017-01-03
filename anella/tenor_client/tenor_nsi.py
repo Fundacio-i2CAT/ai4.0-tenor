@@ -13,6 +13,8 @@ from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
 
 from scp import SCPClient
+from os import chmod
+from Crypto.PublicKey import RSA
 import os
 import ConfigParser
 
@@ -64,6 +66,23 @@ class TenorNSI(object):
                     if 'addresses' in vnfr['server']:
                         self._addresses = vnfr['server']['addresses']
         return nsi
+
+    def create_provider_key(self):
+        """Creates a new RSA key pair and updates the machine with the public one"""
+        for addr in self._addresses[0][1]:
+            if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
+                server_ip = addr['addr']
+        key = RSA.generate(2048)
+        pubkey = key.publickey()
+        ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
+        command = 'echo \'{0}\' >> /root/.ssh/authorized_keys'.format(pubkey.exportKey('OpenSSH'))
+        print command
+        stdin, stdout, stderr = ssh.exec_command(command)
+        print stdout.readlines()
+        print stderr.readlines()
+        ssh.close()
+        # returns the private key
+        return key.exportKey('PEM')
 
     def configure(self):
         """Configures the instance according to consumer needs"""
