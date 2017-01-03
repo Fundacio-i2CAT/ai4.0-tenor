@@ -131,6 +131,9 @@ class TenorNSI(object):
                     if item.runtime:
                         runtime_value = runtime_mapping(item.name, self)
                         if runtime_value:
+                            print "RUNTIME"
+                            print item.name
+                            print runtime_value
                             keyvalues[item.name] = runtime_value
                     else:
                         keyvalues[item.name] = item.value

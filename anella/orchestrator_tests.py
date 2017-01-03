@@ -102,6 +102,20 @@ ADAM_EXAMPLE = {
 		"path" : "/var/www/html/index.html",
 		"fields" : [
                     {
+			"required": True,
+			"name" : "floating_ip",
+			"desc" : "Instance's floating IP",
+			"value" : "floating_ip",
+			"runtime" : True
+		    },
+                    {
+			"required": True,
+			"name" : "fixed_ip",
+			"desc" : "Instance's fixed IP",
+			"value" : "fixed_ip",
+			"runtime" : True
+		    },
+                    {
 			"required" : True,
 			"name" : "name",
 			"desc" : "Name of the consumer",
