@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """TeNOR messages models"""
 
-from mongoengine import *
+from mongoengine import Document, StringField, DateTimeField
 import datetime
 
 class CriticalError(Document):

@@ -15,6 +15,6 @@ class Callback(object):
     """Represents a callback object"""
 
     def __init__(self, data, callback_url=DEFAULT_CALLBACK_URL):
-        resp = requests.post(callback_url,
-                             headers={'Content-Type': 'application/json'},
-                             json=data)
+        requests.post(callback_url,
+                      headers={'Content-Type': 'application/json'},
+                      json=data)

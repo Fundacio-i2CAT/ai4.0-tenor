@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Api Log model"""
 
-from mongoengine import *
+from mongoengine import StringField, DateTimeField, Document
 import datetime
 
 class ApiLog(Document):

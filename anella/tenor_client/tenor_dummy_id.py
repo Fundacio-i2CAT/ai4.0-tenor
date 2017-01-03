@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """TeNOR Dummy and Internal ID module ..."""
 
-import random
-
 class TenorDummyId(object):
     """Manages mixed ids ... ints for vnfs and unicode for nsd"""
     def __init__(self, value):

@@ -81,7 +81,7 @@ class TenorNS(object):
         except:
             raise IOError('Template {0} IOError'.format(self._template))
         resp = None
-        while (resp == None) or (not resp.status_code in (200,201)):
+        while (resp == None) or (not resp.status_code in (200, 201)):
             self._nsd = templ.render(ns_id=self._dummy_id,
                                      vnf_id=self._vnf.get_dummy_id(),
                                      flavor=self._vnf.get_vdu().flavor,
@@ -116,8 +116,8 @@ class TenorNS(object):
                    'public_network_id': public_network_id}
         quota = self.check_quota(pop_id, flavor)
         if quota:
-            resp = type('',(object,),{'text': json.dumps({"message": quota}),
-                                      'status_code': 403})()
+            resp = type('', (object,), {'text': json.dumps({"message": quota}),
+                                        'status_code': 403})()
             return resp
         try:
             resp = requests.post('{0}/ns-instances'.format(self._tenor_url),

@@ -6,12 +6,10 @@ from tenor_client.tenor_vdu import TenorVDU
 from tenor_client.tenor_vnf import TenorVNF
 from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
-from models.instance_configuration import InstanceConfiguration
 from models.instance_configuration import build_instance_configuration
 from models.tenor_messages import RegularMessage
 from models.api_log import ApiLog
 
-from bson import json_util
 import flask_restful
 from flask_restful import abort
 from flask import request
@@ -19,7 +17,6 @@ import json
 import ConfigParser
 from flask import send_file
 import uuid
-import os
 import StringIO
 
 CONFIG = ConfigParser.RawConfigParser()
@@ -40,13 +37,17 @@ class ServiceInstance(flask_restful.Resource):
                   message="Error retrieving NS instances: {0}".format(str(exc)))
         states = []
         for tid in tids:
-            nsi = TenorNSI(tid)
-            nsi_state = nsi.get_state_and_addresses()
-            if ns_id:
-                if tid == ns_id:
-                    return nsi_state
-            else:
+            if not ns_id:
+                nsi = TenorNSI(tid)
+                nsi_state = nsi.get_state_and_addresses()
                 states.append(nsi_state)
+            else:
+                if tid == ns_id:
+                    nsi = TenorNSI(tid)
+                    nsi_state = nsi.get_state_and_addresses()
+                    return nsi_state
+        if len(states) == 0 and ns_id:
+            abort(404, message="Service instance {0} not found".format(ns_id))
         return states
 
     def post(self):
@@ -147,13 +148,15 @@ class ServiceInstanceHistory(flask_restful.Resource):
 
     def get(self, ns_id):
         """Gets NSI history"""
+        if not ns_id in TenorNSI.get_nsi_ids():
+            abort(404, message="Service instance {0} not found".format(ns_id))
         events = []
         history = RegularMessage.objects(service_instance_id=ns_id).order_by('timestamp')
-        for h in history:
-            data = str(h.message)
+        for hev in history:
+            data = str(hev.message)
             info = (data[:75] + '...') if len(data) > 75 else data
-            events.append({'time': str(h.timestamp), 'message': info,
-                           'severity': str(h.severity)})
+            events.append({'time': str(hev.timestamp), 'message': info,
+                           'severity': str(hev.severity)})
         return events
 
 class ServiceInstanceKey(flask_restful.Resource):
@@ -163,15 +166,17 @@ class ServiceInstanceKey(flask_restful.Resource):
 
     def get(self, ns_id):
         """Gets a new service instance key"""
+        if not ns_id in TenorNSI.get_nsi_ids():
+            abort(404, message="Service instance {0} not found".format(ns_id))
         nsi = TenorNSI(ns_id)
         private_key = nsi.create_provider_key()
         filename = uuid.uuid4()
-        strIO = StringIO.StringIO()
-        strIO.write(private_key)
-        strIO.seek(0)
+        str_io = StringIO.StringIO()
+        str_io.write(private_key)
+        str_io.seek(0)
         # fake filename to avoid keeping the provider's private key
         #    in the plataforma 4.0 host system
         private_filename = '/tmp/{0}.pem'.format(filename)
-        return send_file(strIO,
+        return send_file(str_io,
                          attachment_filename=private_filename,
                          as_attachment=True)

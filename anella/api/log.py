@@ -2,17 +2,12 @@
 # -*- coding: utf-8 -*-
 """Log API"""
 
-from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
-from tenor_client.tenor_vnf import TenorVNF
-from tenor_client.tenor_vdu import TenorVDU
 from tenor_client.callback import Callback
 from models.tenor_messages import CriticalError
 
 import flask_restful
-from flask_restful import abort
 from flask import request
-import json
 
 class Log(flask_restful.Resource):
     """TeNOR Logs"""
@@ -29,7 +24,7 @@ class Log(flask_restful.Resource):
             nsi.configure()
             try:
                 to_service_manager = nsi.get_state_and_addresses()
-                callback = Callback(to_service_manager)
+                Callback(to_service_manager)
             except:
                 pass
 

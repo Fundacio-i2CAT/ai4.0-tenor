@@ -4,7 +4,6 @@
 
 import requests
 import json
-import paramiko
 import uuid
 from tenor_vnfi import TenorVNFI
 from template_management import create_ssh_client
@@ -13,7 +12,6 @@ from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
 
 from scp import SCPClient
-from os import chmod
 from Crypto.PublicKey import RSA
 import os
 import ConfigParser
@@ -44,6 +42,8 @@ class TenorNSI(object):
         try:
             resp = requests.get('{0}/ns-instances/{1}'.format(
                 self._tenor_url, self._nsi_id))
+            print "LKJASDLKJSD"
+            print resp.text
         except IOError:
             raise IOError('{0} instance unreachable'.format(self._tenor_url))
         try:
@@ -97,17 +97,17 @@ class TenorNSI(object):
             print "ICD NOT FOUND"
             return
 
-        for cp in icds[0].consumer_params:
-            filename = cp.path
-            if 'content' in cp:
-                content = cp.content.encode('utf-8')
+        for cpar in icds[0].consumer_params:
+            filename = cpar.path
+            if 'content' in cpar:
+                content = cpar.content.encode('utf-8')
                 command = 'echo \'{0}\' > {1}'.format(content,
                                                       filename)
                 print command
                 stdin, stdout, stderr = ssh.exec_command(command)
                 print stdout.readlines()
                 print stderr.readlines()
-            if 'fields' in cp:
+            if 'fields' in cpar:
                 print 'Getting {0}'.format(filename)
                 template_id = str(uuid.uuid4())
                 template_filename = '/tmp/{0}'.format(template_id)
@@ -117,7 +117,7 @@ class TenorNSI(object):
                     # DO NOT FORGET TO RAISE ERROR!!!
                     continue
                 keyvalues = {}
-                for item in cp.fields:
+                for item in cpar.fields:
                     keyvalues[item.name] = item.value
                 result = render_template(template_id, keyvalues)
                 render_filename = '/tmp/{0}'.format(uuid.uuid4())

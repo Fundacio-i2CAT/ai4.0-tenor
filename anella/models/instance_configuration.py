@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*-
 """Instance Configuration model"""
 
-from mongoengine import *
-from consumer_param import ConsumerParam,ConsumerField
+from mongoengine import StringField, ListField
+from mongoengine import EmbeddedDocumentField
+from mongoengine import Document, DateTimeField
+from mongoengine import connect
+from consumer_param import ConsumerParam, ConsumerField
 import datetime
 
 class InstanceConfiguration(Document):
@@ -13,23 +16,23 @@ class InstanceConfiguration(Document):
     consumer_params = ListField(EmbeddedDocumentField(ConsumerParam))
     timestamp = DateTimeField(default=datetime.datetime.now)
 
-def build_instance_configuration(service_instance_id,consumer_params):
+def build_instance_configuration(service_instance_id, consumer_params):
     """Building it from array"""
     cpds = []
-    for cp in consumer_params:
-        if 'content' in cp:
-            cpds.append(ConsumerParam(path=cp['path'], content=cp['content']))
+    for cpar in consumer_params:
+        if 'content' in cpar:
+            cpds.append(ConsumerParam(path=cpar['path'], content=cpar['content']))
             continue
-        if 'fields' in cp:
+        if 'fields' in cpar:
             fields = []
-            for fp in cp['fields']:
+            for fpar in cpar['fields']:
                 desc = None
-                if 'desc' in fp:
-                    desc = fp['desc']
-                fields.append(ConsumerField(name=fp['name'],
+                if 'desc' in fpar:
+                    desc = fpar['desc']
+                fields.append(ConsumerField(name=fpar['name'],
                                             desc=desc,
-                                            value=fp['value']))
-            cpds.append(ConsumerParam(path=cp['path'], fields=fields))
+                                            value=fpar['value']))
+            cpds.append(ConsumerParam(path=cpar['path'], fields=fields))
     return InstanceConfiguration(service_instance_id=service_instance_id,
                                  consumer_params=cpds)
 
@@ -40,7 +43,7 @@ if __name__ == "__main__":
     FPICTURE = ConsumerField(name="picture",
                           value="http://example.com/hola.jpg",
                           desc="URL de la foto")
-    CP1 = ConsumerParam(path="/var/www/html", fields=[FNAME,FPICTURE])
+    CP1 = ConsumerParam(path="/var/www/html", fields=[FNAME, FPICTURE])
     CP2 = ConsumerParam(path="/root/chequeo.txt", content="YO ESTUVE AQuÏ")
     IC = InstanceConfiguration(service_instance_id="laksdjlkasjd",
                                consumer_params=[CP1, CP2])
@@ -50,10 +53,10 @@ if __name__ == "__main__":
                                 consumer_params=[CP1, CP2])
     IC2.save()
     for ic in InstanceConfiguration.objects(service_instance_id="pwoeipqwoei"):
-        for cp in ic.consumer_params:
-            print "\t", cp.path
-            if 'content' in cp:
-                print "\t\t", cp.content
-            if 'fields' in cp:
-                for f in cp.fields:
+        for cpar2 in ic.consumer_params:
+            print "\t", cpar2.path
+            if 'content' in cpar2:
+                print "\t\t", cpar2.content
+            if 'fields' in cpar2:
+                for f in cpar2.fields:
                     print "\t\t", f.name, "\t=\t", f.value

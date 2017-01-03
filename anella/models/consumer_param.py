@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """Consumer Param model"""
 
-from mongoengine import *
+from mongoengine import EmbeddedDocument, StringField, ListField
+from mongoengine import EmbeddedDocumentField
 
 class ConsumerField(EmbeddedDocument):
     """Consumer field class"""
@@ -16,7 +17,7 @@ class ConsumerParam(EmbeddedDocument):
 
     path = StringField(required=True)
     content = StringField(required=False)
-    fields = ListField(EmbeddedDocumentField(ConsumerField),required=False)
+    fields = ListField(EmbeddedDocumentField(ConsumerField), required=False)
 
 if __name__ == "__main__":
     FNAME = ConsumerField(name="name",
@@ -25,5 +26,5 @@ if __name__ == "__main__":
     FPICTURE = ConsumerField(name="picture",
                           value="http://example.com/hola.jpg",
                           desc="URL de la foto")
-    CP1 = ConsumerParam(path="/var/www/html", fields=[FNAME,FPICTURE])
+    CP1 = ConsumerParam(path="/var/www/html", fields=[FNAME, FPICTURE])
     CP2 = ConsumerParam(path="/root/chequeo.txt", content="YO ESTUVE AQuÏ")

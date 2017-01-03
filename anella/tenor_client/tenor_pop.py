@@ -11,10 +11,12 @@ class TenorPoP(object):
     """Represents a TeNOR PoP"""
 
     def __init__(self, pop_id=None, tenor_url=DEFAULT_TENOR_URL):
+        self._tenor_url = tenor_url
         self._pop_id = int(pop_id)
 
     def get_name(self):
-        url = '{0}/pops/dc/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        """Gets the PoP Name"""
+        url = '{0}/pops/dc/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
             resp = requests.get(url)
         except:
@@ -23,12 +25,12 @@ class TenorPoP(object):
             json.loads(resp.text)
         except:
             raise ValueError('Decoding PoP response json response failed')
-        ids = []
         pop = json.loads(resp.text)
         return pop['name']
 
     def get_server_details(self):
-        url = '{0}/pops/servers/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        """Gets the server details"""
+        url = '{0}/pops/servers/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
             resp = requests.get(url)
         except:
@@ -40,7 +42,8 @@ class TenorPoP(object):
         return servers['servers']
 
     def get_quota_details(self):
-        url = '{0}/pops/quotas/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        """Gets the quotas on the PoP"""
+        url = '{0}/pops/quotas/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
             resp = requests.get(url)
         except:
@@ -52,7 +55,8 @@ class TenorPoP(object):
         return quotas['quota_set']
 
     def get_network_details(self):
-        url = '{0}/pops/networks/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        """Gets networks information"""
+        url = '{0}/pops/networks/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
             resp = requests.get(url)
         except:
@@ -69,6 +73,7 @@ class TenorPoP(object):
         return network_details
 
     def get_floating_ip_details(self):
+        """Gets used floating_ips"""
         servers = self.get_server_details()
         quota = self.get_quota_details()
         floating_ips = int(quota['floating_ips'])
@@ -81,6 +86,7 @@ class TenorPoP(object):
         return {'quota': floating_ips, 'used': used_floating_ips, 'ratio': float(used_floating_ips)/float(floating_ips)}
 
     def get_core_details(self):
+        """Gets used and active cores"""
         servers = self.get_server_details()
         quota = self.get_quota_details()
         cores = int(quota['cores'])
@@ -91,6 +97,7 @@ class TenorPoP(object):
         return {'quota': cores, 'used': used_cores, 'ratio': float(used_cores)/float(cores)}
 
     def get_ram_details(self):
+        """Gets used ram active"""
         servers = self.get_server_details()
         quota = self.get_quota_details()
         ram = int(quota['ram'])
@@ -102,7 +109,8 @@ class TenorPoP(object):
                 'units': 'MB'}
 
     def get_flavor_details(self):
-        url = '{0}/pops/flavours/{1}'.format(DEFAULT_TENOR_URL,self._pop_id)
+        """Gets flavor details"""
+        url = '{0}/pops/flavours/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
             resp = requests.get(url)
         except:

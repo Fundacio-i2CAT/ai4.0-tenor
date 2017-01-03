@@ -3,10 +3,8 @@
 """Enotification API"""
 
 import flask_restful
-from flask_restful import abort
 from flask import request
 from models.tenor_messages import RegularMessage
-import json
 
 class Enotification(flask_restful.Resource):
     """TeNOR error management"""

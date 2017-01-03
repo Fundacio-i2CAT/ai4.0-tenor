@@ -3,7 +3,6 @@
 """Template management and scp routine"""
 
 from jinja2 import Environment, FileSystemLoader
-import os
 import paramiko
 
 def create_ssh_client(server, user, key):

@@ -8,7 +8,6 @@ from jinja2 import Template
 from tenor_dummy_id import TenorDummyId
 from tenor_vdu import TenorVDU
 import ConfigParser
-import random
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -103,7 +102,7 @@ class TenorVNF(object):
         except:
             raise IOError('Template {0} IOError'.format(self._template))
         resp = None
-        while (resp == None) or (not resp.status_code in (200,201)):
+        while (resp == None) or (not resp.status_code in (200, 201)):
             self._vnfd = templ.render(vnf_id=self._dummy_id,
                                       vm_image=self._vdu.vm_image,
                                       vm_image_format=self._vdu.vm_image_format.lower(),

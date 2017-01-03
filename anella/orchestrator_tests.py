@@ -9,10 +9,11 @@ import requests
 import random
 import time
 import ConfigParser
+import paramiko
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
-POP_ID = int(CONFIG.get('tenor','i2cat_pop'))
+POP_ID = int(CONFIG.get('tenor', 'i2cat_pop'))
 
 BASE_URL = 'http://localhost:{0}{1}'.format(PORT, URL_PREFIX)
 
@@ -173,7 +174,6 @@ class OrchestratorTestCase(unittest.TestCase):
         """Posts a new NS"""
         vresp = requests.get('{0}/vnf'.format(BASE_URL))
         assert vresp.status_code == 200
-        vnf_data = json.loads(vresp.text)
         url = '{0}/ns'.format(BASE_URL)
         resp = requests.post(url, headers={'Content-Type': 'application/json'},
                              json={'vnf_id': random.choice(self._vnfs),
@@ -205,10 +205,8 @@ class OrchestratorTestCase(unittest.TestCase):
     def instantiate_ns(self, preserve=False):
         """Instantates a NS, injects a random number
         in apache index.html and waits to stack deployment to check"""
-        vresp = requests.get('{0}/ns'.format(BASE_URL))
-        presp = requests.get('{0}/pop'.format(BASE_URL))
-        pops = json.loads(presp.text)
-        nss = json.loads(vresp.text)
+        requests.get('{0}/ns'.format(BASE_URL))
+        requests.get('{0}/pop'.format(BASE_URL))
         pop_id = POP_ID
         tns = random.choice(self._nss)
         ns_id = tns
@@ -247,6 +245,21 @@ class OrchestratorTestCase(unittest.TestCase):
         for addr in nsi['addresses']:
             if addr['OS-EXT-IPS:type'] == 'floating':
                 ipaddr = addr['addr']
+        # checks also the key generation feature
+        key_url = '{0}/service/instance/{1}/key'.format(BASE_URL, nsid)
+        key_resp = requests.get(key_url)
+        with open('keys/test_key.pem', 'w') as key_file:
+            key_file.write(key_resp.text)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(ipaddr, username='root',
+                    key_filename='keys/test_key.pem',
+                    timeout=15)
+        command = 'ls -laht /'
+        stdin, stdout, stderr = ssh.exec_command(command)
+        assert len(stdout.readlines()) > 1
+        assert len(stderr.readlines()) == 0
+        ssh.close()
         webresp = requests.get('http://{0}'.format(ipaddr))
         assert random_number == int(webresp.text)
         if not preserve:
@@ -261,10 +274,9 @@ class OrchestratorTestCase(unittest.TestCase):
     def test_07(self):
         """Posts service/instance one round mode"""
         url = '{0}/service/instance'.format(BASE_URL)
-        for i in range(0,1):
-            resp = requests.post(url, headers={'Content-Type': 'application/json'},
-                                 json=CATALOG_EXAMPLE)
-            assert resp.status_code == 200
+        resp = requests.post(url, headers={'Content-Type': 'application/json'},
+                             json=CATALOG_EXAMPLE)
+        assert resp.status_code == 200
 
     def test_08(self):
         """Posts service/instance one round mode at Adam with fixed network/pop"""

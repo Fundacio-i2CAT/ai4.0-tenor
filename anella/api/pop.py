@@ -36,7 +36,7 @@ class PoP(flask_restful.Resource):
                         return {'networks': tpop.get_network_details()}
             if resource:
                 abort(404,
-                      message='{0} PoP nf or rsrc {1} not in (networks,flavors)'.format(pop_id,resource))
+                      message='{0} PoP nf or rsrc {1} not in (networks,flavors)'.format(pop_id, resource))
         for pop_sid in ids:
             my_pop = TenorPoP(pop_sid)
             result.append({'pop_id': int(pop_sid),
