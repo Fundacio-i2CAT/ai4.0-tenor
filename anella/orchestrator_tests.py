@@ -299,7 +299,7 @@ class OrchestratorTestCase(unittest.TestCase):
                              json=CATALOG_EXAMPLE)
         assert resp.status_code == 200
 
-    def atest_08(self):
+    def test_08(self):
         """Posts service/instance one round mode at Adam with fixed network/pop"""
         url = '{0}/service/instance'.format(BASE_URL)
         resp = requests.post(url, headers={'Content-Type': 'application/json'},
