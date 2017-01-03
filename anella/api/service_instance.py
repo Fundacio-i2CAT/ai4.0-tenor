@@ -17,6 +17,10 @@ from flask_restful import abort
 from flask import request
 import json
 import ConfigParser
+from flask import send_file
+import uuid
+import os
+import StringIO
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -147,7 +151,27 @@ class ServiceInstanceHistory(flask_restful.Resource):
         history = RegularMessage.objects(service_instance_id=ns_id).order_by('timestamp')
         for h in history:
             data = str(h.message)
-            info = (data[:75] + '...') if len(data) > 75 else data 
+            info = (data[:75] + '...') if len(data) > 75 else data
             events.append({'time': str(h.timestamp), 'message': info,
                            'severity': str(h.severity)})
         return events
+
+class ServiceInstanceKey(flask_restful.Resource):
+    """Service instance history resources"""
+    def __init__(self):
+        pass
+
+    def get(self, ns_id):
+        """Gets a new service instance key"""
+        nsi = TenorNSI(ns_id)
+        private_key = nsi.create_provider_key()
+        filename = uuid.uuid4()
+        strIO = StringIO.StringIO()
+        strIO.write(private_key)
+        strIO.seek(0)
+        # fake filename to avoid keeping the provider's private key
+        #    in the plataforma 4.0 host system
+        private_filename = '/tmp/{0}.pem'.format(filename)
+        return send_file(strIO,
+                         attachment_filename=private_filename,
+                         as_attachment=True)
