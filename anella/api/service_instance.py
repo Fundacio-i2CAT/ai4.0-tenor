@@ -148,8 +148,6 @@ class ServiceInstanceHistory(flask_restful.Resource):
 
     def get(self, ns_id):
         """Gets NSI history"""
-        if not ns_id in TenorNSI.get_nsi_ids():
-            abort(404, message="Service instance {0} not found".format(ns_id))
         events = []
         history = RegularMessage.objects(service_instance_id=ns_id).order_by('timestamp')
         for hev in history:
@@ -157,7 +155,10 @@ class ServiceInstanceHistory(flask_restful.Resource):
             info = (data[:75] + '...') if len(data) > 75 else data
             events.append({'time': str(hev.timestamp), 'message': info,
                            'severity': str(hev.severity)})
-        return events
+        if len(events) > 0:
+            return events
+        else:
+            abort(404, message="Service instance {0} history not found".format(ns_id))
 
 class ServiceInstanceKey(flask_restful.Resource):
     """Service instance history resources"""
