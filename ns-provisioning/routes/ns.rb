@@ -46,8 +46,7 @@ class Provisioner < NsProvisioning
             rescue => e
                 # Destroys documents corresponding to instances out of control in the database
                 #     it seems a good idea today but who knows ...
-                logger.error params['id'], "Destroying instance out of control document"
-                instance.destroy
+                logger.error params['id'], "Found instance out of control document"
                 halt 500
             end
             dc = {
