@@ -41,6 +41,7 @@ class TenorNSI(object):
         self._state = "UNKNOWN"
         self._addresses = []
         self._image_id = None
+        self._image_url = None
         self.retrieve()
 
     def __repr__(self):
@@ -201,24 +202,16 @@ class TenorNSI(object):
 
         if failed:
             self._state = "FAILED"
-        created_image = None
-        if self._image_id:
-            created_image = {'vm_image': self._image_id,
-                             'vm_image_format': 'openstack_id'}
-        image_url = None
-        if self._image_url:
-            image_url = self._image_url
 
-        state = {'service_instance_id': self._nsi_id,
-                 'state': self._state,
-                 'addresses': addresses,
-                 'created_image': created_image,
-                 'image_url': image_url,
-                 'runtime_params': runtime_params}
-        result = {}
-        for key in state.keys():
-            if state[key]:
-                result[key] = state[key]
+        result = {'service_instance_id': self._nsi_id,
+                  'state': self._state,
+                  'addresses': addresses,
+                  'runtime_params': runtime_params}
+        if self._image_id:
+            result['created_image'] = {'vm_image': self._image_id,
+                                       'vm_image_format': 'openstack_id'}
+        if self._image_url:
+            result['image_url'] = self._image_url
         return result
 
     @staticmethod
