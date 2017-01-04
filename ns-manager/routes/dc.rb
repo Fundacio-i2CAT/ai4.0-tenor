@@ -192,6 +192,8 @@ class DcController < TnovaManager
             logger.error 'DC not found'
             return 404
         end
+        urls = getPopUrls(dc['extra_info'])
+        dc['orch'] = urls[:orch]
         return dc.to_json
     end
 
