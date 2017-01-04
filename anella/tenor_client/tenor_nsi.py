@@ -10,6 +10,7 @@ from template_management import create_ssh_client
 from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
+from urlparse import urlparse
 
 from scp import SCPClient
 from Crypto.PublicKey import RSA
@@ -211,7 +212,14 @@ class TenorNSI(object):
             result['created_image'] = {'vm_image': self._image_id,
                                        'vm_image_format': 'openstack_id'}
         if self._image_url:
-            result['image_url'] = self._image_url
+            image_path = None
+            try:
+                parsed_url = urlparse(self._image_url)
+                image_path = parsed_url.path
+            except:
+                image_path = None
+            if image_path:
+                result['image_path'] = image_path
         return result
 
     @staticmethod
