@@ -46,6 +46,26 @@ class Provisioning < VnfProvisioning
         halt 200, vnfrs.to_json
     end
 
+    # @method post cachedimg
+    # @overload get "/cachedimg"
+    # Checks if a vm_image is cached (ANELLA)
+    post '/cachedimg' do
+        return 415 unless request.content_type == 'application/json'
+        cachedimg_info = JSON.parse(request.body.read)
+        puts cachedimg_info
+        is_cached = Cachedimg.where(image_url: cachedimg_info['vm_image'],
+                                    vim_url: cachedimg_info['vim_url'])
+        all = Cachedimg.all
+        all.each do |item|
+            puts item
+        end
+        if is_cached.any?
+            halt 200
+        else
+            halt 404
+        end
+    end
+
     # @method post_vnf_provisioning_vnf_instances
     # @overload post '/vnf-provisioning/vnf-instances'
     #   Instantiate a VNF
