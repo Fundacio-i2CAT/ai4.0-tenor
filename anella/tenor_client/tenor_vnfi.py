@@ -20,6 +20,7 @@ class TenorVNFI(object):
                  tenor_url=DEFAULT_TENOR_URL):
         self._tenor_url = tenor_url
         self._image_id = None
+        self._image_url = None
         self._vnfi_id = vnfi_id
         self._all = None
         if self._vnfi_id:
@@ -42,11 +43,17 @@ class TenorVNFI(object):
         if len(vms) > 0:
             if 'image_id' in vms[0]:
                 self._image_id = vms[0]['image_id']
+            if 'vm_image_url' in vms[0]:
+                self._image_url = vms[0]['vm_image_url']
         return self._image_id
 
     def get_image_id(self):
         """Getter"""
         return self._image_id
+
+    def get_image_url(self):
+        """Getter"""
+        return self._image_url
 
     @staticmethod
     def get_vnfi_ids():

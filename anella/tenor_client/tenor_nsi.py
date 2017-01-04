@@ -64,6 +64,7 @@ class TenorNSI(object):
                 if 'vnfr_id' in vnfr:
                     vnfi = TenorVNFI(vnfr['vnfr_id'])
                     self._image_id = vnfi.get_image_id()
+                    self._image_url = vnfi.get_image_url()
                 if 'server' in vnfr:
                     if 'status' in vnfr['server']:
                         if vnfr['server']['status'].upper() == 'ACTIVE':
@@ -200,17 +201,25 @@ class TenorNSI(object):
 
         if failed:
             self._state = "FAILED"
+        created_image = None
         if self._image_id:
-            return {'service_instance_id': self._nsi_id,
-                    'state': self._state,
-                    'addresses': addresses,
-                    'created_image': {'vm_image': self._image_id,
-                                      'vm_image_format': 'openstack_id'},
-                    'runtime_params': runtime_params}
-        return {'service_instance_id': self._nsi_id,
-                'state': self._state,
-                'addresses': addresses,
-                'runtime_params': runtime_params}
+            created_image = {'vm_image': self._image_id,
+                             'vm_image_format': 'openstack_id'}
+        image_url = None
+        if self._image_url:
+            image_url = self._image_url
+
+        state = {'service_instance_id': self._nsi_id,
+                 'state': self._state,
+                 'addresses': addresses,
+                 'created_image': created_image,
+                 'image_url': image_url,
+                 'runtime_params': runtime_params}
+        result = {}
+        for key in state.keys():
+            if state[key]:
+                result[key] = state[key]
+        return result
 
     @staticmethod
     def get_nsi_ids():

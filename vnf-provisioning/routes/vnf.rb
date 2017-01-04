@@ -376,6 +376,7 @@ class Provisioning < VnfProvisioning
         if params[:status] == 'create_complete'
             logger.info 'Create complete'
 
+            vnfd = JSON.parse(RestClient.get("http://localhost:4000/vnfs/#{vnfr['vnfd_reference']}", :accept => :json))
             vms = []
             vms_id = {}
             # get stack resources
@@ -383,16 +384,6 @@ class Provisioning < VnfProvisioning
             logger.error errors if errors
             resources.each do |resource|
                 if resource['resource_type'] == 'OS::Glance::Image'
-                    puts "HERE GOES THE STACK"
-                    puts stack_info['vim_info']['url']['orch']
-                    puts "HERE GOES THE IMAGE OPENSTACK_ID"
-                    puts resource['physical_resource_id']
-                    puts "DESCRIPTOR REFERENCE="
-                    puts vnfr['vnfd_reference']
-                    vnfd = JSON.parse(RestClient.get("http://localhost:4000/vnfs/#{vnfr['vnfd_reference']}", :accept => :json))
-                    puts "IMAGE VM"
-                    puts vnfd['vnfd']['vdu'][0]['vm_image']
-                    puts vnfd['vnfd']['vdu'][0]['cached']
                     if vnfd['vnfd']['vdu'][0]['cached']
                         Cachedimg.create!(stack_url: vnfr.stack_url,
                                           openstack_id: resource['physical_resource_id'],
@@ -418,10 +409,12 @@ class Provisioning < VnfProvisioning
                 unless resource['resource_type'] != 'OS::Nova::Server'
                     vm = vms.find { |vdu| vdu[:id] == resource['resource_name'] }
                     if vm.nil?
-                        vms << { id: resource['resource_name'], physical_resource_id: resource['physical_resource_id'] }
+                        vms << { id: resource['resource_name'], physical_resource_id: resource['physical_resource_id'],
+                            vm_image_url: vnfd['vnfd']['vdu'][0]['vm_image']}
                     else
                         vm[:id] = resource['resource_name']
                         vm[:physical_resource_id] = resource['physical_resource_id']
+                        vm[:vm_image_url] = vnfd['vnfd']['vdu'][0]['vm_image']
                     end
                 end
                 unless resource['resource_type'] != 'OS::Nova::Flavor'
