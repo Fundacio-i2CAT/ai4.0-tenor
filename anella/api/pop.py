@@ -19,7 +19,9 @@ class PoP(flask_restful.Resource):
                 if pid == int(pop_id):
                     tpop = TenorPoP(pid)
                     if not resource:
-                        return {'pop_id': pop_id, 'name': tpop.get_name()}
+                        pop_info = tpop.retrieve()
+                        return {'pop_id': pop_id, 'name': pop_info['name'],
+                                'orch': pop_info['orch']}
                     if resource == 'flavors':
                         return {'flavors': tpop.get_flavor_details()}
                     if resource == 'quotas':
@@ -39,6 +41,8 @@ class PoP(flask_restful.Resource):
                       message='{0} PoP nf or rsrc {1} not in (networks,flavors)'.format(pop_id, resource))
         for pop_sid in ids:
             my_pop = TenorPoP(pop_sid)
+            pop_info = my_pop.retrieve()
             result.append({'pop_id': int(pop_sid),
-                           'name': my_pop.get_name()})
+                           'name': pop_info['name'],
+                           'orch': pop_info['orch']})
         return result

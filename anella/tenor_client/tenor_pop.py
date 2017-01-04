@@ -13,8 +13,10 @@ class TenorPoP(object):
     def __init__(self, pop_id=None, tenor_url=DEFAULT_TENOR_URL):
         self._tenor_url = tenor_url
         self._pop_id = int(pop_id)
+        self._name = None
+        self._orch = None
 
-    def get_name(self):
+    def retrieve(self):
         """Gets the PoP Name"""
         url = '{0}/pops/dc/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
         try:
@@ -26,7 +28,9 @@ class TenorPoP(object):
         except:
             raise ValueError('Decoding PoP response json response failed')
         pop = json.loads(resp.text)
-        return pop['name']
+        self._name = pop['name']
+        self._orch = pop['orch']
+        return pop
 
     def get_server_details(self):
         """Gets the server details"""
