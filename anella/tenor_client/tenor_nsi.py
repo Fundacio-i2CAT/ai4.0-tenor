@@ -187,7 +187,7 @@ class TenorNSI(object):
         for adr in self._addresses:
             for ipif in adr[1]:
                 if ipif['OS-EXT-IPS:type'] == 'floating':
-                    runtime_params.append({'name': 'instance_ip',
+                    runtime_params.append({'name': 'floating_ip',
                                            'desc': 'Service instance IP address',
                                            'value': ipif['addr']})
                 addresses.append({'OS-EXT-IPS:type': ipif['OS-EXT-IPS:type'],

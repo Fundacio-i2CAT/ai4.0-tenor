@@ -79,7 +79,7 @@ class Provisioner < NsProvisioning
                             vnf['server']['addresses'].append(ad)
                         end
                     rescue => e
-                        logger.error operationId, 'Openstack request failed',id
+                        logger.error operationId, 'Openstack request failed'
                         halt e.response.code, e.response
                     end
                 end
