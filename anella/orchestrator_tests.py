@@ -152,6 +152,32 @@ class OrchestratorTestCase(unittest.TestCase):
         self._nss = []
         self._nsis = []
 
+    def test_01(self):
+        """PoP tests"""
+        resp = requests.get('{0}/pop'.format(BASE_URL))
+        assert resp.status_code == 200
+        pops = json.loads(resp.text)
+        for tpop in pops:
+            presp = requests.get('{0}/pop/{1}'.format(BASE_URL, tpop['pop_id']))
+            assert presp.status_code == 200
+            pdata = json.loads(presp.text)
+            assert 'pop_id' in pdata
+            assert 'orch' in pdata
+            assert 'name' in pdata
+            print "- CHECKING {0}".format(pdata['name'])
+            print "\t * HEAT URL: ", pdata['orch']
+            resources = ['flavors', 'quotas', 'servers', 'ram',
+                         'cores', 'floating_ips', 'networks']
+            for res in resources:
+                url = '{0}/pop/{1}/{2}'.format(BASE_URL, tpop['pop_id'],res)
+                print "\t -- {0}".format(res.upper())
+                rresp = requests.get(url)
+                assert rresp.status_code == 200
+                rrdata = json.loads(rresp.text)
+                sample = rresp.text[:100] + (rresp.text[100:] and '...')
+                print "\t\t $-$ ", sample.strip()
+            print
+
     def test_02(self):
         """Gets NS instances"""
         resp = requests.get('{0}/service/instance'.format(BASE_URL))
@@ -161,6 +187,12 @@ class OrchestratorTestCase(unittest.TestCase):
             assert 'service_instance_id' in instances[0]
             for ins in instances:
                 assert ins['state'].upper() in ('RUNNING', 'DEPLOYED', 'UNKNOWN', 'FAILED')
+                iresp = requests.get('{0}/service/instance/{1}'.format(BASE_URL, ins['service_instance_id']))
+                idata = json.loads(iresp.text)
+                assert 'service_instance_id' in idata
+                hresp = requests.get('{0}/service/instance/{1}/history'.format(BASE_URL, ins['service_instance_id']))
+                hdata = json.loads(hresp.text)
+                assert hresp.status_code == 200
         return instances
 
     def start_stop(self, prv, nxt, expected):
@@ -175,7 +207,7 @@ class OrchestratorTestCase(unittest.TestCase):
                                 json={'state': nxt})
             assert resp.status_code == expected
 
-    def atest_03(self):
+    def test_03(self):
         """Testing start/stop"""
         self.start_stop('RUNNING', 'DEPLOYED', 200)
         self.start_stop('DEPLOYED', 'RUNNING', 200)
