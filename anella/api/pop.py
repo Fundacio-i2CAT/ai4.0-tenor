@@ -4,7 +4,38 @@
 
 from tenor_client.tenor_pop import TenorPoP
 import flask_restful
+from flask import request
 from flask_restful import abort
+
+class IsCached(flask_restful.Resource):
+    """Endpoint to query cached images in VIMs"""
+    def __init__(self):
+        pass
+
+    def post(self, pop_id=None):
+        """Requests TeNOR to ask the VIM(s) if an image from an URL is cached"""
+        data = request.get_json()
+        vm_image = data['vm_image']
+        if pop_id:
+            tpop = TenorPoP(pop_id)
+            cachedimgs = tpop.get_cachedimgs(vm_image)
+            if len(cachedimgs) > 0:
+                return cachedimgs[0]
+            else:
+                abort(404,
+                      message='Image at {0} not cached at PoP {1}'.format(vm_image, pop_id))
+        ids = TenorPoP.get_pop_ids()
+        total = []
+        for pid in ids:
+            tpop = TenorPoP(pid)
+            cachedimgs = tpop.get_cachedimgs(vm_image)
+            if len(cachedimgs) > 0:
+                total.append(cachedimgs[0])
+        if len(total) > 0:
+            return total
+        else:
+                abort(404,
+                      message='Image at {0} is not cached anywhere'.format(vm_image))
 
 class PoP(flask_restful.Resource):
     """PoP related resources"""

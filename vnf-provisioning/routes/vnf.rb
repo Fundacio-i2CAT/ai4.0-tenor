@@ -53,7 +53,6 @@ class Provisioning < VnfProvisioning
     post '/cachedimg' do
         return 415 unless request.content_type == 'application/json'
         cachedimg_info = JSON.parse(request.body.read)
-        puts cachedimg_info
         is_cached = Cachedimg.where(image_url: cachedimg_info['vm_image'],
                                     vim_url: cachedimg_info['vim_url'])
         cached = []

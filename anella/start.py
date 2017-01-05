@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Anella 4.0 Orchestrator"""
 
-from api.pop import PoP
+from api.pop import PoP, IsCached
 from api.vnf import VNF
 from api.ns import NS
 from api.service_instance import ServiceInstance
@@ -62,6 +62,10 @@ API_V2.add_resource(PoP,
                     '/pop',
                     '/pop/<pop_id>',
                     '/pop/<pop_id>/<resource>')
+
+API_V2.add_resource(IsCached,
+                    '/iscached',
+                    '/iscached/<pop_id>')
 
 if __name__ == "__main__":
     print "Industrial Platform 4.0 Orchestrator"

@@ -4,14 +4,26 @@
 
 import requests
 import json
+import ConfigParser
 
-DEFAULT_TENOR_URL = 'http://localhost:4000'
+CONFIG = ConfigParser.RawConfigParser()
+CONFIG.read('config.cfg')
+
+DEFAULT_TENOR_URL = format('{0}:{1}'.format(
+    CONFIG.get('tenor', 'url'),
+    CONFIG.get('tenor', 'port')))
+
+DEFAULT_VNFP_URL = format('{0}:{1}'.format(
+    CONFIG.get('tenor', 'url'),
+    CONFIG.get('tenor', 'vnfp_port')))
 
 class TenorPoP(object):
     """Represents a TeNOR PoP"""
 
-    def __init__(self, pop_id=None, tenor_url=DEFAULT_TENOR_URL):
+    def __init__(self, pop_id=None, tenor_url=DEFAULT_TENOR_URL,
+                 vnfp_url=DEFAULT_VNFP_URL):
         self._tenor_url = tenor_url
+        self._vnfp_url = vnfp_url
         self._pop_id = int(pop_id)
         self._name = None
         self._orch = None
@@ -130,6 +142,23 @@ class TenorPoP(object):
                                    'disk': flavor['disk'],
                                    'vcpus': flavor['vcpus']})
         return flavor_details
+
+    def get_cachedimgs(self, vm_image):
+        self.retrieve()
+        body = {'vm_image': vm_image, 'vim_url': self._orch}
+        url = '{0}/vnf-provisioning/cachedimg'.format(self._vnfp_url)
+        resp = requests.post(url,
+                             headers={'Content-Type': 'application/json'},
+                             json=body)
+        if resp.status_code == 404:
+            return []
+        try:
+            rits = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        for rit in rits:
+            rit['pop_id'] = self._pop_id
+        return rits
 
     @staticmethod
     def get_pop_ids():
