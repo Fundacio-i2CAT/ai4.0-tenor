@@ -1,0 +1,4 @@
+{
+    "vm_image": "https://cloud-images.ubuntu.com/zesty/current/zesty-server-cloudimg-amd64.img",
+    "vim_url": "http://87.236.219.10:8004/v1"
+}

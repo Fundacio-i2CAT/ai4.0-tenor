@@ -49,20 +49,23 @@ class Provisioning < VnfProvisioning
     # @method post cachedimg
     # @overload get "/cachedimg"
     # Checks if a vm_image is cached (ANELLA)
+    # Uses the VIM's orchestrator main URL (heat)
     post '/cachedimg' do
         return 415 unless request.content_type == 'application/json'
         cachedimg_info = JSON.parse(request.body.read)
         puts cachedimg_info
         is_cached = Cachedimg.where(image_url: cachedimg_info['vm_image'],
                                     vim_url: cachedimg_info['vim_url'])
-        all = Cachedimg.all
-        all.each do |item|
-            puts item
+        cached = []
+        is_cached.each do |item|
+            cached.append({openstack_id: item.openstack_id,
+                              vim_url: item.vim_url})
         end
-        if is_cached.any?
-            halt 200
+        if cached.any?
+            halt 200, cached.to_json
         else
-            halt 404
+            message = 'Image '+cachedimg_info['vm_image']+' not found in '+cachedimg_info['vim_url']
+            halt 404, {message: message}.to_json
         end
     end
 
