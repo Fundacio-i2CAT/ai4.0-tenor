@@ -215,7 +215,7 @@ class TenorNSI(object):
             image_path = None
             try:
                 parsed_url = urlparse(self._image_url)
-                image_path = parsed_url.path
+                image_path = parsed_url.path.split('/')[-1]
             except:
                 image_path = None
             if image_path:
