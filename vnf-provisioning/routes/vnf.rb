@@ -306,6 +306,40 @@ class Provisioning < VnfProvisioning
         halt 200 # , response.body
     end
 
+    # @method
+    # @overload post '/vnf-provisioning/vnf-instances/:vnfr_id/snapshot'
+    #   Request to generate an Snapshot of the VM instance
+    #   @param [String] vnfr_id the VNFR ID
+    #   @param [JSON]
+    # Request to generate an snapshot
+    put '/vnf-instances/:vnfr_id/snapshot' do |vnfr_id|
+        # Return if content-type is invalid
+        halt 415 unless request.content_type == 'application/json'
+        # Validate JSON format
+        config_info = parse_json(request.body.read)
+
+        # Get VNFR stack info
+        begin
+            vnfr = Vnfr.find(vnfr_id)
+        rescue Mongoid::Errors::DocumentNotFound => e
+            halt 404
+        end
+        name_image = config_info['name_image']
+        dc = config_info['vim_info']
+        pop_urls = dc['pop_urls']
+        admin_credentials, errors = authenticate_anella(pop_urls['keystone'], dc["tenant_name"], dc['user'], dc['password'])
+        tenant_id = admin_credentials[:tenant_id]
+        auth_token = admin_credentials[:token]
+        url =
+            pop_urls['compute']+'/'+
+            tenant_id+
+            '/servers/'+vnfr.vms_id['vdu0']+
+            '/action'
+        amessage = {"createImage" => {"name": name_image, "metadata": {}}}
+        check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
+
+    end
+
     # @method post_vnf_provisioning_instances_id_config
     # @overload post '/vnf-provisioning/vnf-instances/:vnfr_id/config'
     #   Request to execute a lifecycle event

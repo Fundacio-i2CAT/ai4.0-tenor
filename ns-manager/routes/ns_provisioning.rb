@@ -187,6 +187,40 @@ class NsProvisioner < TnovaManager
   # Update ns-instance status
   # @param [string] nsr_id Instance id
   # @param [string] status Status
+  post '/:nsr_id/snapshot' do
+    snapshot_info = JSON.parse(request.body.read)
+    logger.info "Snapshoting " + params[:nsr_id].to_s
+    provisioner, errors = ServiceConfigurationHelper.get_module('ns_provisioner')
+    halt 500, errors if errors
+
+    begin
+      response = RestClient.get provisioner.host + '/ns-instances/' + params['nsr_id'], 'X-Auth-Token' => provisioner.token, :content_type => :json
+    rescue Errno::ECONNREFUSED
+      halt 500, 'NS Provisioning unreachable'
+    rescue => e
+      logger.error e.response
+      halt e.response.code, e.response.body
+    end
+    ns_instance, error = parse_json(response)
+
+    info = { :instance => ns_instance, :name_image => snapshot_info['name_image'] }
+    begin
+      response = RestClient.post provisioner.host + request.fullpath, info.to_json, 'X-Auth-Token' => provisioner.token, :content_type => :json
+    rescue Errno::ECONNREFUSED
+      halt 500, 'NS Provisioning unreachable'
+    rescue => e
+      logger.error e.response
+      halt e.response.code, e.response.body
+    end
+
+    return response.code, response.body
+  end
+
+  # @method put_ns_instances
+  # @overload put "/ns-instances/:nsr_id/:status"
+  # Update ns-instance status
+  # @param [string] nsr_id Instance id
+  # @param [string] status Status
   put '/:nsr_id/:status' do
     logger.info "Change status request of " + params[:nsr_id].to_s + " to " + params[:status].to_s
     provisioner, errors = ServiceConfigurationHelper.get_module('ns_provisioner')

@@ -167,6 +167,45 @@ class Provisioner < NsProvisioning
         return instance['status']
     end
 
+    # @method
+    # @overload post '/ns-instances/:nsr_id/snapshot'
+    # Generates a snapshot of the vms of the vnfs
+    # @param [JSON]
+    post '/:id/snapshot' do
+        body, errors = parse_json(request.body.read)
+        @instance = body['instance']
+        name_image = body['name_image']
+        begin
+            @nsInstance = Nsr.find(params['id'])
+        rescue Mongoid::Errors::DocumentNotFound => e
+            halt 404
+        end
+        operationId = @nsInstance.id
+        vim_info = {
+            'tenant_name' => @nsInstance['authentication'][0]['tenant_name'],
+            'user' => @nsInstance['authentication'][0]['username'],
+            'password' => @nsInstance['authentication'][0]['password'],
+            'pop_urls' => @nsInstance['authentication'][0]['urls']
+        }
+        @instance['vnfrs'].each do |vnf|
+            logger.info operationId, 'Generating snapshot of vnf ' + vnf['vnfr_id'].to_s
+            endpoint = '/snapshot'
+            begin
+                snapshot_info = {'vim_info' => vim_info, 'name_image' => name_image}
+                response = RestClient.post(settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint,
+                                           snapshot_info.to_json(), content_type: :json)
+            rescue Errno::ECONNREFUSED
+                logger.error operationId, 'VNF Manager unreachable.'
+                halt 500, 'VNF Manager unreachable'
+            rescue => e
+                logger.info operationId, e.response.code.to_s
+                halt e.response.code, e.response.body
+            end
+            @nsInstance.push(lifecycle_event_history: 'Executed a snapshot')
+        end
+        200
+    end
+
     # @method put_ns_instance_status
     # @overload post '/ns-instances/:nsr_id/status'
     # Update instance status
