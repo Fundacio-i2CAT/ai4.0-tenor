@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - VNF Manager
 #
@@ -156,6 +157,35 @@ class Provisioning < VNFManager
             halt 500, 'VNF Provisioning unreachable'
         rescue => e
             logger.error e
+            logger.error e.response
+            halt e.response.code, e.response.body
+        end
+
+        halt response.code, response.body
+    end
+
+    # @method post_vnf_rovisioning_vnf_instances_vnfr_id_config
+    # @overload post '/vnf-provisioning/vnf-instances/:vnfr_id/config'
+    #       Request to execute a lifecycle event
+    #       @param [String] vnfr_id the VNFR ID
+    #       @param [JSON] information about VIM
+    # Request to execute a lifecycle event
+    post '/vnf-instances/:vnfr_id/snapshot' do |vnfr_id|
+        provisioner, errors = ServiceConfigurationHelper.get_module('vnf_provisioner')
+        halt 500, errors if errors
+
+        # Return if content-type is invalid
+        halt 415 unless request.content_type == 'application/json'
+
+        # Read request body
+        config_info = parse_json(request.body.read)
+
+        # Forward the request to the VNF Provisioning
+        begin
+            response = RestClient.put provisioner.host + '/vnf-provisioning/vnf-instances/' + vnfr_id + '/snapshot', config_info.to_json, 'X-Auth-Token' => provisioner.token, :content_type => :json
+        rescue Errno::ECONNREFUSED
+            halt 500, 'VNF Provisioning unreachable'
+        rescue => e
             logger.error e.response
             halt e.response.code, e.response.body
         end
