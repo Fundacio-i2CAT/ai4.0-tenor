@@ -37,7 +37,7 @@ def build_instance_configuration(service_instance_id, consumer_params):
                     required = fpar['required']
                 fields.append(ConsumerField(name=fpar['name'],
                                             desc=desc,
-                                            value=fpar['value'],
+                                            value=str(fpar['value']),
                                             required=required,
                                             runtime=runtime))
             cpds.append(ConsumerParam(path=cpar['path'], fields=fields))
