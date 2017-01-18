@@ -162,6 +162,57 @@ module ProvisioningHelper
         end
     end
 
+    # Monitor vm state (active/shutoff)
+    #
+    # @param [String] vm_id the openstack id of the compute instance
+    # @param [String] desired the desired final state
+    # @param [String] instance_id the service_instance_id to notify anella plugin
+    # @param [String] dc the datacenter info
+    # @param [String] auth_token the auth token to authenticate with the VIM
+    # @param [String] notification the endpoint url of the orchestrator
+    def create_thread_to_monitor_vm(vm_id, instance_id, desired, dc, auth_token, notification)
+        # Check when stack change state
+        os_desired = 'ACTIVE'
+        if desired.casecmp('stop').zero?
+            os_desired = 'SHUTOFF'
+        end
+        url =
+            dc['pop_urls']['compute']+'/'+
+            dc['tenant_id']+
+            '/servers/'+vm_id
+        thread = Thread.new do
+            counter = 0
+            sleep_time = 2 # set wait time in seconds
+            begin
+                sleep sleep_time # wait x seconds
+                counter = counter+1
+                begin
+                    check = RestClient.get(url, headers = {'X-Auth-Token' => auth_token,'accept' => 'json'})
+                    data = JSON.parse(check.body)
+                    current_state = data['server']['status']
+                    puts 'CHECKING STATE '+current_state
+                rescue => e
+                    logger.error operationId, 'Openstack state get failed'
+                    halt e.response.code, e.response
+                end
+            end while (current_state.casecmp(os_desired) != 0)
+            puts 'TARGET STATE '+os_desired+' REACHED'
+            begin
+                info = {
+                    'service_instance_id' => instance_id,
+                    'state_change' => {
+                        'reached' => os_desired
+                    }
+                }
+                RestClient.post notification, info.to_json, content_type: :json
+            rescue Errno::ECONNREFUSED
+                halt 500, 'Marketplace unreachable'
+            rescue => e
+                logger.error e.response
+            end
+        end
+    end
+
     def vnf_complete_parsing(vnfr_id, stack_info, scale_resources)
         logger.debug 'Stack info: ' + stack_info.to_json
 

@@ -383,7 +383,8 @@ class Provisioning < VnfProvisioning
                     amessage = { 'os-stop': 'os-stop' }
                 end
                 check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
-                puts check
+                dc['tenant_id'] = tenant_id
+                create_thread_to_monitor_vm(vnfr.vms_id['vdu0'], config_info['instance_id'], config_info['event'], dc, auth_token, config_info['notification'])
             rescue => e
                 logger.info 'Openstack request failed'
                 halt 409

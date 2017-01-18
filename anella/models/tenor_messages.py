@@ -20,3 +20,10 @@ class RegularMessage(Document):
     severity = StringField(required=True)
     module = StringField(required=True)
     timestamp = DateTimeField(default=datetime.datetime.now)
+
+class MonitoringMessage(Document):
+    """Monitoring message"""
+
+    service_instance_id = StringField(required=True)
+    message = StringField(required=True)
+    timestamp = DateTimeField(default=datetime.datetime.now)

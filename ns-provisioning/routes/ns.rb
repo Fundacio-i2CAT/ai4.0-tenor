@@ -191,7 +191,12 @@ class Provisioner < NsProvisioning
             logger.info operationId, 'Generating snapshot of vnf ' + vnf['vnfr_id'].to_s
             endpoint = '/snapshot'
             begin
-                snapshot_info = {'vim_info' => vim_info, 'name_image' => name_image}
+                snapshot_info = {
+                    'vim_info' => vim_info,
+                    'name_image' => name_image,
+                    'notification' => @instance['notification'],
+                    'instance_id' => operationId
+                }
                 response = RestClient.post(settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint,
                                            snapshot_info.to_json(), content_type: :json)
             rescue Errno::ECONNREFUSED
@@ -287,7 +292,7 @@ class Provisioner < NsProvisioning
         elsif params[:status] === 'start'
             @instance['vnfrs'].each do |vnf|
                 logger.info operationId, 'Starting VNF ' + vnf['vnfr_id'].to_s
-                event = { event: 'start', vim_info: vim_info }
+                event = { event: 'start', vim_info: vim_info, notification: @instance['notification'], 'instance_id': operationId }
                 endpoint = '/config'
                 begin
                     response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint, event.to_json, content_type: :json
@@ -306,7 +311,7 @@ class Provisioner < NsProvisioning
         elsif params[:status] === 'stop'
             @instance['vnfrs'].each do |vnf|
                 logger.info operationId, 'Stopping VNF ' + vnf['vnfr_id'].to_s
-                event = { event: 'stop', vim_info: vim_info }
+                event = { event: 'stop', vim_info: vim_info, notification: @instance['notification'], 'instance_id': operationId }
                 endpoint = '/config'
                 begin
                     response = RestClient.put settings.vnf_manager + '/vnf-provisioning/vnf-instances/' + vnf['vnfr_id'] + endpoint, event.to_json, content_type: :json
