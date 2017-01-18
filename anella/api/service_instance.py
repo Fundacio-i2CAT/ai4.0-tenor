@@ -8,6 +8,7 @@ from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import build_instance_configuration
 from models.tenor_messages import RegularMessage
+from models.tenor_messages import MonitoringMessage
 from models.api_log import ApiLog
 
 import flask_restful
@@ -136,6 +137,9 @@ class ServiceInstance(flask_restful.Resource):
                 nsi = TenorNSI(ns_id)
                 nsi.delete()
                 msg = '{0} request successfully sent'.format(ns_id)
+                monim = MonitoringMessage(service_instance_id=ns_id,
+                                          message='DELETE_REQUEST_RECEIVED')
+                monim.save()
                 return {'message': msg}
             except Exception as exc:
                 msg = 'Error deleting NS instance: {0}'.format(str(exc))
