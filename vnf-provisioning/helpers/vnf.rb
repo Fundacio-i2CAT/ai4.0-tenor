@@ -58,6 +58,26 @@ module ProvisioningHelper
         ]
     end
 
+    def really_cached(is_cached)
+        cached = []
+        is_cached.each do |item|
+            message = { 'vim_url' => item['vim_url'], 'stack_url' => item['stack_url'] }
+            begin
+                verification_response = RestClient.post('http://localhost:4000/pops/stack',
+                                                        message.to_json,
+                                                        content_type: :json)
+            rescue Errno::ECONNREFUSED
+                next
+            rescue => e
+                next
+            end
+            if verification_response.code == 200
+                cached.append(item)
+            end
+        end
+        cached
+    end
+
     # DEPCREATED
     # Request an auth token from the VIM
     #

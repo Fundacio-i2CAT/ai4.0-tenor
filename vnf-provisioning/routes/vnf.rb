@@ -55,24 +55,7 @@ class Provisioning < VnfProvisioning
         cachedimg_info = JSON.parse(request.body.read)
         is_cached = Cachedimg.where(image_url: cachedimg_info['vm_image'],
                                     vim_url: cachedimg_info['vim_url'])
-        cached = []
-        is_cached.each do |item|
-            message = { 'vim_url' => item['vim_url'], 'stack_url' => item['stack_url'] }
-            begin
-                verification_response = RestClient.post('http://localhost:4000/pops/stack',
-                                                        message.to_json,
-                                                        content_type: :json)
-            rescue Errno::ECONNREFUSED
-                halt 500, 'NS manager unreacheable'
-            rescue => e
-                halt 404, 'Not found'
-            end
-            puts verification_response
-            if verification_response.code == 200
-                cached.append({openstack_id: item.openstack_id,
-                                  vim_url: item.vim_url})
-            end
-        end
+        cached = really_cached(is_cached)
         if cached.any?
             halt 200, cached.to_json
         else
@@ -108,15 +91,14 @@ class Provisioning < VnfProvisioning
             vim_info = instantiation_info['auth']
             is_cached = Cachedimg.where(image_url: vnf['vnfd']['vdu'][0]['vm_image'],
                                         vim_url: vim_info['url']['heat'])
-            puts vim_info['url']['heat']
-            puts vnf['vnfd']['vdu'][0]['vm_image']
+            cached = really_cached(is_cached)
             ### In the query it lacks the vim's orchestrator URL preventing to take as cached
-            if is_cached.any?
+            if cached.any?
                 puts "THE IMAGE IS ALREADY CACHED"
                 puts "OPENSTACK_ID"
-                puts is_cached[0]['openstack_id']
-                logger.info instantiation_info['nsr_id'], 'The Image is cached ... openstack_id: '+is_cached[0]['openstack_id'].to_s
-                vnf['vnfd']['vdu'][0]['vm_image'] = is_cached[0]['openstack_id']
+                puts cached[0]['openstack_id']
+                logger.info instantiation_info['nsr_id'], 'The Image is cached ... openstack_id: '+cached[0]['openstack_id'].to_s
+                vnf['vnfd']['vdu'][0]['vm_image'] = cached[0]['openstack_id']
                 vnf['vnfd']['vdu'][0]['vm_image_format'] = 'openstack_id'
             end
         end
