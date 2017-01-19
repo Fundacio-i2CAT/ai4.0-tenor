@@ -32,6 +32,47 @@ class DcController < TnovaManager
         end
     end
 
+    # @method post stack
+    # @overload post "/stack"
+    # post stack URL to query if it exists on the VIM (ANELLA)
+    post '/stack/:id' do |id|
+        begin
+            return 415 unless request.content_type == 'application/json'
+            stack_info, errors = parse_json(request.body.read)
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                response = RestClient.get stack_info['stack_url'], 'X-Auth-Token' => auth_token, :accept => :json
+                stack = JSON.parse(response.body)
+                if stack['stack']['stack_status'].casecmp('create_complete').zero?
+                    response
+                else
+                    halt 404
+                end
+            rescue Errno::ECONNREFUSED
+                logger.error "VIM unreachable"
+                halt 500, 'VIM unreachable'
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                halt 404
+            rescue RestClient::Unauthorized
+                logger.error 'Unauthorized'
+                halt 401
+            rescue => e
+                logger.error e
+                halt 500
+            end
+        end
+    end
+
     # @method get dc_servers
     # @overload get "/servers/:id"
     # Get the servers running for the vim (ANELLA)
