@@ -57,8 +57,21 @@ class Provisioning < VnfProvisioning
                                     vim_url: cachedimg_info['vim_url'])
         cached = []
         is_cached.each do |item|
-            cached.append({openstack_id: item.openstack_id,
-                              vim_url: item.vim_url})
+            message = { 'vim_url' => item['vim_url'], 'stack_url' => item['stack_url'] }
+            begin
+                verification_response = RestClient.post('http://localhost:4000/pops/stack',
+                                                        message.to_json,
+                                                        content_type: :json)
+            rescue Errno::ECONNREFUSED
+                halt 500, 'NS manager unreacheable'
+            rescue => e
+                halt 404, 'Not found'
+            end
+            puts verification_response
+            if verification_response.code == 200
+                cached.append({openstack_id: item.openstack_id,
+                                  vim_url: item.vim_url})
+            end
         end
         if cached.any?
             halt 200, cached.to_json
