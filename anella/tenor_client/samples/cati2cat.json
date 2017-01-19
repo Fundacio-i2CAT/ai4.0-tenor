@@ -9,7 +9,7 @@
 	"name_image" : "Stack por HTTP",
 	"vm_image_format" : "QCOW2",
 	"tenor_url" : "http://localhost:4000",
-	"vm_image" : "http://10.8.0.6/zesty.img",
+	"vm_image" : "http://10.8.0.6/precise-server-cloudimg-amd64-disk1.img",
 	"flavor" : "m1.medium",
 	"consumer_params" : [
             {

@@ -35,12 +35,23 @@ class DcController < TnovaManager
     # @method post stack
     # @overload post "/stack"
     # post stack URL to query if it exists on the VIM (ANELLA)
-    post '/stack/:id' do |id|
+    post '/stack' do
         begin
             return 415 unless request.content_type == 'application/json'
             stack_info, errors = parse_json(request.body.read)
+            dc = nil
             begin
-                dc = Dc.find(id.to_i)
+                dcs = Dc.find()
+                Dc.each do |idc|
+                    popUrls = getPopUrls(idc['extra_info'])
+                    if popUrls[:orch] == stack_info['vim_url']
+                        dc = idc
+                        break
+                    end
+                end
+                if dc.nil?
+                    halt 404, "DC not found"
+                end
             rescue Mongoid::Errors::DocumentNotFound => e
                 logger.error 'DC not found'
                 return 404
