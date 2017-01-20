@@ -19,6 +19,10 @@ import ConfigParser
 from flask import send_file
 import uuid
 import StringIO
+import time
+from time import mktime
+from datetime import datetime
+
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -159,6 +163,42 @@ class ServiceInstanceHistory(flask_restful.Resource):
             info = (data[:75] + '...') if len(data) > 75 else data
             events.append({'time': str(hev.timestamp), 'message': info,
                            'severity': str(hev.severity)})
+        if len(events) > 0:
+            return events
+        else:
+            abort(404, message="Service instance {0} history not found".format(ns_id))
+
+class ServiceInstanceMonitoring(flask_restful.Resource):
+    """Service instance monitoring resources"""
+    def __init__(self):
+        pass
+
+    def get(self, ns_id, idate, fdate=None):
+        """Gets NSI monitoring"""
+        initial_date = datetime.fromtimestamp(time.mktime(time.strptime(idate, '%Y-%m-%d')))
+        final_date = None
+        if fdate:
+            final_date = datetime.fromtimestamp(time.mktime(time.strptime(fdate, '%Y-%m-%d')))
+        events = []
+        monitoring = []
+        if final_date == None:
+            monitoring = MonitoringMessage.objects(service_instance_id=ns_id,
+                                                   timestamp__gte=initial_date).order_by('timestamp')
+        else:
+            monitoring = MonitoringMessage.objects(service_instance_id=ns_id,
+                                                   timestamp__gte=initial_date,
+                                                   timestamp__lt=final_date).order_by('timestamp')
+        hours_acum = 0
+        active_flag = False
+        last_active_time = initial_date
+        print final_date-initial_date
+        for mev in monitoring:
+            data = str(mev.message)
+            info = (data[:75] + '...') if len(data) > 75 else data
+            if data.upper() == 'ACTIVE':
+                
+                pass
+            events.append({'time': str(mev.timestamp), 'message': info})
         if len(events) > 0:
             return events
         else:
