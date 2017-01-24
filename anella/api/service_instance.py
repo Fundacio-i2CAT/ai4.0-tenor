@@ -22,7 +22,8 @@ import StringIO
 import time
 from time import mktime
 from datetime import datetime
-
+from pprint import pprint
+import datetime
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -203,6 +204,30 @@ class ServiceInstanceMonitoring(flask_restful.Resource):
             return events
         else:
             abort(404, message="Service instance {0} history not found".format(ns_id))
+
+
+class ServiceInstanceBilling(flask_restful.Resource):
+    """Service instance history resources"""
+    def __init__(self):
+        pass
+
+    def get(self, ns_id):
+        """Get the time difference between an activation and a termination event or current time"""
+        start_times = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
+        stop_times = MonitoringMessage.objects(service_instance_id=ns_id, message = 'STOPPED')
+        """time running is stop-start in while loop"""
+        count_times = 0
+        time = datetime.timedelta(minutes=0)
+        for start_time in start_times:
+            if stop_times:
+                time += stop_times[count_times]['timestamp'] - time['timestamp']
+            else:
+                time += datetime.datetime.now() - start_time['timestamp']
+            count_times += 1
+            if count_times > len(stop_times):
+                break
+        cost = 2
+        return time.seconds/60 * 2
 
 class ServiceInstanceKey(flask_restful.Resource):
     """Service instance history resources"""
