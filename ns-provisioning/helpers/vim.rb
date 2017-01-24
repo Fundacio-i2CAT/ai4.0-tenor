@@ -66,7 +66,7 @@ module VimHelper
         if external_networks.length > 1
         # network_id de Adam ext-clientes_demo-net en caso de haber más de una disponible
         #	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
-            network['id'] = '71257860-3085-40bb-b009-5f12c688cdfb'
+            network['id'] = 'c3e218b7-bf3b-4b93-887a-11edd51e1eba'
         end
         network['id']
     end
