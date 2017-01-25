@@ -19,6 +19,7 @@
 # @see DcController
 class DcController < TnovaManager
 
+    # port is 4000. Need to add exact path for the calls
     # @method get_pops_dc
     # @overload get '/pops/dc/:id'
     #  Returns a DCs
@@ -131,7 +132,7 @@ class DcController < TnovaManager
     end
 
     # @method get dc_quotas
-    # @overload get "/quotas/:id"
+    # @overload get "/pops/quotas/:id"
     # Get the quotas avaliable for the vim (ANELLA)
     get '/quotas/:id' do |id|
         begin
@@ -165,6 +166,72 @@ class DcController < TnovaManager
             response
         end
     end
+
+
+    # @method get dc_limits
+    # @overload get "/pops/limits/:id"
+    # Get the limits avaliable for the vim (ANELLA)
+    get '/limits/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                response = RestClient.get compute_url +"/#{tenant_id}/limits", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                # halt 500, 'VIM unreachable'
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                return
+            end
+            response
+        end
+    end
+
+    # @method get dc_keypairs
+    # @overload get "/pops/keypairs/:id"
+    # Get the keypairs of the vim (ANELLA)
+    get '/keypairs/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                response = RestClient.get compute_url +"/#{tenant_id}/os-keypairs", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                # halt 500, 'VIM unreachable'
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                return
+            end
+            response
+        end
+    end
+
 
     # @method get dc_networks
     # @overload get "/networks/:id"

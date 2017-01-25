@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """TeNOR PoP Class"""
+"""Uses tenor ns-manager/routes/dc.rb """
 
 import requests
 import json
@@ -70,6 +71,19 @@ class TenorPoP(object):
             raise ValueError('Decoding PoP response json response failed')
         return quotas['quota_set']
 
+    def get_limits(self):
+        '''Get limits and quotas'''
+        url = '{0}/pops/limits/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            limits = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        return limits['limits']
+
     def get_network_details(self):
         """Gets networks information"""
         url = '{0}/pops/networks/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
@@ -100,6 +114,23 @@ class TenorPoP(object):
                     if address['OS-EXT-IPS:type'].upper() == 'FLOATING':
                         used_floating_ips = used_floating_ips+1
         return {'quota': floating_ips, 'used': used_floating_ips, 'ratio': float(used_floating_ips)/float(floating_ips)}
+
+    def get_keypair_details(self):
+        """Get used keypairs"""
+        url = '{0}/pops/keypairs/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            keypairs = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        return keypairs
+
+    def get_secutity_groups_details(self):
+        '''gets used and active security groups'''
+        
 
     def get_core_details(self):
         """Gets used and active cores"""
