@@ -214,7 +214,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
     def get(self, ns_id):
         """Get the time difference between an activation and a termination event or current time"""
         start_times = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
-        stop_times = MonitoringMessage.objects(service_instance_id=ns_id, message = 'STOPPED')
+        stop_times = MonitoringMessage.objects.filter(service_instance_id = ns_id, message = 'SHUTOFF' or 'DELETE_REQUEST_RECEIVED')
         """time running is stop-start in while loop"""
         count_times = 0
         time = datetime.timedelta(minutes=0)
