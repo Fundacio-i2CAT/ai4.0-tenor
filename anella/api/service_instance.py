@@ -92,7 +92,7 @@ class ServiceInstance(flask_restful.Resource):
                   message="Error posting NS instance: {0}".format(str(exc)))
         if resp.status_code == 403:
             edata = json.loads(resp.text)
-            abort(403, message=edata['message'])
+            abort(403, code=edata['message'])
 
         icd = build_instance_configuration(nsdata['id'],
                                            data['context']['consumer_params'])
