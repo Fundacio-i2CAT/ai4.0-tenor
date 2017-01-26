@@ -8,6 +8,7 @@ from api.ns import NS
 from api.service_instance import ServiceInstance
 from api.service_instance import ServiceInstanceHistory
 from api.service_instance import ServiceInstanceMonitoring
+from api.service_instance import ServiceInstanceBilling
 from api.service_instance import ServiceInstanceKey
 from api.log import Log
 from api.enotification import Enotification
@@ -51,6 +52,10 @@ API_V2.add_resource(ServiceInstanceHistory,
 API_V2.add_resource(ServiceInstanceMonitoring,
                     '/service/instance/<ns_id>/monitoring/<idate>',
                     '/service/instance/<ns_id>/monitoring/<idate>/<fdate>')
+
+API_V2.add_resource(ServiceInstanceBilling,
+                    '/service/instance/<ns_id>/billing/<idate>',
+                    '/service/instance/<ns_id>/billing/<idate>/<fdate>')
 
 API_V2.add_resource(ServiceInstanceKey,
                     '/service/instance/<ns_id>/key')
