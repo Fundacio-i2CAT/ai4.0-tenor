@@ -54,7 +54,8 @@ API_V2.add_resource(ServiceInstanceMonitoring,
                     '/service/instance/<ns_id>/monitoring/<idate>/<fdate>')
 
 API_V2.add_resource(ServiceInstanceBilling,
-		    '/service/instance/<ns_id>/billing/uptime')
+                    '/service/instance/<ns_id>/billing/<idate>',
+                    '/service/instance/<ns_id>/billing/<idate>/<fdate>')
 
 API_V2.add_resource(ServiceInstanceKey,
                     '/service/instance/<ns_id>/key')

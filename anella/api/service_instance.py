@@ -19,11 +19,10 @@ import ConfigParser
 from flask import send_file
 import uuid
 import StringIO
-import time
-from time import mktime
+from time import mktime, strptime
 from datetime import datetime
 from pprint import pprint
-import datetime
+from datetime import datetime, timedelta
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -169,18 +168,11 @@ class ServiceInstanceHistory(flask_restful.Resource):
         else:
             abort(404, message="Service instance {0} history not found".format(ns_id))
 
-class ServiceInstanceMonitoring(flask_restful.Resource):
-    """Service instance monitoring resources"""
-    def __init__(self):
-        pass
-
-    def get(self, ns_id, idate, fdate=None):
-        """Gets NSI monitoring"""
-        initial_date = datetime.fromtimestamp(time.mktime(time.strptime(idate, '%Y-%m-%d')))
+def monitoring_events(ns_id,idate, fdate=None):
+        initial_date = datetime.fromtimestamp(mktime(strptime(idate, '%Y-%m-%d')))
         final_date = None
         if fdate:
-            final_date = datetime.fromtimestamp(time.mktime(time.strptime(fdate, '%Y-%m-%d')))
-        events = []
+            final_date = datetime.fromtimestamp(mktime(strptime(fdate, '%Y-%m-%d')))
         monitoring = []
         if final_date == None:
             monitoring = MonitoringMessage.objects(service_instance_id=ns_id,
@@ -189,10 +181,20 @@ class ServiceInstanceMonitoring(flask_restful.Resource):
             monitoring = MonitoringMessage.objects(service_instance_id=ns_id,
                                                    timestamp__gte=initial_date,
                                                    timestamp__lt=final_date).order_by('timestamp')
+        return monitoring, initial_date, final_date
+
+class ServiceInstanceMonitoring(flask_restful.Resource):
+    """Service instance monitoring resources"""
+    def __init__(self):
+        pass
+
+    def get(self, ns_id, idate, fdate=None):
+        """Gets NSI monitoring"""
+        monitoring, initial_date, final_date = monitoring_events(ns_id, idate, fdate)
         hours_acum = 0
         active_flag = False
         last_active_time = initial_date
-        print final_date-initial_date
+        events = []
         for mev in monitoring:
             data = str(mev.message)
             info = (data[:75] + '...') if len(data) > 75 else data
@@ -211,23 +213,25 @@ class ServiceInstanceBilling(flask_restful.Resource):
     def __init__(self):
         pass
 
-    def get(self, ns_id):
+    def get(self, ns_id, idate, fdate=None):
         """Get the time difference between an activation and a termination event or current time"""
-        start_times = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
-        stop_times = MonitoringMessage.objects.filter(service_instance_id = ns_id, message = 'SHUTOFF' or 'DELETE_REQUEST_RECEIVED')
-        """time running is stop-start in while loop"""
-        count_times = 0
-        time = datetime.timedelta(minutes=0)
-        for start_time in start_times:
-            if stop_times:
-                time += stop_times[count_times]['timestamp'] - time['timestamp']
-            else:
-                time += datetime.datetime.now() - start_time['timestamp']
-            count_times += 1
-            if count_times > len(stop_times):
-                break
-        cost = 2
-        return time.seconds/60 * 2
+        monitoring, initial_date, final_date = monitoring_events(ns_id, idate, fdate)
+        first_slot = True
+        last_active = None
+        time_acum = timedelta(minutes=0)
+        for mev in monitoring:
+            if (mev['message'].upper() == 'SHUTOFF') or (mev['message'].upper() == 'DELETE_REQUEST_RECEIVED'):
+                if first_slot == True:
+                    time_acum += mev['timestamp']-initial_date
+            if last_active:
+                time_acum += mev['timestamp']-last_active
+            first_slot = False
+            if mev['message'].upper() == 'ACTIVE':
+                last_active = mev['timestamp']
+        if len(monitoring) > 0:
+            if monitoring[len(monitoring)-1]['message'] == 'ACTIVE':
+                time_acum += datetime.now()-monitoring[len(monitoring)-1]['timestamp']
+        return time_acum.seconds/60.0
 
 class ServiceInstanceKey(flask_restful.Resource):
     """Service instance history resources"""
