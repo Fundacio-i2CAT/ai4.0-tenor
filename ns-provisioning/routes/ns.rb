@@ -368,7 +368,9 @@ class Provisioner < NsProvisioning
             @instance['lifecycle_event_history'].push('ERROR_CREATING')
             @instance['audit_log'].push(callback_response['stack_resources']['stack']['stack_status_reason'])
             instance.update_attributes(@instance)
-            generateMarketplaceResponse(@instance['notification'], { status: 'error', message: callback_response['stack_resources']['stack']['stack_status_reason'] }.to_s)
+            generateMarketplaceResponse(@instance['notification'], { status: 'error',
+                                          service_instance_id: operationId,
+                                          message: callback_response['stack_resources']['stack']['stack_status_reason'] })
             return 200
         end
 
