@@ -52,7 +52,7 @@ class ServiceInstance(flask_restful.Resource):
                     nsi_state = nsi.get_state_and_addresses()
                     return nsi_state
         if len(states) == 0 and ns_id:
-            abort(404, message="Service instance {0} not found".format(ns_id))
+            abort(404, code="SERVICE_INSTANCE_NOT_FOUND")
         return states
 
     def post(self):
@@ -219,19 +219,34 @@ class ServiceInstanceBilling(flask_restful.Resource):
         first_slot = True
         last_active = None
         time_acum = timedelta(minutes=0)
+        lapses = []
         for mev in monitoring:
             if (mev['message'].upper() == 'SHUTOFF') or (mev['message'].upper() == 'DELETE_REQUEST_RECEIVED'):
                 if first_slot == True:
-                    time_acum += mev['timestamp']-initial_date
-            if last_active:
-                time_acum += mev['timestamp']-last_active
+                    dt = mev['timestamp']-initial_date
+                    time_acum += dt
+                    lapses.append({'t0': str(initial_date),
+                                   't1': str(mev['timestamp']),
+                                   'delta': str(dt)})
+            if last_active and mev['message'] != 'ACTIVE':
+                dt =  mev['timestamp']-last_active
+                time_acum += dt
+                lapses.append({'t0': str(last_active),
+                               't1': str(mev['timestamp']),
+                               'delta': str(dt)})
             first_slot = False
             if mev['message'].upper() == 'ACTIVE':
                 last_active = mev['timestamp']
         if len(monitoring) > 0:
             if monitoring[len(monitoring)-1]['message'] == 'ACTIVE':
-                time_acum += datetime.now()-monitoring[len(monitoring)-1]['timestamp']
-        return time_acum.seconds/60.0
+                now = datetime.now()
+                dt = now-monitoring[len(monitoring)-1]['timestamp']
+                time_acum += dt
+                lapses.append({'t0': str(monitoring[len(monitoring)-1]['timestamp']),
+                               't1': str(now),
+                               'delta': str(dt)})
+        resp = {'lapses': lapses, 'total_minutes': time_acum.seconds/60.0, 'total_delta': str(time_acum)}
+        return resp
 
 class ServiceInstanceKey(flask_restful.Resource):
     """Service instance history resources"""
