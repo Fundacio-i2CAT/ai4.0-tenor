@@ -16,6 +16,14 @@ class InstanceConfiguration(Document):
     consumer_params = ListField(EmbeddedDocumentField(ConsumerParam))
     timestamp = DateTimeField(default=datetime.datetime.now)
 
+def safe_encoding(thing):
+    param_value = thing
+    if type(param_value) == unicode:
+        param_value = param_value.encode('utf-8')
+    else:
+        param_value = str(param_value)
+    return param_value
+
 def build_instance_configuration(service_instance_id, consumer_params):
     """Building it from array"""
     cpds = []
@@ -35,9 +43,9 @@ def build_instance_configuration(service_instance_id, consumer_params):
                     runtime = fpar['runtime']
                 if 'required' in fpar:
                     required = fpar['required']
-                fields.append(ConsumerField(name=fpar['name'],
-                                            desc=desc,
-                                            value=str(fpar['value']),
+                fields.append(ConsumerField(name=safe_encoding(fpar['name']),
+                                            desc=safe_encoding(desc),
+                                            value=safe_encoding(fpar['value']),
                                             required=required,
                                             runtime=runtime))
             cpds.append(ConsumerParam(path=cpar['path'], fields=fields))
