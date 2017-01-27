@@ -167,6 +167,92 @@ class DcController < TnovaManager
         end
     end
 
+    # @method get network_quotas
+    # @overload get "/pops/network_quotas/:id"
+    # Get the network quotas avaliable for the vim (ANELLA)
+    get '/network_quotas/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            neutron_url = popUrls[:neutron]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                response = RestClient.get neutron_url  +"/quotas/#{tenant_id}", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                #logger.error e.response
+                return
+                # halt e.response.code, e.response.body
+            end
+            response
+        end
+    end
+
+    # @method get routers
+    # @overload get "/pops/routers/:id"
+    # Get the routers avaliable for the vim (ANELLA)
+    get '/routers/:id' do |id|
+        begin
+            begin
+                dc = Dc.find(id.to_i)
+            rescue Mongoid::Errors::DocumentNotFound => e
+                logger.error 'DC not found'
+                return 404
+            end
+            popUrls = getPopUrls(dc['extra_info'])
+            compute_url = popUrls[:compute]
+            neutron_url = popUrls[:neutron]
+            admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
+            tenant_id = admin_credentials[:tenant_id]
+            auth_token = admin_credentials[:token]
+            begin
+                response = RestClient.get neutron_url  +"/routers", 'X-Auth-Token' => auth_token, :accept => :json
+            rescue Errno::ECONNREFUSED
+                logger.error "VIM unreachable"
+            rescue RestClient::ResourceNotFound
+                logger.error 'Already removed from the VIM.'
+                return 404
+            rescue => e
+                logger.error e
+                return
+            end
+            tenant_routers = 0
+            json_routers = parse_json(response)
+            json_routers[0]["routers"].each do |child|
+		if(child["tenant_id"] == tenant_id)
+                    print child["tenant_id"]
+                    tenant_routers = tenant_routers + 1
+		    print "TENANT RO: #{tenant_routers}"
+		end
+	    end
+	    #json_routers[0]["routers"].delete_if do |v|
+    	    #	if k == 1?
+       	    #	     true
+    	    #	else
+            #	     v.update
+            #	     false
+    	    #   end
+	    #end
+
+            #for router in json_routers['routers']:
+	    #	print router
+	    #print json_routers
+            return "#{tenant_routers}"
+        end
+    end
 
     # @method get dc_limits
     # @overload get "/pops/limits/:id"
