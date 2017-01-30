@@ -8,11 +8,8 @@ import json
 import ConfigParser
 
 
-fp = open(r'/home/vagrant/tenor/anella/config.cfg')
-CONFIG = ConfigParser.ConfigParser()
-#CONFIG = ConfigParser.RawConfigParser()
-#CONFIG.readfp('config.cfg')
-CONFIG.readfp(fp)
+CONFIG = ConfigParser.RawConfigParser()
+CONFIG.read('config.cfg')
 
 DEFAULT_TENOR_URL = format('{0}:{1}'.format(
     CONFIG.get('tenor', 'url'),
