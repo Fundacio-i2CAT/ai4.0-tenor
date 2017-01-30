@@ -160,12 +160,15 @@ module InstantiationHelper
                         end
                     end
                     logger.error operationId, error
-                    generateMarketplaceResponse(callback_url, generateError(nsd_id, 'FAILED', error))
+                    generateMarketplaceResponse(callback_url, {nsd_id: nsd_id,
+                                                  status: 'FAILED',
+                                                  cause: error,
+                                                  code: 'ERROR_CREATING_VNF'})
                     return 400, error
                 end
             end
             logger.error operationId, 'Handle error.'
-            generateMarketplaceResponse(@instance['notification'], { status: 'error', service_instance_id: @instance['id'] })
+            generateMarketplaceResponse(@instance['notification'], { status: 'error', code: 'ERROR_CREATING_VNF', service_instance_id: @instance['id'] })
             return 400, 'Error with the VNF: ' + e.response
         end
 

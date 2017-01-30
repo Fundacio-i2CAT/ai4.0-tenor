@@ -8,6 +8,7 @@ use JSON::Parse 'parse_json';;
 
 my $ua = LWP::UserAgent->new;
 my $server = shift @ARGV || die "\nLack of orchestrator\n\n";
+my $type = shift @ARGV;
 
 # die "NOOO" if $server =~ m/dev/gi;
 
@@ -23,6 +24,11 @@ die "\nOrchestrator unreacheable\n" unless ( $res->is_success );
 my $instances = parse_json($res->decoded_content);
 
 foreach my $instance ( @{$instances} ) {
+  if ($type) {
+    if ( $type ne $instance->{state} ) {
+      next;
+    }
+  }
   my $delete = HTTP::Request->new("DELETE","$url/" . $instance->{"service_instance_id"});
   my $resp = $ua->request($delete);
   if ( $resp->is_success ) {

@@ -1,0 +1,41 @@
+{
+    "context" : {
+	"runtime_params" : [
+            {
+		"name" : "wwwwww",
+		"desc" : "sssssss"
+            }
+	],
+	"pop_id": 21,
+	"name_image" : "Stack por HTTP",
+	"vm_image_format" : "openstack_id",
+	"tenor_url" : "http://localhost:4000",
+	"vm_image" : "f68aed31-3c18-4688-889b-6ba4e15b6006",
+	"flavor" : "VM.M1",
+	"consumer_params" : [
+            {
+		"path" : "/var/www/html/index.html",
+		"fields" : [
+                    {
+			"required": true,
+			"name" : "picture",
+			"desc" : "picture",
+			"value" : "https://lh6.googleusercontent.com/-fu-lv-gTLY4/AAAAAAAAAAI/AAAAAAAAEN4/NHHQas5Pvvk/photo.jpg"
+		    },
+                    {
+			"required" : true,
+			"name" : "name",
+			"desc" : "Name of the consumer",
+			"value" : "yo votééé ññññ a kodos"
+                    },
+                    {
+			"required" : true,
+			"name" : "cv",
+			"desc" : "cv",
+			"value" : 22193213
+                    }
+		]
+	    }
+	]
+    }
+}

@@ -625,7 +625,7 @@ class Provisioning < VnfProvisioning
                     vnf_status: 2
                 )
 
-                message = { status: 'ERROR_CREATING', vnfd_id: vnfr.vnfd_reference, vnfr_id: vnfr.id, stack_resources: response }
+                message = { status: 'ERROR_CREATING', code: 'ERROR_CREATING_INSTANCE', vnfd_id: vnfr.vnfd_reference, vnfr_id: vnfr.id, stack_resources: response }
                 nsmanager_callback(stack_info['ns_manager_callback'], message)
 
                 # Delete the VNFR from the database

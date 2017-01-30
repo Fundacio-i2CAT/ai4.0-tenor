@@ -370,6 +370,7 @@ class Provisioner < NsProvisioning
             instance.update_attributes(@instance)
             generateMarketplaceResponse(@instance['notification'], { status: 'error',
                                           service_instance_id: operationId,
+                                          code: 'ERROR_CREATING_INSTANCE',
                                           message: callback_response['stack_resources']['stack']['stack_status_reason'] })
             return 200
         end

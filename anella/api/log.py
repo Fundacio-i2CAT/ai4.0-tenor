@@ -39,8 +39,11 @@ class Log(flask_restful.Resource):
                 print data['message']
                 message = data['message']
             if str(data['status']) == 'error':
+                code = ''
+                if 'code' in data:
+                    code = data['code']
                 crite = CriticalError(service_instance_id=data['service_instance_id'],
-                                      message=message)
+                                      message=message, code=code)
                 crite.save()
 
         if 'state_change' in data:
