@@ -50,6 +50,9 @@ class ServiceInstance(flask_restful.Resource):
                 if tid == ns_id:
                     nsi = TenorNSI(tid)
                     nsi_state = nsi.get_state_and_addresses()
+                    if nsi_state['state'] == 'FAILED':
+                        abort(400, message='Instance failed',
+                              code=nsi_state['code'], state=nsi_state['state'])
                     return nsi_state
         if len(states) == 0 and ns_id:
             abort(404, code="SERVICE_INSTANCE_NOT_FOUND")
@@ -205,7 +208,7 @@ class ServiceInstanceMonitoring(flask_restful.Resource):
             data = str(mev.message)
             info = (data[:75] + '...') if len(data) > 75 else data
             if data.upper() == 'ACTIVE':
-                
+
                 pass
             events.append({'time': str(mev.timestamp), 'message': info})
         if len(events) > 0:
