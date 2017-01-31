@@ -290,7 +290,7 @@ class OrchestratorTestCase(unittest.TestCase):
             resp = requests.get(url)
             assert resp.status_code == 200
             nsi = json.loads(resp.text)
-            if nsi['state'].upper() == 'RUNNING':
+            if nsi['state'].upper() == 'RUNNING' or nsi['state'].upper() == 'FAILED':
                 break
         resp = requests.get(url)
         ipaddr = None

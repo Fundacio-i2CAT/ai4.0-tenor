@@ -204,7 +204,9 @@ module HotHelper
             @instance.push(lifecycle_event_history: 'ERROR_CREATING the ' + type)
             @instance.update_attribute('status', 'ERROR_CREATING')
             @instance.push(audit_log: stack_info)
-            generateMarketplaceResponse(@instance['notification'], { status: 'error', message: 'ERROR '+type, service_instance_id: @instance['id'] })
+            generateMarketplaceResponse(@instance['notification'], { status: 'error',
+                                          code: 'ERROR_CREATING_INSTANCE',
+                                          message: 'ERROR '+type, service_instance_id: @instance['id'] })
             logger.error 'Creation of Network Stack failed.'
             return 400, error
         elsif status == 'CREATE_COMPLETE'
