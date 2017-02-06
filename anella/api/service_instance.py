@@ -50,6 +50,9 @@ class ServiceInstance(flask_restful.Resource):
                 if tid == ns_id:
                     nsi = TenorNSI(tid)
                     nsi_state = nsi.get_state_and_addresses()
+                    if nsi_state['state'] == 'FAILED':
+                        abort(400, message='Instance failed',
+                              code=nsi_state['code'], state=nsi_state['state'])
                     return nsi_state
         if len(states) == 0 and ns_id:
             abort(404, code="SERVICE_INSTANCE_NOT_FOUND")
@@ -121,13 +124,19 @@ class ServiceInstance(flask_restful.Resource):
             abort(500, message='Internal server error: {0}'.format(str(exc)))
         if hasattr(resp, 'status_code'):
             if resp.status_code == 409:
+                state_and_addresses = nsi.get_state_and_addresses()
                 abort(409,
-                      message='Conflict: {0} stopped(running)'.format(ns_id))
+                      message='Conflict: {0} stopped(running)'.format(ns_id),
+                      code='START_STOP_CONFLICT',
+                      state=state_and_addresses['state'])
             if resp.status_code in (200, 201):
                 return {'message': 'Successfully sent state signal',
-                        'state': 'UNKNOWN'}
+                        'state': state['state'].upper()}
             else:
-                abort(404, message='{0} NS not found'.format(ns_id))
+                state_and_addresses = nsi.get_state_and_addresses()
+                abort(404, message='{0} NS not found'.format(ns_id),
+                      code='INSTANCE_OUT_OF_CONTROL',
+                      state=state_and_addresses['state'])
         else:
             abort(500,
                   message='Invalid: \'{0}\''.format(state['state'].upper()))
@@ -199,7 +208,7 @@ class ServiceInstanceMonitoring(flask_restful.Resource):
             data = str(mev.message)
             info = (data[:75] + '...') if len(data) > 75 else data
             if data.upper() == 'ACTIVE':
-                
+
                 pass
             events.append({'time': str(mev.timestamp), 'message': info})
         if len(events) > 0:

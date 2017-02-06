@@ -43,6 +43,7 @@ class TenorNSI(object):
         self._addresses = []
         self._image_id = None
         self._image_url = None
+        self._code = None
         self.retrieve()
 
     def __repr__(self):
@@ -203,11 +204,14 @@ class TenorNSI(object):
 
         if failed:
             self._state = "FAILED"
+            self._code = crites[0].code
 
         result = {'service_instance_id': self._nsi_id,
                   'state': self._state,
                   'addresses': addresses,
                   'runtime_params': runtime_params}
+        if self._code:
+            result['code'] = self._code
         if self._image_id:
             result['created_image'] = {'vm_image': self._image_id,
                                        'vm_image_format': 'openstack_id'}

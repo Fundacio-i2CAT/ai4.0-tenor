@@ -1,10 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """TeNOR PoP Class"""
+"""Uses tenor ns-manager/routes/dc.rb """
 
 import requests
 import json
 import ConfigParser
+
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -70,6 +72,32 @@ class TenorPoP(object):
             raise ValueError('Decoding PoP response json response failed')
         return quotas['quota_set']
 
+    def get_network_quota_details(self):
+        """Gets the quotas on the PoP"""
+        url = '{0}/pops/network_quotas/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            quotas = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        return quotas['quota']
+
+    def get_limits(self):
+        '''Get limits and quotas'''
+        url = '{0}/pops/limits/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            limits = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+        return limits['limits']
+
     def get_network_details(self):
         """Gets networks information"""
         url = '{0}/pops/networks/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
@@ -100,6 +128,49 @@ class TenorPoP(object):
                     if address['OS-EXT-IPS:type'].upper() == 'FLOATING':
                         used_floating_ips = used_floating_ips+1
         return {'quota': floating_ips, 'used': used_floating_ips, 'ratio': float(used_floating_ips)/float(floating_ips)}
+
+    def get_keypair_details(self):
+        """Get used keypairs"""
+        url = '{0}/pops/keypairs/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            keypairs = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+	keypairs_used = len(keypairs['keypairs'])
+	keypairs_max = self.get_limits()['absolute']['maxTotalKeypairs']
+        return {'keypairs_quota': keypairs_max, 'keypairs_used': keypairs_used, 'keypairs_ratio': float(keypairs_used)/float(keypairs_max)}
+
+    def get_secutity_groups_details(self):
+        '''gets used and active security groups'''
+        sec_groups_max = self.get_limits()['absolute']['maxSecurityGroups']
+        sec_groups_used = self.get_limits()['absolute']['totalSecurityGroupsUsed']
+	return {'security_groups_quota': sec_groups_max, 'security_groups_used': sec_groups_used, 'security_groups_ratio': float(sec_groups_used)/float(sec_groups_max)}
+        
+    def get_instance_details(self):
+	'''get number of used and quota of images'''
+        instances_max = self.get_limits()['absolute']['maxTotalInstances']
+        instances_used = self.get_limits()['absolute']['totalInstancesUsed']
+        return {'instances_quota': instances_max, 'instances_used': instances_used, 'instances_ratio': float(instances_used)/float(instances_max)}
+
+    def get_routers_details(self):
+	'''get used and active router'''
+        url = '{0}/pops/routers/{1}'.format(DEFAULT_TENOR_URL, self._pop_id)
+        try:
+            resp = requests.get(url)
+        except:
+            raise IOError('{0} PoP unreachable'.format(self._pop_id))
+        try:
+            routers = json.loads(resp.text)
+        except:
+            raise ValueError('Decoding PoP response json response failed')
+	routers_max = self.get_network_quota_details()['router']
+	routers_used = routers
+        return {'routers_quota': routers_max, 'routers_used': routers_used, 'routers_ratio': float(routers_used)/float(routers_max)}
+ 
 
     def get_core_details(self):
         """Gets used and active cores"""
