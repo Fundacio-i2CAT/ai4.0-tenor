@@ -90,7 +90,6 @@ ADAM_EXAMPLE = {
 		"desc" : "sssssss"
             }
 	],
-	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
 	"name_image" : "TEST",
 	"pop_id": 21,
         "vm_image_format" : "openstack_id",
