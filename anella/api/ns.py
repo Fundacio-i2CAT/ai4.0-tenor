@@ -61,8 +61,11 @@ class NS(flask_restful.Resource):
                     abort(400, message='Lack of PoP id')
                 resp = tns.instantiate(data['pop_id'])
                 nsdata = json.loads(resp.text)
+                pkey = ''
+                with open('./keys/anella') as fhandle:
+                    pkey = fhandle.read()
                 icd = build_instance_configuration(nsdata['id'],
-                                                   data['context']['consumer_params'])
+                                                   data['context']['consumer_params'], pkey)
                 icd.save()
                 return {'service_instance_id': nsdata['id'],
                         'state': 'PROVISIONED'}

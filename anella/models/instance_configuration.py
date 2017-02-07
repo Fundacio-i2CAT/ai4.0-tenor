@@ -15,6 +15,7 @@ class InstanceConfiguration(Document):
     service_instance_id = StringField(required=True)
     consumer_params = ListField(EmbeddedDocumentField(ConsumerParam))
     timestamp = DateTimeField(default=datetime.datetime.now)
+    pkey = StringField(required=False)
 
 def safe_encoding(thing):
     param_value = thing
@@ -24,7 +25,7 @@ def safe_encoding(thing):
         param_value = str(param_value)
     return param_value
 
-def build_instance_configuration(service_instance_id, consumer_params):
+def build_instance_configuration(service_instance_id, consumer_params, pkey):
     """Building it from array"""
     cpds = []
     for cpar in consumer_params:
@@ -50,7 +51,7 @@ def build_instance_configuration(service_instance_id, consumer_params):
                                             runtime=runtime))
             cpds.append(ConsumerParam(path=cpar['path'], fields=fields))
     return InstanceConfiguration(service_instance_id=service_instance_id,
-                                 consumer_params=cpds)
+                                 consumer_params=cpds, pkey=pkey)
 
 if __name__ == "__main__":
     FNAME = ConsumerField(name="name",

@@ -23,6 +23,7 @@ from time import mktime, strptime
 from datetime import datetime
 from pprint import pprint
 from datetime import datetime, timedelta
+from Crypto.PublicKey import RSA
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -72,11 +73,15 @@ class ServiceInstance(flask_restful.Resource):
             cached = "true"
         vdu = TenorVDU(context['vm_image'], context['vm_image_format'],
                        context['flavor'], cached)
+        key = RSA.generate(2048)
+        pubkey = key.publickey()
+        public_key_string = pubkey.exportKey('OpenSSH')
         if not 'bootstrap_script' in context:
             shell = None
             with open('keys/anella.json') as data_file:
                 shell = json.load(data_file)
             context['bootstrap_script'] = shell['shell']
+            context['bootstrap_script'] = '#!/bin/bash\\necho \'{0}\' >> /root/.ssh/authorized_keys'.format(public_key_string)
         try:
             vnf = TenorVNF(vdu)
             tns = TenorNS(vnf)
@@ -98,7 +103,8 @@ class ServiceInstance(flask_restful.Resource):
             abort(403, code=edata['message'])
 
         icd = build_instance_configuration(nsdata['id'],
-                                           data['context']['consumer_params'])
+                                           data['context']['consumer_params'],
+                                           key.exportKey('PEM'))
         icd.save()
         return {'service_instance_id': nsdata['id'], 'state': 'PROVISIONED'}
 

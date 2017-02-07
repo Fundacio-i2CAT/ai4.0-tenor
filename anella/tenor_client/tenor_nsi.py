@@ -85,7 +85,12 @@ class TenorNSI(object):
                 server_ip = addr['addr']
         key = RSA.generate(2048)
         pubkey = key.publickey()
-        ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
+        icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
+
+        if len(icds) < 1:
+            print "ICD NOT FOUND"
+            return
+        ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
         command = 'echo \'{0}\' >> /root/.ssh/authorized_keys'.format(pubkey.exportKey('OpenSSH'))
         print command
         stdin, stdout, stderr = ssh.exec_command(command)
@@ -103,13 +108,13 @@ class TenorNSI(object):
         for addr in self._addresses[0][1]:
             if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
                 server_ip = addr['addr']
-        ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
-        scp = SCPClient(ssh.get_transport())
         icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
 
         if len(icds) < 1:
             print "ICD NOT FOUND"
             return
+        ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
+        scp = SCPClient(ssh.get_transport())
 
         for cpar in icds[0].consumer_params:
             filename = cpar.path
