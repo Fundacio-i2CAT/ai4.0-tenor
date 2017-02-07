@@ -7,6 +7,7 @@ from tenor_client.callback import Callback
 from models.tenor_messages import CriticalError
 from models.tenor_messages import MonitoringMessage
 
+import re
 import flask_restful
 from flask import request
 
@@ -42,6 +43,9 @@ class Log(flask_restful.Resource):
                 code = ''
                 if 'code' in data:
                     code = data['code']
+                    if code == 'ERROR_CREATING_INSTANCE':
+                        if re.search('disk is too small', message):
+                            code = 'FLAVOR_TOO_SMALL'
                 crite = CriticalError(service_instance_id=data['service_instance_id'],
                                       message=message, code=code)
                 crite.save()
