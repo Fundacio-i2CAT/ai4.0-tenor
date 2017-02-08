@@ -158,6 +158,22 @@ class ServiceInstance(flask_restful.Resource):
                 msg = 'Error deleting NS instance: {0}'.format(str(exc))
                 abort(500, message=msg)
 
+class ServiceInstanceSnapshot(flask_restful.Resource):
+    """Service instance history resources"""
+    def __init__(self):
+        pass
+
+    def post(self, ns_id):
+        if not ns_id in TenorNSI.get_nsi_ids():
+            abort(404, message="Service instance {0} not found".format(ns_id))
+        nsi = TenorNSI(ns_id)
+        name_image = str(uuid.uuid4())
+        try:
+            resp = nsi.create_image(name_image)
+        except:
+            abort(500, 'Error creating snapshot')
+        return {'message': 'Successfully sent snapshot creation command'}
+
 class ServiceInstanceHistory(flask_restful.Resource):
     """Service instance history resources"""
     def __init__(self):

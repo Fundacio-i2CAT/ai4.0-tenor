@@ -183,6 +183,15 @@ class TenorNSI(object):
             raise IOError('Error deleting {0}'.format(self._nsi_id))
         return resp
 
+    def create_image(self, name_image):
+        try:
+            resp = requests.post('{0}/ns-instances/{1}/snapshot'.format(self._tenor_url, self._nsi_id),
+                                 headers={'Content-Type': 'application/json'},
+                                 json={'name_image': name_image})
+        except:
+            raise IOError('Error creating snapshot from {0}'.format(self._nsi_id))
+        return
+
     def get_state_and_addresses(self):
         """Returns state and addresses associated with the NSI"""
         addresses = []

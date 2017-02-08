@@ -259,8 +259,8 @@ module ProvisioningHelper
                     image_data = JSON.parse(check.body)
                     image = image_data['images'][0]
                     current_status = image['status']
+                    puts current_status
                     image_id = image['id']
-                    puts image+' '+counter
                 rescue => e
                     logger.error operationId, 'Openstack state get failed'
                     halt e.response.code, e.response
@@ -271,7 +271,8 @@ module ProvisioningHelper
                 info = {
                     'service_instance_id' => instance_id,
                     'snapshot' => {
-                        'image_id' => image_id
+                        'image_id' => image_id,
+                        'name_image' => name_image
                     }
                 }
                 RestClient.post notification, info.to_json, content_type: :json
