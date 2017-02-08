@@ -6,6 +6,7 @@ from tenor_client.tenor_nsi import TenorNSI
 from tenor_client.callback import Callback
 from models.tenor_messages import CriticalError
 from models.tenor_messages import MonitoringMessage
+from models.instance_snapshot import InstanceSnapshot
 
 import re
 import flask_restful
@@ -55,6 +56,13 @@ class Log(flask_restful.Resource):
             monim = MonitoringMessage(service_instance_id=data['service_instance_id'],
                                       message=data['state_change']['reached'])
             monim.save()
+
+        if 'snapshot' in data:
+            print data['snapshot']
+            inssnp = InstanceSnapshot(service_instance_id=data['service_instance_id'],
+                                      image_id=data['snapshot']['image_id'],
+                                      name_image=data['snapshot']['name_image'])
+            inssnp.save()
 
     def get(self):
         """Log get"""
