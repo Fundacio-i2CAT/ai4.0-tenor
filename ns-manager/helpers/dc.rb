@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #
 # TeNOR - NS Manager
 #
@@ -97,6 +98,8 @@ module DcHelper
         popUrls[:compute] = item.split('=')[1]
       elsif key == 'orch-endpoint'
         popUrls[:orch] = item.split('=')[1]
+      elsif key == 'image-endpoint'
+        popUrls[:image] = item.split('=')[1]
       elsif key == 'tenant-name'
         popUrls[:tenantname] = item.split('=')[1]
       end

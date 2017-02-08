@@ -331,8 +331,14 @@ class Provisioning < VnfProvisioning
             '/servers/'+vnfr.vms_id['vdu0']+
             '/action'
         amessage = {"createImage" => {"name": name_image, "metadata": {}}}
-        check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
-
+        begin
+            check = RestClient.post(url, amessage.to_json , 'X-Auth-Token' => auth_token, content_type: :json)
+            dc['tenant_id'] = tenant_id
+            create_thread_to_monitor_snapshot(vnfr.vms_id['vdu0'], name_image, config_info['instance_id'], dc, auth_token, config_info['notification'])
+        rescue => e
+            logger.info 'Openstack request failed'
+            halt 409
+        end
     end
 
     # @method post_vnf_provisioning_instances_id_config
