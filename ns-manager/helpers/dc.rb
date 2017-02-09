@@ -83,29 +83,47 @@ module DcHelper
   #
   # @param [Symbol] format the format type, `:text` or `:html`
   # @return [String] the object converted into the expected format.
-  def getPopUrls(extraInfo)
-    urls = extraInfo.split(" ")
-
-    popUrls = {}
-
-    for item in urls
-      key = item.split('=')[0]
-      if key == 'keystone-endpoint'
-        popUrls[:keystone] = item.split('=')[1]
-      elsif key == 'neutron-endpoint'
-        popUrls[:neutron] = item.split('=')[1]
-      elsif key == 'compute-endpoint'
-        popUrls[:compute] = item.split('=')[1]
-      elsif key == 'orch-endpoint'
-        popUrls[:orch] = item.split('=')[1]
-      elsif key == 'glance-endpoint'
-        popUrls[:glance] = item.split('=')[1]
-      elsif key == 'tenant-name'
-        popUrls[:tenantname] = item.split('=')[1]
+  def getPopUrls(dc)
+      extraInfo = dc['extra_info']
+      urls = extraInfo.split(" ")
+      popUrls = {}
+      for item in urls
+          key = item.split('=')[0]
+          if key == 'keystone-endpoint'
+              popUrls[:keystone] = item.split('=')[1]
+          elsif key == 'neutron-endpoint'
+              popUrls[:neutron] = item.split('=')[1]
+          elsif key == 'compute-endpoint'
+              popUrls[:compute] = item.split('=')[1]
+          elsif key == 'orch-endpoint'
+              popUrls[:orch] = item.split('=')[1]
+          elsif key == 'glance-endpoint'
+              popUrls[:glance] = item.split('=')[1]
+          elsif key == 'tenant-name'
+              popUrls[:tenantname] = item.split('=')[1]
+          elsif key == 'dns'
+              popUrls[:dns] = [item.split('=')[1]]
+          end
       end
-    end
-
-    return popUrls
+      unless dc['dns'].nil?
+          popUrls[:dns] = [dc['dns']]
+      end
+      unless dc['keystone_endpoint'].nil?
+          popUrls[:keystone] = dc['keystone_endpoint']
+      end
+      unless dc['neutron_endpoint'].nil?
+          popUrls[:neutron] = dc['neutron_endpoint']
+      end
+      unless dc['heat_endpoint'].nil?
+          popUrls[:orch] = dc['heat_endpoint']
+      end
+      unless dc['nova_endpoint'].nil?
+          popUrls[:compute] = dc['nova_endpoint']
+      end
+      unless dc['glance_endpoint'].nil?
+          popUrls[:glance] = dc['glance_endpoint']
+      end
+      return popUrls
   end
 
   def registerPop(pop_info)

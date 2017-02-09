@@ -44,7 +44,7 @@ class DcController < TnovaManager
             begin
                 dcs = Dc.find()
                 Dc.each do |idc|
-                    popUrls = getPopUrls(idc['extra_info'])
+                    popUrls = getPopUrls(idc)
                     if popUrls[:orch] == stack_info['vim_url']
                         dc = idc
                         break
@@ -57,7 +57,8 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
+
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
             auth_token = admin_credentials[:token]
@@ -96,7 +97,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -142,7 +143,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -178,7 +179,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             neutron_url = popUrls[:neutron]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
@@ -212,7 +213,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             neutron_url = popUrls[:neutron]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
@@ -265,7 +266,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -297,7 +298,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -330,7 +331,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             neutron_url = popUrls[:neutron]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -364,7 +365,7 @@ class DcController < TnovaManager
                 logger.error 'DC not found'
                 return 404
             end
-            popUrls = getPopUrls(dc['extra_info'])
+            popUrls = getPopUrls(dc)
             compute_url = popUrls[:compute]
             admin_credentials, errors = authenticate_anella(popUrls[:keystone], dc["tenant_name"], dc['user'], dc['password'])
             tenant_id = admin_credentials[:tenant_id]
@@ -397,7 +398,7 @@ class DcController < TnovaManager
             logger.error 'DC not found'
             return 404
         end
-        urls = getPopUrls(dc['extra_info'])
+        urls = getPopUrls(dc)
         dc['orch'] = urls[:orch]
         return dc.to_json
     end

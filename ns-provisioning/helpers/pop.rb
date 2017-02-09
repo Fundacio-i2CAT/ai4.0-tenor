@@ -41,17 +41,14 @@ module PopHelper
         popInfo
     end
 
-    # Returns the list of URLs of the PoPs
+    # Get list of PoPs
     #
-    # @param [JSON] message some JSON message
-    # @return [Hash, nil] if the parsed message is a valid JSON
-    # @return [Hash, String] if the parsed message is an invalid JSON
-    def getPopUrls(extraInfo)
-        urls = extraInfo.split(' ')
-
+    # @param [Symbol] format the format type, `:text` or `:html`
+    # @return [String] the object converted into the expected format.
+    def getPopUrls(dc)
+        extraInfo = dc['extra_info']
+        urls = extraInfo.split(" ")
         popUrls = {}
-        popUrls[:dns] = []
-
         for item in urls
             key = item.split('=')[0]
             if key == 'keystone-endpoint'
@@ -64,11 +61,31 @@ module PopHelper
                 popUrls[:orch] = item.split('=')[1]
             elsif key == 'glance-endpoint'
                 popUrls[:glance] = item.split('=')[1]
+            elsif key == 'tenant-name'
+                popUrls[:tenantname] = item.split('=')[1]
             elsif key == 'dns'
-                popUrls[:dns] << item.split('=')[1] unless item.split('=')[1].nil?
+                popUrls[:dns] = [item.split('=')[1]]
             end
         end
-        popUrls
+        unless dc['dns'].nil?
+            popUrls[:dns] = [dc['dns']]
+        end
+        unless dc['keystone_endpoint'].nil?
+            popUrls[:keystone] = dc['keystone_endpoint']
+        end
+        unless dc['neutron_endpoint'].nil?
+            popUrls[:neutron] = dc['neutron_endpoint']
+        end
+        unless dc['heat_endpoint'].nil?
+            popUrls[:orch] = dc['heat_endpoint']
+        end
+        unless dc['nova_endpoint'].nil?
+            popUrls[:compute] = dc['nova_endpoint']
+        end
+        unless dc['glance_endpoint'].nil?
+            popUrls[:glance] = dc['glance_endpoint']
+        end
+        return popUrls
     end
 
     # Returns an object with the properties of a PoP

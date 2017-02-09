@@ -306,7 +306,7 @@ class OrchestratorTestCase(unittest.TestCase):
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(ipaddr, username='root',
                     key_filename='keys/test_key.pem',
-                    timeout=15)
+                    timeout=30)
         command = 'ls -laht /'
         stdin, stdout, stderr = ssh.exec_command(command)
         assert len(stdout.readlines()) > 1
@@ -342,20 +342,20 @@ class OrchestratorTestCase(unittest.TestCase):
         while len(self._nsis) > 0:
             nsi = self._nsis.pop()
             url = '{0}/service/instance/{1}'.format(BASE_URL, nsi)
-            resp = requests.delete(url)
-            assert resp.status_code == 200
+            # resp = requests.delete(url)
+            # assert resp.status_code == 200
 
         while len(self._nss) > 0:
             vnf = self._nss.pop()
             url = '{0}/ns/{1}'.format(BASE_URL, vnf)
-            resp = requests.delete(url)
-            assert resp.status_code == 200
+            # resp = requests.delete(url)
+            # assert resp.status_code == 200
 
         while len(self._vnfs) > 0:
             vnf = self._vnfs.pop()
             url = '{0}/vnf/{1}'.format(BASE_URL, vnf)
-            resp = requests.delete(url)
-            assert resp.status_code == 200
+            # resp = requests.delete(url)
+            # assert resp.status_code == 200
 
 if __name__ == '__main__':
     unittest.main()

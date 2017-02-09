@@ -94,7 +94,7 @@ module NsProvisioner
             pop_info, errors = getPopInfo(resource['pop_id'])
             logger.error operationId, errors if errors
             return 400, errors.to_json if errors
-            popUrls = getPopUrls(pop_info['extra_info'])
+            popUrls = getPopUrls(pop_info)
             keystone_url = popUrls[:keystone]
 
             admin_credentials, errors = authenticate(keystone_url, pop_info['tenant_name'], pop_info['user'], pop_info['password'])
@@ -127,7 +127,7 @@ module NsProvisioner
             pop_auth, errors = getPopInfo(pop_info['pop_id'])
             logger.error operationId, errors if errors
             return 400, errors.to_json if errors
-            popUrls = getPopUrls(pop_auth['extra_info'])
+            popUrls = getPopUrls(pop_auth)
 
             auth_info = @instance['authentication'].find { |auth| auth['pop_id'] == pop_info['pop_id'] }
             credentials, errors = authenticate(popUrls[:keystone], auth_info['tenant_name'], auth_info['username'], auth_info['password'])
