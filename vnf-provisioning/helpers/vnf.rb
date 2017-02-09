@@ -212,8 +212,8 @@ module ProvisioningHelper
                     current_state = data['server']['status']
                     puts 'CHECKING STATE '+current_state
                 rescue => e
-                    logger.error operationId, 'Openstack state get failed'
-                    halt e.response.code, e.response
+                    logger.error instance_id, 'Openstack state get failed'
+                    halt e.response.code
                 end
             end while (current_state.casecmp(os_desired) != 0)
             puts 'TARGET STATE '+os_desired+' REACHED'
@@ -262,8 +262,8 @@ module ProvisioningHelper
                     puts current_status
                     image_id = image['id']
                 rescue => e
-                    logger.error operationId, 'Openstack state get failed'
-                    halt e.response.code, e.response
+                    logger.error instance_id, 'Openstack state get failed'
+                    halt e.response.code
                 end
             end while (current_status.casecmp('active') != 0)
             begin
