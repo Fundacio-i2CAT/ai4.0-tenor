@@ -112,6 +112,19 @@
                     </div>
                     <div class="box-body">
                         <div class="form-group">
+                            <label for="tenantName" class="col-sm-4 control-label">Glance API</label>
+                            <div class="col-sm-6">
+                                <input ng-model="dc_default.glance_api" type="text" class="form-control" id="openstack_ip" value="" />
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-default" ng-model="glance_version" data-html="1" bs-options="version.id as version.id for version in glance_versions" bs-select placeholder="select" ng-change="updateOpenstackIP()">
+                                  Action <span class="caret"></span>
+                              </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="form-group">
                             <label for="tenantName" class="col-sm-4 control-label">DNS</label>
                             <div class="col-sm-8">
                                 <input ng-model="dc_default.dns" type="text" class="form-control" id="dns" value="8.8.8.8" />

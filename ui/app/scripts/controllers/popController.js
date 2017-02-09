@@ -12,11 +12,13 @@ angular.module('tNovaApp')
         $scope.heat_versions = [{"id": "v1"}];
         $scope.compute_versions = [{"id": "v2"}, {"id": "v2.1"}];
         $scope.neutron_versions = [{"id": "v2.0"}];
+        $scope.glance_versions = [{"id": "v2.0"}];
 
         $scope.keystone_version = "v2.0"
         $scope.heat_version = "v1"
         $scope.compute_version = "v2.1"
         $scope.neutron_version = "v2.0"
+        $scope.glance_version = "v2.0"
 
         $scope.openstack_ip = "";
         $scope.infr_repo_url = undefined
@@ -98,6 +100,7 @@ angular.module('tNovaApp')
                 heat_api: $scope.openstack_ip + ":8004/v1",
                 compute_api: $scope.openstack_ip + ":8774/v2.1",
                 neutron_api: $scope.openstack_ip + ":9696/v2.0",
+		glance_api: $scope.openstack_ip + ":9292/v2.0",
                 dns: "8.8.8.8"
             };
             $modal({
@@ -117,7 +120,13 @@ angular.module('tNovaApp')
                 "tenant_name": obj.tenantName,
                 "is_admin": obj.isAdmin,
                 "description": obj.msg,
-                "extra_info": "keystone-endpoint=http://" + obj.keystone_api + " orch-endpoint=http://" + obj.heat_api + " compute-endpoint=http://" + obj.compute_api + " neutron-endpoint=http://" + obj.neutron_api + " dns=" + obj.dns
+                "extra_info": "keystone-endpoint=http://" + obj.keystone_api + " orch-endpoint=http://" + obj.heat_api + " compute-endpoint=http://" + obj.compute_api + " neutron-endpoint=http://" + obj.neutron_api + " dns=" + obj.dns,
+		"keystone_endpoint": "http://" + obj.keystone_api,
+		"heat_endpoint": "http://" + obj.heat_api,
+		"nova_endpoint": "http://" + obj.compute_api,
+		"glance_endpoint": "http://" + obj.glance_api,
+		"neutron_endpoint": "http://" + obj.neutron_api,
+		"dns": obj.dns
             };
             console.log(pop);
             tenorService.post('pops/dc', pop).then(function (d) {
@@ -208,6 +217,7 @@ angular.module('tNovaApp')
             var heat_port = $scope.dc_default.heat_api.split(":")[1].split("/")[0]
             var compute_port = $scope.dc_default.compute_api.split(":")[1].split("/")[0]
             var neutron_port = $scope.dc_default.neutron_api.split(":")[1].split("/")[0]
+	    var glance_port = $scope.dc_default.glance_api.split(":")[1].split("/")[0]
             $scope.dc_default = {
                 msg: $scope.dc_default.msg,
                 id: $scope.dc_default.id,
@@ -220,6 +230,7 @@ angular.module('tNovaApp')
                 heat_api: openstack_ip + ":" + heat_port + "/" + $scope.heat_version,
                 compute_api: openstack_ip + ":" + compute_port + "/" + $scope.compute_version,
                 neutron_api: openstack_ip + ":" + neutron_port + "/" + $scope.neutron_version,
+		glance_api: openstack_ip + ":" + glance_port + "/" + $scope.glance_version,
                 dns: $scope.dc_default.dns
             }
         };

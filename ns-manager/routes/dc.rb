@@ -428,6 +428,7 @@ class DcController < TnovaManager
     post '/dc' do
         return 415 unless request.content_type == 'application/json'
         pop_info, errors = parse_json(request.body.read)
+        puts pop_info
         serv = {
             name: pop_info['name'],
             host: pop_info['host'],
@@ -436,7 +437,13 @@ class DcController < TnovaManager
             tenant_name: pop_info['tenant_name'],
             is_admin: pop_info['is_admin'],
             description: pop_info['description'],
-            extra_info: pop_info['extra_info']
+            extra_info: pop_info['extra_info'],
+            keystone_endpoint: pop_info['keystone_endpoint'],
+            neutron_endpoint: pop_info['neutron_endpoint'],
+            glance_endpoint: pop_info['glance_endpoint'],
+            nova_endpoint: pop_info['nova_endpoint'],
+            heat_endpoint: pop_info['heat_endpoint'],
+            dns: pop_info['dns']
         }
         begin
             dc = Dc.find_by(name: pop_info['name'])

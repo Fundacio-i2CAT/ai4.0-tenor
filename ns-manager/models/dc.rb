@@ -34,7 +34,12 @@ class Dc
     field :tenant_name, type: String
     field :is_admin, type: Boolean
     field :extra_info, type: String
+    field :keystone_endpoint, type: String
+    field :nova_endpoint, type: String
+    field :glance_endpoint, type: String
+    field :heat_endpoint, type: String
+    field :neutron_endpoint, type: String
+    field :dns, type: String
     field :description, type: String
-
     increments :id
 end
