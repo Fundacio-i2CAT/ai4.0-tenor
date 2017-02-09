@@ -244,9 +244,9 @@ module ProvisioningHelper
     def create_thread_to_monitor_snapshot(vm_id, name_image, instance_id, dc, auth_token, notification)
 
         url =
-            dc['pop_urls']['image']+'/'+
+            dc['pop_urls']['glance']+'/'+
             'images?name='+name_image
-        puts url
+
         image_id = nil
         thread = Thread.new do
             counter = 0
@@ -262,7 +262,7 @@ module ProvisioningHelper
                     puts current_status
                     image_id = image['id']
                 rescue => e
-                    logger.error operationId, 'Openstack state get failed'
+                    logger.error instance_id, 'Openstack state get failed'
                     halt e.response.code, e.response
                 end
             end while (current_status.casecmp('active') != 0)

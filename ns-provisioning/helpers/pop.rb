@@ -62,8 +62,8 @@ module PopHelper
                 popUrls[:compute] = item.split('=')[1]
             elsif key == 'orch-endpoint'
                 popUrls[:orch] = item.split('=')[1]
-            elsif key == 'image-endpoint'
-                popUrls[:image] = item.split('=')[1]
+            elsif key == 'glance-endpoint'
+                popUrls[:glance] = item.split('=')[1]
             elsif key == 'dns'
                 popUrls[:dns] << item.split('=')[1] unless item.split('=')[1].nil?
             end

@@ -120,7 +120,7 @@ angular.module('tNovaApp')
                 "tenant_name": obj.tenantName,
                 "is_admin": obj.isAdmin,
                 "description": obj.msg,
-                "extra_info": "keystone-endpoint=http://" + obj.keystone_api + " orch-endpoint=http://" + obj.heat_api + " compute-endpoint=http://" + obj.compute_api + " neutron-endpoint=http://" + obj.neutron_api + " dns=" + obj.dns,
+                "extra_info": "keystone-endpoint=http://" + obj.keystone_api + " orch-endpoint=http://" + obj.heat_api + " compute-endpoint=http://" + obj.compute_api + " neutron-endpoint=http://" + obj.neutron_api + " glance-endpoint=http://" + obj.glance_api + " dns=" + obj.dns,
 		"keystone_endpoint": "http://" + obj.keystone_api,
 		"heat_endpoint": "http://" + obj.heat_api,
 		"nova_endpoint": "http://" + obj.compute_api,
