@@ -28,6 +28,7 @@ from Crypto.PublicKey import RSA
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor', 'default_pop'))
+TENOR_LABEL = CONFIG.get('tenor', 'label')
 
 class ServiceInstance(flask_restful.Resource):
     """Service instance resources"""
@@ -85,6 +86,7 @@ class ServiceInstance(flask_restful.Resource):
         try:
             vnf = TenorVNF(vdu)
             tns = TenorNS(vnf)
+            name = TENOR_LABEL+'_{0}'.format(name)
             tns.register(name, context['bootstrap_script'])
             resp = None
             pop_id = POP_ID
