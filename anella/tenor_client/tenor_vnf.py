@@ -45,7 +45,7 @@ class TenorVNF(object):
     def get_last_vnf_id(self):
         """Gets last vnf_id"""
         try:
-            resp = requests.get('{0}/vnfs'.format(self._tenor_url))
+            resp = requests.get('{0}/vnfs/ids'.format(self._tenor_url))
         except:
             raise IOError('{0} instance unreachable'.format(self._tenor_url))
         try:
@@ -132,7 +132,7 @@ class TenorVNF(object):
     def get_vnf_ids():
         """Returns the list of VNF registered in TeNOR"""
         try:
-            resp = requests.get('{0}/vnfs'.format(DEFAULT_TENOR_URL))
+            resp = requests.get('{0}/vnfs/ids'.format(DEFAULT_TENOR_URL))
         except:
             raise IOError('{0} instance unreachable'.format(DEFAULT_TENOR_URL))
         try:
