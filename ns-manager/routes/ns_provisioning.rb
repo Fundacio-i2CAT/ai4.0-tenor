@@ -182,6 +182,25 @@ class NsProvisioner < TnovaManager
     return response.code, response.body
   end
 
+  # @method get_ns_instances/ids
+  # @overload get "/ns-instances/ids"
+  # Get all ns-instances ids
+  get '/ids' do
+    provisioner, errors = ServiceConfigurationHelper.get_module('ns_provisioner')
+    halt 500, errors if errors
+
+    begin
+      response = RestClient.get provisioner.host + request.fullpath, 'X-Auth-Token' => provisioner.token, :content_type => :json
+    rescue Errno::ECONNREFUSED
+      halt 500, 'NS Provisioning unreachable'
+    rescue => e
+      logger.error e.response
+      halt e.response.code, e.response.body
+    end
+
+    return response.code, response.body
+  end
+
   # @method put_ns_instances
   # @overload put "/ns-instances/:nsr_id/:status"
   # Update ns-instance status

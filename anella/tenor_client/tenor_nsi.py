@@ -264,7 +264,7 @@ class TenorNSI(object):
     def get_nsi_ids():
         """Returns the list of NSI registered in TeNOR"""
         try:
-            resp = requests.get('{0}/ns-instances'.format(DEFAULT_TENOR_URL))
+            resp = requests.get('{0}/ns-instances/ids'.format(DEFAULT_TENOR_URL))
         except:
             raise IOError('{0} instance unreachable'.format(DEFAULT_TENOR_URL))
         try:

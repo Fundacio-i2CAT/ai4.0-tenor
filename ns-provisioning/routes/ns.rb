@@ -27,7 +27,21 @@ class Provisioner < NsProvisioning
                         Nsr.where(status: params[:status])
                     else
                         Nsr.all
-                       end
+                    end
+
+        return instances.to_json
+    end
+
+    # @method get_ns_instances/ids
+    # @overload get "/ns-instances/ids"
+    # Gets all ns-instances ids
+    get '/ids' do
+        #logger.info 666,'Getting NS instances.'
+        instances = if params[:status]
+                        Nsr.where(status: params[:status])
+                    else
+                        Nsr.only(:id)
+                    end
 
         return instances.to_json
     end
