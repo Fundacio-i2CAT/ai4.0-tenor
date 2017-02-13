@@ -69,7 +69,6 @@ class TenorNS(object):
 
     def register(self, name, bootstrap_script=None):
         """Registers a NS via TeNOR"""
-        name = TENOR_LABEL+'_{0}'.format(name)
         self._dummy_id = self.get_last_ns_id()+1
         if self._lite == False:
             if not bootstrap_script:
