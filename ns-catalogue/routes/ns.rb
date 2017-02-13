@@ -41,6 +41,35 @@ class Catalogue < NsCatalogue
         end
     end
 
+    # @method get_network_services ids
+    # @overload get '/network-services/ids'
+    # Returns a list of NSs ids
+    get '/ids' do
+        params[:offset] ||= 1
+        params[:limit] ||= Ns.count()+1
+
+        # Only accept positive numbers
+        params[:offset] = 1 if params[:offset].to_i < 1
+        params[:limit] = 2 if params[:limit].to_i < 1
+
+        # Get paginated list
+        nss = Ns.paginate(page: params[:offset], limit: params[:limit])
+        nss_ids = []
+        nss.each do |ns|
+            nss_ids.push({:nsd => { :id => ns['nsd']['id']}})
+        end
+
+        # Build HTTP Link Header
+        headers['Link'] = build_http_link(params[:offset].to_i, params[:limit])
+
+        begin
+            return 200, nss_ids.to_json
+        rescue
+            logger.error 'Error Establishing a Database Connection'
+            return 500, 'Error Establishing a Database Connection'
+        end
+    end
+
     # @method get_network_services_id
     # @overload get '/network-services/:external_ns_id'
     #	Show a NS
