@@ -113,7 +113,13 @@ class TenorNSI(object):
         if len(icds) < 1:
             print "ICD NOT FOUND"
             return
-        ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
+        try:
+            ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
+        except:
+            crite = CriticalError(service_instance_id=self._nsi_id,
+                                  message='Failed to connect to {0}'.format(server_ip),
+                                  code='CONFIGURATION_FAILED')
+            crite.save()
         scp = SCPClient(ssh.get_transport())
 
         for cpar in icds[0].consumer_params:
@@ -123,7 +129,13 @@ class TenorNSI(object):
                 command = 'echo \'{0}\' > {1}'.format(content,
                                                       filename)
                 print command
-                stdin, stdout, stderr = ssh.exec_command(command)
+                try:
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                except:
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to configure {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
                 print stdout.readlines()
                 print stderr.readlines()
             if 'fields' in cpar:
@@ -133,8 +145,10 @@ class TenorNSI(object):
                 try:
                     scp.get(filename, template_filename)
                 except:
-                    # DO NOT FORGET TO RAISE ERROR!!!
-                    continue
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to retrieve {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
                 keyvalues = {}
                 for item in cpar.fields:
                     if item.runtime:
@@ -151,7 +165,13 @@ class TenorNSI(object):
                 with open(render_filename, 'w') as fhandle:
                     fhandle.write(result)
                 print 'Sending {0}'.format(filename)
-                scp.put(render_filename, filename)
+                try:
+                    scp.put(render_filename, filename)
+                except:
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to write {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
                 print 'Removing temporary files'
                 os.remove(template_filename)
                 os.remove(render_filename)
