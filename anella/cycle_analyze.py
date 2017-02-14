@@ -70,3 +70,11 @@ if __name__ == "__main__":
 
     print
     print
+
+    print " ERRORS"
+    print " -------------------------------"
+    for conf in confs:
+        siid = conf['service_instance_id']
+        crite = CriticalError.objects(service_instance_id=siid)
+        if len(crite) > 0:
+            print " ", crite[0]['message'], crite[0]['code']
