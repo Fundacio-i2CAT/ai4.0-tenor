@@ -120,6 +120,7 @@ class TenorNSI(object):
                                   message='Failed to connect to {0}'.format(server_ip),
                                   code='CONFIGURATION_FAILED')
             crite.save()
+            return
         scp = SCPClient(ssh.get_transport())
 
         for cpar in icds[0].consumer_params:
@@ -136,6 +137,7 @@ class TenorNSI(object):
                                           message='Failed to configure {0} configuration file'.format(filename),
                                           code='CONFIGURATION_FAILED')
                     crite.save()
+                    return
                 print stdout.readlines()
                 print stderr.readlines()
             if 'fields' in cpar:
@@ -149,6 +151,7 @@ class TenorNSI(object):
                                           message='Failed to retrieve {0} configuration file'.format(filename),
                                           code='CONFIGURATION_FAILED')
                     crite.save()
+                    return
                 keyvalues = {}
                 for item in cpar.fields:
                     if item.runtime:
@@ -172,6 +175,7 @@ class TenorNSI(object):
                                           message='Failed to write {0} configuration file'.format(filename),
                                           code='CONFIGURATION_FAILED')
                     crite.save()
+                    return
                 print 'Removing temporary files'
                 os.remove(template_filename)
                 os.remove(render_filename)
