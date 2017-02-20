@@ -23,7 +23,6 @@ if __name__ == "__main__":
     failed = { 'i2cat': [], 'adam': []}
     hanged = { 'i2cat': [], 'adam': []}
     ok = { 'i2cat': [], 'adam': []}
-
     confs_data = get_siids()
     confs = confs_data['confs']
     for conf in confs:
@@ -42,15 +41,19 @@ if __name__ == "__main__":
             crite = CriticalError.objects(service_instance_id=siid)
             if len(crite) > 0:
                 failed[dc].append({'id': siid, 'message': crite[0]['message']})
+                print " ", dc, "\t", conf['timestamp'], 'FAILED'
             else:
                 ok[dc].append({'id': siid, 'message': 'ok'})
+                print " ", dc, "\t", conf['timestamp'], 'OK'
         else:
             hanged[dc].append({'id': siid, 'message': 'no response'})
+            print " ", dc, "\t", conf['timestamp'], 'HANGED'
 
     totals = {}
     totals['adam'] = len(ok['adam'])+len(failed['adam'])+len(hanged['adam'])
     totals['i2cat'] = len(ok['i2cat'])+len(failed['i2cat'])+len(hanged['i2cat'])
     total = totals['adam']+totals['i2cat']
+
     print
     print
 

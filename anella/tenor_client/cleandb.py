@@ -12,8 +12,8 @@ ns_catalogue.ns.remove()
 vnf_catalogue = client['vnf_catalogue']
 vnf_catalogue.vnfs.remove()
 
-pi40orch = client['pi40orch']
-pi40orch.regular_message.remove()
-pi40orch.critical_error.remove()
-pi40orch.api_log.remove()
-pi40orch.instance_configuration.remove()
+# pi40orch = client['pi40orch']
+# pi40orch.regular_message.remove()
+# pi40orch.critical_error.remove()
+# pi40orch.api_log.remove()
+# pi40orch.instance_configuration.remove()
