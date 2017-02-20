@@ -212,8 +212,8 @@ module ProvisioningHelper
                     current_state = data['server']['status']
                     puts 'CHECKING STATE '+current_state
                 rescue => e
-                    logger.error operationId, 'Openstack state get failed'
-                    halt e.response.code, e.response
+                    logger.error instance_id, 'Openstack state get failed'
+                    halt e.response.code
                 end
             end while (current_state.casecmp(os_desired) != 0)
             puts 'TARGET STATE '+os_desired+' REACHED'
@@ -222,6 +222,57 @@ module ProvisioningHelper
                     'service_instance_id' => instance_id,
                     'state_change' => {
                         'reached' => os_desired
+                    }
+                }
+                RestClient.post notification, info.to_json, content_type: :json
+            rescue Errno::ECONNREFUSED
+                halt 500, 'Marketplace unreachable'
+            rescue => e
+                logger.error e.response
+            end
+        end
+    end
+
+    # Monitor snapshot state
+    #
+    # @param [String] vm_id the openstack id of the compute instance
+    # @param [String] desired the desired final state
+    # @param [String] instance_id the service_instance_id to notify anella plugin
+    # @param [String] dc the datacenter info
+    # @param [String] auth_token the auth token to authenticate with the VIM
+    # @param [String] notification the endpoint url of the orchestrator
+    def create_thread_to_monitor_snapshot(vm_id, name_image, instance_id, dc, auth_token, notification)
+
+        url =
+            dc['pop_urls']['image']+'/'+
+            'images?name='+name_image
+        puts url
+        image_id = nil
+        thread = Thread.new do
+            counter = 0
+            sleep_time = 5 # set wait time in seconds
+            begin
+                sleep sleep_time # wait x seconds
+                counter = counter+1
+                begin
+                    check = RestClient.get(url, headers = {'X-Auth-Token' => auth_token,'accept' => 'json'})
+                    image_data = JSON.parse(check.body)
+                    image = image_data['images'][0]
+                    current_status = image['status']
+                    puts current_status
+                    image_id = image['id']
+                rescue => e
+                    logger.error instance_id, 'Openstack state get failed'
+                    halt e.response.code
+                end
+            end while (current_status.casecmp('active') != 0)
+            begin
+                puts 'Sending image_id '+image_id+' to marketplace'
+                info = {
+                    'service_instance_id' => instance_id,
+                    'snapshot' => {
+                        'image_id' => image_id,
+                        'name_image' => name_image
                     }
                 }
                 RestClient.post notification, info.to_json, content_type: :json

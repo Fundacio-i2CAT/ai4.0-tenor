@@ -23,10 +23,12 @@ from time import mktime, strptime
 from datetime import datetime
 from pprint import pprint
 from datetime import datetime, timedelta
+from Crypto.PublicKey import RSA
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
 POP_ID = int(CONFIG.get('tenor', 'default_pop'))
+TENOR_LABEL = CONFIG.get('tenor', 'label')
 
 class ServiceInstance(flask_restful.Resource):
     """Service instance resources"""
@@ -72,14 +74,19 @@ class ServiceInstance(flask_restful.Resource):
             cached = "true"
         vdu = TenorVDU(context['vm_image'], context['vm_image_format'],
                        context['flavor'], cached)
+        key = RSA.generate(2048)
+        pubkey = key.publickey()
+        public_key_string = pubkey.exportKey('OpenSSH')
         if not 'bootstrap_script' in context:
             shell = None
             with open('keys/anella.json') as data_file:
                 shell = json.load(data_file)
             context['bootstrap_script'] = shell['shell']
+            context['bootstrap_script'] = '#!/bin/bash\\necho \'{0}\' >> /root/.ssh/authorized_keys'.format(public_key_string)
         try:
             vnf = TenorVNF(vdu)
             tns = TenorNS(vnf)
+            name = TENOR_LABEL+'_{0}'.format(name)
             tns.register(name, context['bootstrap_script'])
             resp = None
             pop_id = POP_ID
@@ -98,7 +105,8 @@ class ServiceInstance(flask_restful.Resource):
             abort(403, code=edata['message'])
 
         icd = build_instance_configuration(nsdata['id'],
-                                           data['context']['consumer_params'])
+                                           data['context']['consumer_params'],
+                                           key.exportKey('PEM'))
         icd.save()
         return {'service_instance_id': nsdata['id'], 'state': 'PROVISIONED'}
 
@@ -157,6 +165,22 @@ class ServiceInstance(flask_restful.Resource):
             except Exception as exc:
                 msg = 'Error deleting NS instance: {0}'.format(str(exc))
                 abort(500, message=msg)
+
+class ServiceInstanceSnapshot(flask_restful.Resource):
+    """Service instance history resources"""
+    def __init__(self):
+        pass
+
+    def post(self, ns_id):
+        if not ns_id in TenorNSI.get_nsi_ids():
+            abort(404, message="Service instance {0} not found".format(ns_id))
+        nsi = TenorNSI(ns_id)
+        name_image = str(uuid.uuid4())
+        try:
+            resp = nsi.create_image(name_image)
+        except:
+            abort(500, 'Error creating snapshot')
+        return {'message': 'Successfully sent snapshot creation command'}
 
 class ServiceInstanceHistory(flask_restful.Resource):
     """Service instance history resources"""

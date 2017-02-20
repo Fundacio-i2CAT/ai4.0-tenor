@@ -21,7 +21,7 @@ OVNFD_EXAMPLE = {
     "name": "TEST",
     "vdu":
     {
-        "vm_image": "e64c8134-21e0-4de2-8d7b-12d832068f1e",
+        "vm_image": "6d2b10db-1716-4541-9514-542e91594d2a",
         "vm_image_format": "OpenstacK_id",
         "shell": "#!/bin/bash\\necho 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCTyrMs/iliz2PPAGACyGWwC7OqoIDgoStpiiXcJIAElaLiiAhlOdhCJP6okE2WzkuMf4XD80fVm/yikrjSRTVwph981KEEcAH+mRWThkoItaPqDLPh79AJfT1Ud48FQbG8MZu91X+E4ecnYQH/1bPRxiumWQLNrHmIhY8aIKv/xPCF8zZBYjG6BK/g2L22h4Ky6VI07uyzHyIk78OxUZTpQcb+jnFpJlVOZreRLc8RE6pDF17h4ZhrEmv0tvdWiubk46cbEUwOvGq9wWxFKReEQubC+7/2WNcQnkAylDxzbR9pF/RlomuwcBWSycQ8RVpmr8T1cydaBpi9cbBB2DOn alfonso@knightmare' >> /root/.ssh/authorized_keys",
         "storage_amount": 6,
@@ -40,7 +40,7 @@ CATALOG_EXAMPLE = {
 	],
 	"name_image" : "TEST",
 	"tenor_url" : "http://localhost:4000",
-        "vm_image": "c3e47e71-8ce2-43d6-a04a-14d6ca1b4404",
+        "vm_image": "6d2b10db-1716-4541-9514-542e91594d2a",
         "vm_image_format": "openstack_id",
 	"flavor" : "m1.medium",
 	"consumer_params" : [
@@ -90,7 +90,6 @@ ADAM_EXAMPLE = {
 		"desc" : "sssssss"
             }
 	],
-	"public_network_id" : "71257860-3085-40bb-b009-5f12c688cdfb",
 	"name_image" : "TEST",
 	"pop_id": 21,
         "vm_image_format" : "openstack_id",

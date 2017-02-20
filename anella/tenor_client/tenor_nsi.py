@@ -85,7 +85,12 @@ class TenorNSI(object):
                 server_ip = addr['addr']
         key = RSA.generate(2048)
         pubkey = key.publickey()
-        ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
+        icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
+
+        if len(icds) < 1:
+            print "ICD NOT FOUND"
+            return
+        ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
         command = 'echo \'{0}\' >> /root/.ssh/authorized_keys'.format(pubkey.exportKey('OpenSSH'))
         print command
         stdin, stdout, stderr = ssh.exec_command(command)
@@ -103,13 +108,20 @@ class TenorNSI(object):
         for addr in self._addresses[0][1]:
             if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
                 server_ip = addr['addr']
-        ssh = create_ssh_client(server_ip, 'root', 'keys/anella')
-        scp = SCPClient(ssh.get_transport())
         icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
 
         if len(icds) < 1:
             print "ICD NOT FOUND"
             return
+        try:
+            ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
+        except:
+            crite = CriticalError(service_instance_id=self._nsi_id,
+                                  message='Failed to connect to {0}'.format(server_ip),
+                                  code='CONFIGURATION_FAILED')
+            crite.save()
+            return
+        scp = SCPClient(ssh.get_transport())
 
         for cpar in icds[0].consumer_params:
             filename = cpar.path
@@ -118,7 +130,14 @@ class TenorNSI(object):
                 command = 'echo \'{0}\' > {1}'.format(content,
                                                       filename)
                 print command
-                stdin, stdout, stderr = ssh.exec_command(command)
+                try:
+                    stdin, stdout, stderr = ssh.exec_command(command)
+                except:
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to configure {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
+                    return
                 print stdout.readlines()
                 print stderr.readlines()
             if 'fields' in cpar:
@@ -128,8 +147,11 @@ class TenorNSI(object):
                 try:
                     scp.get(filename, template_filename)
                 except:
-                    # DO NOT FORGET TO RAISE ERROR!!!
-                    continue
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to retrieve {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
+                    return
                 keyvalues = {}
                 for item in cpar.fields:
                     if item.runtime:
@@ -146,7 +168,14 @@ class TenorNSI(object):
                 with open(render_filename, 'w') as fhandle:
                     fhandle.write(result)
                 print 'Sending {0}'.format(filename)
-                scp.put(render_filename, filename)
+                try:
+                    scp.put(render_filename, filename)
+                except:
+                    crite = CriticalError(service_instance_id=self._nsi_id,
+                                          message='Failed to write {0} configuration file'.format(filename),
+                                          code='CONFIGURATION_FAILED')
+                    crite.save()
+                    return
                 print 'Removing temporary files'
                 os.remove(template_filename)
                 os.remove(render_filename)
@@ -182,6 +211,15 @@ class TenorNSI(object):
         except IOError:
             raise IOError('Error deleting {0}'.format(self._nsi_id))
         return resp
+
+    def create_image(self, name_image):
+        try:
+            resp = requests.post('{0}/ns-instances/{1}/snapshot'.format(self._tenor_url, self._nsi_id),
+                                 headers={'Content-Type': 'application/json'},
+                                 json={'name_image': name_image})
+        except:
+            raise IOError('Error creating snapshot from {0}'.format(self._nsi_id))
+        return
 
     def get_state_and_addresses(self):
         """Returns state and addresses associated with the NSI"""
@@ -230,7 +268,7 @@ class TenorNSI(object):
     def get_nsi_ids():
         """Returns the list of NSI registered in TeNOR"""
         try:
-            resp = requests.get('{0}/ns-instances'.format(DEFAULT_TENOR_URL))
+            resp = requests.get('{0}/ns-instances/ids'.format(DEFAULT_TENOR_URL))
         except:
             raise IOError('{0} instance unreachable'.format(DEFAULT_TENOR_URL))
         try:

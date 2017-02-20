@@ -98,6 +98,31 @@ class VnfCatalogue < Sinatra::Application
         halt 200, vnfs.to_json
     end
 
+    # @method get_vnfs
+    # @overload get '/vnfs/ids'
+    #	Returns a list of VNFs ids
+    # List all VNFs ids
+    get '/vnfs/ids' do
+        params[:offset] ||= 1
+        params[:limit] ||= Vnf.count()+1
+
+        # Only accept positive numbers
+        params[:offset] = 1 if params[:offset].to_i < 1
+        params[:limit] = 20 if params[:limit].to_i < 1
+
+        # Get paginated list
+        vnfs = Vnf.paginate(page: params[:offset], limit: params[:limit])
+        vnfs_ids = []
+        vnfs.each do |vnf|
+            vnfs_ids.push({:vnfd => { :id => vnf['vnfd']['id']}})
+        end
+
+        # Build HTTP Link Header
+        headers['Link'] = build_http_link(params[:offset].to_i, params[:limit])
+
+        halt 200, vnfs_ids.to_json
+    end
+
     # @method get_vnfs_vnfd_id
     # @overload get '/vnfs/:vnfd_id'
     #	Show a VNF

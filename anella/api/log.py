@@ -6,7 +6,9 @@ from tenor_client.tenor_nsi import TenorNSI
 from tenor_client.callback import Callback
 from models.tenor_messages import CriticalError
 from models.tenor_messages import MonitoringMessage
+from models.instance_snapshot import InstanceSnapshot
 
+import re
 import flask_restful
 from flask import request
 
@@ -42,6 +44,9 @@ class Log(flask_restful.Resource):
                 code = ''
                 if 'code' in data:
                     code = data['code']
+                    if code == 'ERROR_CREATING_INSTANCE':
+                        if re.search('disk is too small', message):
+                            code = 'FLAVOR_TOO_SMALL'
                 crite = CriticalError(service_instance_id=data['service_instance_id'],
                                       message=message, code=code)
                 crite.save()
@@ -51,6 +56,13 @@ class Log(flask_restful.Resource):
             monim = MonitoringMessage(service_instance_id=data['service_instance_id'],
                                       message=data['state_change']['reached'])
             monim.save()
+
+        if 'snapshot' in data:
+            print data['snapshot']
+            inssnp = InstanceSnapshot(service_instance_id=data['service_instance_id'],
+                                      image_id=data['snapshot']['image_id'],
+                                      name_image=data['snapshot']['name_image'])
+            inssnp.save()
 
     def get(self):
         """Log get"""

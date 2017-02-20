@@ -4,13 +4,17 @@
 
 from jinja2 import Environment, FileSystemLoader
 import paramiko
+import StringIO
 
-def create_ssh_client(server, user, key):
+def create_ssh_client(server, user, pkey):
     """Returns the ssh client"""
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    nraf = StringIO.StringIO(pkey)
+    private_key = paramiko.RSAKey.from_private_key(nraf)
+    nraf.close()
     client.connect(server, username=user,
-                    key_filename=key,
+                    pkey=private_key,
                     timeout=15)
     return client
 

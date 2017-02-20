@@ -10,6 +10,7 @@ from api.service_instance import ServiceInstanceHistory
 from api.service_instance import ServiceInstanceMonitoring
 from api.service_instance import ServiceInstanceBilling
 from api.service_instance import ServiceInstanceKey
+from api.service_instance import ServiceInstanceSnapshot
 from api.log import Log
 from api.enotification import Enotification
 
@@ -59,6 +60,9 @@ API_V2.add_resource(ServiceInstanceBilling,
 
 API_V2.add_resource(ServiceInstanceKey,
                     '/service/instance/<ns_id>/key')
+
+API_V2.add_resource(ServiceInstanceSnapshot,
+                    '/service/instance/<ns_id>/snapshot')
 
 API_V2.add_resource(VNF,
                     '/vnf',

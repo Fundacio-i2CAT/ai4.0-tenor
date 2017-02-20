@@ -19,6 +19,7 @@ POP_ID = int(CONFIG.get('tenor', 'default_pop'))
 DEFAULT_TENOR_URL = format('{0}:{1}'.format(
     CONFIG.get('tenor', 'url'),
     CONFIG.get('tenor', 'port')))
+TENOR_LABEL = CONFIG.get('tenor', 'label')
 
 DEFAULT_TEMPLATE = './tenor_client/templates/simple-f.json'
 DEFAULT_CALLBACK_URL = 'http://localhost:8082/orchestrator/api/v0.1/log'
@@ -54,7 +55,7 @@ class TenorNS(object):
     def get_last_ns_id(self):
         """Gets last ns_id"""
         try:
-            resp = requests.get('{0}/network-services'.format(self._tenor_url))
+            resp = requests.get('{0}/network-services/ids'.format(self._tenor_url))
         except:
             raise IOError('{0} instance unreachable'.format(self._tenor_url))
         try:
@@ -166,7 +167,7 @@ class TenorNS(object):
     @staticmethod
     def get_ns_ids():
         """Returns the list of NS registered in TeNOR"""
-        url = '{0}/network-services'.format(DEFAULT_TENOR_URL)
+        url = '{0}/network-services/ids'.format(DEFAULT_TENOR_URL)
         try:
             resp = requests.get(url)
         except:
