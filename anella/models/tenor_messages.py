@@ -28,3 +28,10 @@ class MonitoringMessage(Document):
     service_instance_id = StringField(required=True)
     message = StringField(required=True)
     timestamp = DateTimeField(default=datetime.datetime.now)
+
+class InstanceDenial(Document):
+    """Instance Denial Message"""
+
+    service_instance_id = StringField(required=True)
+    message = StringField(required=True)
+    timestamp = DateTimeField(default=datetime.datetime.now)

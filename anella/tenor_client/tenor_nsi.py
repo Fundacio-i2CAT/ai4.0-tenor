@@ -10,6 +10,7 @@ from template_management import create_ssh_client
 from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
+from models.tenor_messages import InstanceDenial
 from urlparse import urlparse
 
 from scp import SCPClient
@@ -186,6 +187,9 @@ class TenorNSI(object):
     def start(self):
         """Sets active all the VNF instances associated"""
         try:
+            insdens = InstanceDenial.objects(service_instance_id=self._nsi_id)
+            if len(insdens) > 0:
+                InstanceDenial.objects(service_instance_id=self._nsi_id).delete()
             resp = requests.put('{0}/ns-instances/{1}/start'.format(
                 self._tenor_url, self._nsi_id))
             self.retrieve()
@@ -193,12 +197,17 @@ class TenorNSI(object):
             raise IOError('Error starting {0}'.format(self._nsi_id))
         return resp
 
-    def stop(self):
+    def stop(self, denied=False):
         """Sets shutoff all the VNF instances associated"""
         try:
             resp = requests.put('{0}/ns-instances/{1}/stop'.format(
                 self._tenor_url, self._nsi_id))
             self.retrieve()
+            if denied==True:
+                insden = InstanceDenial(service_instance_id=self._nsi_id, message='DENIED')
+                insden.save()
+                resp = type('', (object,), {'text': json.dumps({'message': 'Successfully sent deny state signal',
+                                                                'state': 'DENIEDX'}),'status_code': 200})()
         except:
             raise IOError('Error stoping {0}'.format(self._nsi_id))
         return resp
@@ -241,8 +250,16 @@ class TenorNSI(object):
             failed = True
 
         if failed:
-            self._state = "FAILED"
+            self._state = 'FAILED'
             self._code = crites[0].code
+
+        denied = False
+        insdens = InstanceDenial.objects(service_instance_id=self._nsi_id)
+        if len(insdens) > 0:
+            denied = True
+
+        if denied:
+            self._state = 'DENIED'
 
         result = {'service_instance_id': self._nsi_id,
                   'state': self._state,
