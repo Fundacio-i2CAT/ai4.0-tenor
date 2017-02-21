@@ -10,6 +10,7 @@ from template_management import create_ssh_client
 from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
+from models.tenor_messages import InstanceDenial
 from urlparse import urlparse
 
 from scp import SCPClient
@@ -200,6 +201,8 @@ class TenorNSI(object):
                 self._tenor_url, self._nsi_id))
             self.retrieve()
             if denied==True:
+                insden = InstanceDenial(service_instance_id=self._nsi_id, message='DENIED')
+                insden.save()
                 resp = type('', (object,), {'text': json.dumps({'message': 'Successfully sent deny state signal',
                                                                 'state': 'DENIEDX'}),'status_code': 200})()
         except:
@@ -244,8 +247,16 @@ class TenorNSI(object):
             failed = True
 
         if failed:
-            self._state = "FAILED"
+            self._state = 'FAILED'
             self._code = crites[0].code
+
+        denied = False
+        insdens = InstanceDenial.objects(service_instance_id=self._nsi_id)
+        if len(insdens) > 0:
+            denied = True
+
+        if denied:
+            self._state = 'DENIED'
 
         result = {'service_instance_id': self._nsi_id,
                   'state': self._state,
