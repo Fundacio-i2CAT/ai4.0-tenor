@@ -206,8 +206,8 @@ class TenorNSI(object):
             if denied==True:
                 insden = InstanceDenial(service_instance_id=self._nsi_id, message='DENIED')
                 insden.save()
-                resp = type('', (object,), {'text': json.dumps({'message': 'Successfully sent deny state signal',
-                                                                'state': 'DENIEDX'}),'status_code': 200})()
+                resp = type('', (object,), {'text': json.dumps({'message': 'Successfully sent state signal',
+                                                                'state': 'DENIED'}),'status_code': 200})()
         except:
             raise IOError('Error stoping {0}'.format(self._nsi_id))
         return resp

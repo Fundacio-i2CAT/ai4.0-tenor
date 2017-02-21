@@ -66,10 +66,11 @@ if __name__ == "__main__":
     print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['adam']),totals['adam'], round(100.0*float(len(hanged['adam']))/totals['adam']),2)
     print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['adam']),totals['adam'], round(100.0*float(len(failed['adam']))/totals['adam']),2)
     print
-    print " AT I2CAT: {0}/{1}".format(str(totals['i2cat']),str(total))
-    print " \tOK:\t{0}/{1}\t({2}%)".format(len(ok['i2cat']), totals['i2cat'], round(100.0*float(len(ok['i2cat']))/totals['i2cat']),2)
-    print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['i2cat']),totals['i2cat'], round(100.0*float(len(hanged['i2cat']))/totals['i2cat']),2)
-    print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['i2cat']),totals['i2cat'], round(100.0*float(len(failed['i2cat']))/totals['i2cat']),2)
+    if totals['i2cat'] > 0:
+        print " AT I2CAT: {0}/{1}".format(str(totals['i2cat']),str(total))
+        print " \tOK:\t{0}/{1}\t({2}%)".format(len(ok['i2cat']), totals['i2cat'], round(100.0*float(len(ok['i2cat']))/totals['i2cat']),2)
+        print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['i2cat']),totals['i2cat'], round(100.0*float(len(hanged['i2cat']))/totals['i2cat']),2)
+        print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['i2cat']),totals['i2cat'], round(100.0*float(len(failed['i2cat']))/totals['i2cat']),2)
 
     print
     print
