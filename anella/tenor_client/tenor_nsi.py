@@ -187,6 +187,9 @@ class TenorNSI(object):
     def start(self):
         """Sets active all the VNF instances associated"""
         try:
+            insdens = InstanceDenial.objects(service_instance_id=self._nsi_id)
+            if len(insdens) > 0:
+                InstanceDenial.objects(service_instance_id=self._nsi_id).delete()
             resp = requests.put('{0}/ns-instances/{1}/start'.format(
                 self._tenor_url, self._nsi_id))
             self.retrieve()
