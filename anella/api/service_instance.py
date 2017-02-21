@@ -128,6 +128,8 @@ class ServiceInstance(flask_restful.Resource):
                 resp = nsi.start()
             if state['state'].upper() == 'DEPLOYED':
                 resp = nsi.stop()
+            if state['state'].upper() == 'DENIED':
+                resp = nsi.stop(True)
         except Exception as exc:
             abort(500, message='Internal server error: {0}'.format(str(exc)))
         if hasattr(resp, 'status_code'):

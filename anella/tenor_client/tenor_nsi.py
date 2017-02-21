@@ -193,12 +193,15 @@ class TenorNSI(object):
             raise IOError('Error starting {0}'.format(self._nsi_id))
         return resp
 
-    def stop(self):
+    def stop(self, denied=False):
         """Sets shutoff all the VNF instances associated"""
         try:
             resp = requests.put('{0}/ns-instances/{1}/stop'.format(
                 self._tenor_url, self._nsi_id))
             self.retrieve()
+            if denied==True:
+                resp = type('', (object,), {'text': json.dumps({'message': 'Successfully sent deny state signal',
+                                                                'state': 'DENIEDX'}),'status_code': 200})()
         except:
             raise IOError('Error stoping {0}'.format(self._nsi_id))
         return resp
