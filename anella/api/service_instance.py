@@ -206,6 +206,9 @@ class ServiceInstanceHistory(flask_restful.Resource):
 def monitoring_events(ns_id,idate, fdate=None):
         initial_date = datetime.fromtimestamp(mktime(strptime(idate, '%Y-%m-%d')))
         final_date = None
+        checkInstance = MonitoringMessage.objects(service_instance_id=ns_id)
+        if len(checkInstance) == 0:
+            abort(404, message="Service instance {0} monitoring not found".format(ns_id))
         if fdate:
             final_date = datetime.fromtimestamp(mktime(strptime(fdate, '%Y-%m-%d')))
         monitoring = []
