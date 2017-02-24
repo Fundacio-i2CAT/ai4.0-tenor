@@ -46,8 +46,13 @@ if __name__ == "__main__":
                 ok[dc].append({'id': siid, 'message': 'ok'})
                 print " ", dc, "\t", conf['timestamp'], 'OK'
         else:
-            hanged[dc].append({'id': siid, 'message': 'no response'})
-            print " ", dc, "\t", conf['timestamp'], 'HANGED'
+            crite = CriticalError.objects(service_instance_id=siid)
+            if len(crite) > 0:
+                failed[dc].append({'id': siid, 'message': crite[0]['message']})
+                print " ", dc, "\t", conf['timestamp'], 'FAILED'
+            else:
+                hanged[dc].append({'id': siid, 'message': 'no response'})
+                print " ", dc, "\t", conf['timestamp'], 'HANGED'
 
     totals = {}
     totals['adam'] = len(ok['adam'])+len(failed['adam'])+len(hanged['adam'])
