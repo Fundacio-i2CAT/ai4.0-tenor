@@ -28,6 +28,8 @@ if __name__ == "__main__":
     for conf in confs:
         dc = 'i2cat'
         siid = conf['service_instance_id']
+	if not 'consumer_params' in conf or len(conf['consumer_params']) == 0:
+		continue
         if 'content' in conf['consumer_params'][0]:
             dc = 'i2cat'
         if 'fields' in conf['consumer_params'][0]:
