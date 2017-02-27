@@ -263,7 +263,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
         crite = CriticalError.objects(service_instance_id=ns_id)
         activation = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
         if len(crite) > 0 or len(activation) == 0:
-            resp = {'lapses': [], 'total_minutes': 0.0, 'total_delta': None}
+            resp = {'lapses': [], 'total_delta': None}
             return resp
 
         for mev in monitoring:
