@@ -9,6 +9,7 @@ from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import build_instance_configuration
 from models.tenor_messages import RegularMessage
 from models.tenor_messages import MonitoringMessage
+from models.tenor_messages import CriticalError
 from models.api_log import ApiLog
 
 import flask_restful
@@ -258,6 +259,13 @@ class ServiceInstanceBilling(flask_restful.Resource):
         last_active = None
         time_acum = timedelta(minutes=0)
         lapses = []
+
+        crite = CriticalError.objects(service_instance_id=ns_id)
+        activation = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
+        if len(crite) > 0 or len(activation) == 0:
+            resp = {'lapses': [], 'total_minutes': 0.0, 'total_delta': None}
+            return resp
+
         for mev in monitoring:
             if (mev['message'].upper() == 'SHUTOFF') or (mev['message'].upper() == 'DELETE_REQUEST_RECEIVED'):
                 if first_slot == True:
@@ -283,7 +291,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
                 lapses.append({'t0': str(monitoring[len(monitoring)-1]['timestamp']),
                                't1': str(now),
                                'delta': str(dt)})
-        resp = {'lapses': lapses, 'total_minutes': time_acum.seconds/60.0, 'total_delta': str(time_acum)}
+        resp = {'lapses': lapses, 'total_delta': str(time_acum)}
         return resp
 
 class ServiceInstanceKey(flask_restful.Resource):
