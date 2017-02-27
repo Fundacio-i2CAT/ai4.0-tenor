@@ -263,7 +263,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
         crite = CriticalError.objects(service_instance_id=ns_id)
         activation = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
         if len(crite) > 0 or len(activation) == 0:
-            resp = {'lapses': [], 'total_delta': None}
+            resp = {'lapses': [], 'total_minutes': 0.0, 'total_delta': None}
             return resp
 
         for mev in monitoring:
@@ -291,7 +291,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
                 lapses.append({'t0': str(monitoring[len(monitoring)-1]['timestamp']),
                                't1': str(now),
                                'delta': str(dt)})
-        resp = {'lapses': lapses, 'total_delta': str(time_acum)}
+        resp = {'lapses': lapses, 'total_minutes': time_acum.total_seconds()/60.0, 'total_delta': str(time_acum)}
         return resp
 
 class ServiceInstanceKey(flask_restful.Resource):
