@@ -114,6 +114,8 @@ class TenorNSI(object):
         if len(icds) < 1:
             print "ICD NOT FOUND"
             return
+        if len(icds[0].consumer_params) == 0:
+            return
         try:
             ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
         except:
