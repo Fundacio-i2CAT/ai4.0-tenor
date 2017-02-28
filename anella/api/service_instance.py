@@ -20,7 +20,7 @@ import ConfigParser
 from flask import send_file
 import uuid
 import StringIO
-from time import mktime, strptime
+from time import mktime, strptime, strftime
 from datetime import datetime
 from pprint import pprint
 from datetime import datetime, timedelta
@@ -263,7 +263,7 @@ class ServiceInstanceBilling(flask_restful.Resource):
         crite = CriticalError.objects(service_instance_id=ns_id)
         activation = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
         if len(crite) > 0 or len(activation) == 0:
-            resp = {'lapses': [], 'total_minutes': 0.0, 'total_delta': None}
+            resp = {'lapses': [], 'total_minutes': 0, 'total_delta': None}
             return resp
 
         for mev in monitoring:
@@ -271,14 +271,14 @@ class ServiceInstanceBilling(flask_restful.Resource):
                 if first_slot == True:
                     dt = mev['timestamp']-initial_date
                     time_acum += dt
-                    lapses.append({'t0': str(initial_date),
-                                   't1': str(mev['timestamp']),
+                    lapses.append({'t0': initial_date.strftime('%d-%m-%Y %H:%M:%S'),
+                                   't1': mev['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
                                    'delta': str(dt)})
             if last_active and mev['message'] != 'ACTIVE':
                 dt =  mev['timestamp']-last_active
                 time_acum += dt
-                lapses.append({'t0': str(last_active),
-                               't1': str(mev['timestamp']),
+                lapses.append({'t0': last_active.strftime('%d-%m-%Y %H:%M:%S'),
+                               't1': mev['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
                                'delta': str(dt)})
             first_slot = False
             if mev['message'].upper() == 'ACTIVE':
@@ -288,10 +288,10 @@ class ServiceInstanceBilling(flask_restful.Resource):
                 now = datetime.now()
                 dt = now-monitoring[len(monitoring)-1]['timestamp']
                 time_acum += dt
-                lapses.append({'t0': str(monitoring[len(monitoring)-1]['timestamp']),
-                               't1': str(now),
+                lapses.append({'t0': monitoring[len(monitoring)-1]['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
+                               't1': now.strftime('%d-%m-%Y %H:%M:%S'),
                                'delta': str(dt)})
-        resp = {'lapses': lapses, 'total_minutes': int(time_acum.total_seconds()/60.0), 'total_delta': str(time_acum)}
+        resp = {'lapses': lapses, 'total_minutes': int(time_acum.total_seconds()/60.0)+1, 'total_delta': str(time_acum)}
         return resp
 
 class ServiceInstanceKey(flask_restful.Resource):
