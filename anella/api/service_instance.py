@@ -9,6 +9,7 @@ from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import build_instance_configuration
 from models.tenor_messages import RegularMessage
 from models.tenor_messages import MonitoringMessage
+from models.tenor_messages import CriticalError
 from models.api_log import ApiLog
 
 import flask_restful
@@ -19,7 +20,7 @@ import ConfigParser
 from flask import send_file
 import uuid
 import StringIO
-from time import mktime, strptime
+from time import mktime, strptime, strftime
 from datetime import datetime
 from pprint import pprint
 from datetime import datetime, timedelta
@@ -128,6 +129,8 @@ class ServiceInstance(flask_restful.Resource):
                 resp = nsi.start()
             if state['state'].upper() == 'DEPLOYED':
                 resp = nsi.stop()
+            if state['state'].upper() == 'DENIED':
+                resp = nsi.stop(True)
         except Exception as exc:
             abort(500, message='Internal server error: {0}'.format(str(exc)))
         if hasattr(resp, 'status_code'):
@@ -204,6 +207,9 @@ class ServiceInstanceHistory(flask_restful.Resource):
 def monitoring_events(ns_id,idate, fdate=None):
         initial_date = datetime.fromtimestamp(mktime(strptime(idate, '%Y-%m-%d')))
         final_date = None
+        checkInstance = MonitoringMessage.objects(service_instance_id=ns_id)
+        if len(checkInstance) == 0:
+            abort(404, message="Service instance {0} monitoring not found".format(ns_id))
         if fdate:
             final_date = datetime.fromtimestamp(mktime(strptime(fdate, '%Y-%m-%d')))
         monitoring = []
@@ -253,19 +259,26 @@ class ServiceInstanceBilling(flask_restful.Resource):
         last_active = None
         time_acum = timedelta(minutes=0)
         lapses = []
+
+        crite = CriticalError.objects(service_instance_id=ns_id)
+        activation = MonitoringMessage.objects(service_instance_id=ns_id, message='ACTIVE')
+        if len(crite) > 0 or len(activation) == 0:
+            resp = {'lapses': [], 'total_minutes': 0, 'total_delta': None}
+            return resp
+
         for mev in monitoring:
             if (mev['message'].upper() == 'SHUTOFF') or (mev['message'].upper() == 'DELETE_REQUEST_RECEIVED'):
                 if first_slot == True:
                     dt = mev['timestamp']-initial_date
                     time_acum += dt
-                    lapses.append({'t0': str(initial_date),
-                                   't1': str(mev['timestamp']),
+                    lapses.append({'t0': initial_date.strftime('%d-%m-%Y %H:%M:%S'),
+                                   't1': mev['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
                                    'delta': str(dt)})
             if last_active and mev['message'] != 'ACTIVE':
                 dt =  mev['timestamp']-last_active
                 time_acum += dt
-                lapses.append({'t0': str(last_active),
-                               't1': str(mev['timestamp']),
+                lapses.append({'t0': last_active.strftime('%d-%m-%Y %H:%M:%S'),
+                               't1': mev['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
                                'delta': str(dt)})
             first_slot = False
             if mev['message'].upper() == 'ACTIVE':
@@ -275,10 +288,10 @@ class ServiceInstanceBilling(flask_restful.Resource):
                 now = datetime.now()
                 dt = now-monitoring[len(monitoring)-1]['timestamp']
                 time_acum += dt
-                lapses.append({'t0': str(monitoring[len(monitoring)-1]['timestamp']),
-                               't1': str(now),
+                lapses.append({'t0': monitoring[len(monitoring)-1]['timestamp'].strftime('%d-%m-%Y %H:%M:%S'),
+                               't1': now.strftime('%d-%m-%Y %H:%M:%S'),
                                'delta': str(dt)})
-        resp = {'lapses': lapses, 'total_minutes': time_acum.seconds/60.0, 'total_delta': str(time_acum)}
+        resp = {'lapses': lapses, 'total_minutes': int(time_acum.total_seconds()/60.0)+1, 'total_delta': str(time_acum)}
         return resp
 
 class ServiceInstanceKey(flask_restful.Resource):

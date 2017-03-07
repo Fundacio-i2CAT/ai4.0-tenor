@@ -28,6 +28,8 @@ if __name__ == "__main__":
     for conf in confs:
         dc = 'i2cat'
         siid = conf['service_instance_id']
+	if not 'consumer_params' in conf or len(conf['consumer_params']) == 0:
+		continue
         if 'content' in conf['consumer_params'][0]:
             dc = 'i2cat'
         if 'fields' in conf['consumer_params'][0]:
@@ -46,8 +48,13 @@ if __name__ == "__main__":
                 ok[dc].append({'id': siid, 'message': 'ok'})
                 print " ", dc, "\t", conf['timestamp'], 'OK'
         else:
-            hanged[dc].append({'id': siid, 'message': 'no response'})
-            print " ", dc, "\t", conf['timestamp'], 'HANGED'
+            crite = CriticalError.objects(service_instance_id=siid)
+            if len(crite) > 0:
+                failed[dc].append({'id': siid, 'message': crite[0]['message']})
+                print " ", dc, "\t", conf['timestamp'], 'FAILED'
+            else:
+                hanged[dc].append({'id': siid, 'message': 'no response'})
+                print " ", dc, "\t", conf['timestamp'], 'HANGED'
 
     totals = {}
     totals['adam'] = len(ok['adam'])+len(failed['adam'])+len(hanged['adam'])
@@ -66,10 +73,11 @@ if __name__ == "__main__":
     print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['adam']),totals['adam'], round(100.0*float(len(hanged['adam']))/totals['adam']),2)
     print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['adam']),totals['adam'], round(100.0*float(len(failed['adam']))/totals['adam']),2)
     print
-    print " AT I2CAT: {0}/{1}".format(str(totals['i2cat']),str(total))
-    print " \tOK:\t{0}/{1}\t({2}%)".format(len(ok['i2cat']), totals['i2cat'], round(100.0*float(len(ok['i2cat']))/totals['i2cat']),2)
-    print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['i2cat']),totals['i2cat'], round(100.0*float(len(hanged['i2cat']))/totals['i2cat']),2)
-    print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['i2cat']),totals['i2cat'], round(100.0*float(len(failed['i2cat']))/totals['i2cat']),2)
+    if totals['i2cat'] > 0:
+        print " AT I2CAT: {0}/{1}".format(str(totals['i2cat']),str(total))
+        print " \tOK:\t{0}/{1}\t({2}%)".format(len(ok['i2cat']), totals['i2cat'], round(100.0*float(len(ok['i2cat']))/totals['i2cat']),2)
+        print " \tHANGED:\t{0}/{1}\t({2}%)".format(len(hanged['i2cat']),totals['i2cat'], round(100.0*float(len(hanged['i2cat']))/totals['i2cat']),2)
+        print " \tFAILED:\t{0}/{1}\t({2}%)".format(len(failed['i2cat']),totals['i2cat'], round(100.0*float(len(failed['i2cat']))/totals['i2cat']),2)
 
     print
     print

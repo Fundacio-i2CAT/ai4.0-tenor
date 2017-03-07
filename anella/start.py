@@ -81,13 +81,15 @@ API_V2.add_resource(IsCached,
                     '/iscached',
                     '/iscached/<pop_id>')
 
+APP.register_blueprint(
+    API_V2_BP,
+    url_prefix=URL_PREFIX
+)
+
+APP.config['MONGODB_SETTINGS'] = {'db': 'pi40orch'}
+DB = MongoEngine()
+DB.init_app(APP)
+
 if __name__ == "__main__":
     print "Industrial Platform 4.0 Orchestrator"
-    APP.register_blueprint(
-        API_V2_BP,
-        url_prefix=URL_PREFIX
-    )
-    APP.config['MONGODB_SETTINGS'] = {'db': 'pi40orch'}
-    DB = MongoEngine()
-    DB.init_app(APP)
     APP.run(debug=False, host=HOST, port=PORT, threaded=True)
