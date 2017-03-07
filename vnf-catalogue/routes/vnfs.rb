@@ -104,14 +104,14 @@ class VnfCatalogue < Sinatra::Application
     # List all VNFs ids
     get '/vnfs/ids' do
         params[:offset] ||= 1
-        params[:limit] ||= Vnf.count()+1
+        params[:limit] ||= 30
 
         # Only accept positive numbers
         params[:offset] = 1 if params[:offset].to_i < 1
         params[:limit] = 20 if params[:limit].to_i < 1
 
         # Get paginated list
-        vnfs = Vnf.desc(:created_at).paginate(page: params[:offset], limit: 20)
+        vnfs = Vnf.desc(:created_at).paginate(page: params[:offset], limit: params[:limit])
         vnfs_ids = []
         vnfs.each do |vnf|
             vnfs_ids.push({:vnfd => { :id => vnf['vnfd']['id']}})
