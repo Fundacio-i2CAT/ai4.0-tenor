@@ -53,7 +53,7 @@ class Catalogue < NsCatalogue
         params[:limit] = 2 if params[:limit].to_i < 1
 
         # Get paginated list
-        nss = Ns.paginate(page: params[:offset], limit: params[:limit])
+        nss = Ns.desc(:created_at).paginate(page: params[:offset], limit: 20)
         nss_ids = []
         nss.each do |ns|
             nss_ids.push({:nsd => { :id => ns['nsd']['id']}})
