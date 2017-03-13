@@ -29,10 +29,10 @@ class Log(flask_restful.Resource):
             monim.save()
             nsi = TenorNSI(ns_instance_id)
             nsi.configure()
-            nsi.stop()
             fbm = FirstBoot(service_instance_id=ns_instance_id,
                             message='FIRST_BOOT')
             fbm.save()
+            nsi.stop()
 
         if 'status' in data:
             print data['status']
