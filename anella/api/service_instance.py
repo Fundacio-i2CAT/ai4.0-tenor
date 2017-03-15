@@ -7,11 +7,13 @@ from tenor_client.tenor_vnf import TenorVNF
 from tenor_client.tenor_ns import TenorNS
 from tenor_client.tenor_nsi import TenorNSI
 from models.instance_configuration import build_instance_configuration
+from models.instance_configuration import DockerRecipe
 from models.tenor_messages import RegularMessage
 from models.tenor_messages import MonitoringMessage
 from models.tenor_messages import CriticalError
 from models.api_log import ApiLog
 
+import requests
 import flask_restful
 from flask_restful import abort
 from flask import request
@@ -68,6 +70,16 @@ class ServiceInstance(flask_restful.Resource):
         data = request.get_json()
         context = data['context']
         name = context['name_image']
+        docker_recipe_url = ''
+        docker_recipe_resp = None
+        if context['vm_image_format'].upper() == 'DOCKER':
+            docker_recipe_url = context['vm_image']
+            # Should make a model to contain docker special images on dcs
+            #    of TeNOR's ns_manager depending on pop_id (extra_info?)
+            context['vm_image'] = 'ad904205-0f6f-46a1-a07f-2328da2bece1'
+            context['vm_image_format'] = 'openstack_id'
+            docker_recipe_resp = requests.get(docker_recipe_url)
+
         cached = "true"
         if 'cached' in context:
             cached = context['cached']
@@ -109,6 +121,13 @@ class ServiceInstance(flask_restful.Resource):
                                            data['context']['consumer_params'],
                                            key.exportKey('PEM'))
         icd.save()
+        if docker_recipe_resp:
+            linelist = []
+            for x in docker_recipe_resp.text.split('\n'):
+                linelist.append(str(x))
+            drecipe = DockerRecipe(service_instance_id=nsdata['id'],
+                                   dockerfile=linelist)
+            drecipe.save()
         return {'service_instance_id': nsdata['id'], 'state': 'PROVISIONED'}
 
     def put(self, ns_id=None):

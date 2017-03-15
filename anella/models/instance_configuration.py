@@ -9,6 +9,11 @@ from mongoengine import connect
 from consumer_param import ConsumerParam, ConsumerField
 import datetime
 
+class DockerRecipe(Document):
+    """Dockerfile recipe class"""
+    service_instance_id = StringField(required=True)
+    dockerfile = ListField(StringField())
+
 class InstanceConfiguration(Document):
     """Instance configuration class"""
 
