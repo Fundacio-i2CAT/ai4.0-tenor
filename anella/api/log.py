@@ -59,6 +59,10 @@ class Log(flask_restful.Resource):
                     FirstBoot.objects(service_instance_id=data['service_instance_id']).delete()
                     nsi = TenorNSI(data['service_instance_id'])
                     to_service_manager = nsi.get_state_and_addresses()
+                    icdockers=DockerRecipe.objects(service_instance_id=data['service_instance_id'])
+                    if len(icdockers) > 0:
+                        nsi = TenorNSI(data['service_instance_id'])
+                        nsi.docker_deployment()
                     Callback(to_service_manager)
                 else:
                     nsi = TenorNSI(data['service_instance_id'])
