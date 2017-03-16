@@ -9,15 +9,18 @@ from tenor_vnfi import TenorVNFI
 from template_management import create_ssh_client
 from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
+from models.instance_configuration import DockerRecipe
 from models.tenor_messages import CriticalError
 from models.tenor_messages import InstanceDenial
 from models.tenor_messages import FirstBoot
 from urlparse import urlparse
+import time
 
 from scp import SCPClient
 from Crypto.PublicKey import RSA
 import os
 import ConfigParser
+import re
 
 CONFIG = ConfigParser.RawConfigParser()
 CONFIG.read('config.cfg')
@@ -104,6 +107,59 @@ class TenorNSI(object):
 
     def get_addresses(self):
         return self._addresses[0][1]
+
+    def docker_deployment(self):
+        """Docker deployment method"""
+        for addr in self._addresses[0][1]:
+            if addr['OS-EXT-IPS:type'].upper() == 'FLOATING':
+                server_ip = addr['addr']
+        icdockers =DockerRecipe.objects(service_instance_id=self._nsi_id)
+        icds = InstanceConfiguration.objects(service_instance_id=self._nsi_id)
+        if len(icdockers) < 1 or len(icds) < 1:
+            print "DOCKERFILE NOT FOUND"
+            return
+        if len(icdockers[0].dockerfile) == 0:
+            return
+        try:
+            time.sleep(20)
+            print 'TRYING TO CONNECT TO HOST {0}'.format(server_ip)
+            ssh = create_ssh_client(server_ip, 'root', icds[0].pkey)
+        except Exception as inst:
+            print type(inst)
+            print inst
+            crite = CriticalError(service_instance_id=self._nsi_id,
+                                  message='Failed to connect to {0}'.format(server_ip),
+                                  code='CONFIGURATION_FAILED')
+            crite.save()
+            return
+        try:
+            scp = SCPClient(ssh.get_transport())
+            dockerfile = '\n'.join(icdockers[0].dockerfile)
+            ports = ''
+            for line in icdockers[0].dockerfile:
+                port = re.search('EXPOSE\s+(\d+)', line)
+                if port:
+                    ports = ports+' -p {0}:{0} '.format(port.group(1))
+            dockerfile_id = str(uuid.uuid4())
+            dockerfilename = '/tmp/{0}'.format(dockerfile_id)
+            with open(dockerfilename,"w") as fhandle:
+                fhandle.write(dockerfile)
+            scp.put(dockerfilename, '/root/dockerbuild/Dockerfile')
+            command = 'docker build -f /root/dockerbuild/Dockerfile -t anellacont /root/dockerbuild/ &&'
+            command = command + ' docker run -d {0} anellacont'.format(ports)
+            stdin, stdout, stderr = ssh.exec_command(command)
+            print stdout.readlines()
+            print stderr.readlines()
+            os.remove(dockerfilename)
+        except Exception as inst:
+            print type(inst)
+            print inst
+            crite = CriticalError(service_instance_id=self._nsi_id,
+                                  message='Failed to deploy to {0}'.format(server_ip),
+                                  code='CONFIGURATION_FAILED')
+            crite.save()
+            return
+        ssh.close()
 
     def configure(self):
         """Configures the instance according to consumer needs"""

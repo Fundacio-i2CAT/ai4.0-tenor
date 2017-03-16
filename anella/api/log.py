@@ -8,6 +8,7 @@ from models.tenor_messages import CriticalError
 from models.tenor_messages import MonitoringMessage
 from models.tenor_messages import FirstBoot
 from models.instance_snapshot import InstanceSnapshot
+from models.instance_configuration import DockerRecipe
 
 import re
 import flask_restful
@@ -66,6 +67,11 @@ class Log(flask_restful.Resource):
                 monim = MonitoringMessage(service_instance_id=data['service_instance_id'],
                                           message=data['state_change']['reached'])
                 monim.save()
+                if data['state_change']['reached'] == 'ACTIVE':
+                    icdockers=DockerRecipe.objects(service_instance_id=data['service_instance_id'])
+                    if len(icdockers) > 0:
+                        nsi = TenorNSI(data['service_instance_id'])
+                        nsi.docker_deployment()
 
         if 'snapshot' in data:
             print data['snapshot']
