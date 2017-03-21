@@ -11,6 +11,7 @@ from template_management import render_template
 from models.instance_configuration import InstanceConfiguration
 from models.tenor_messages import CriticalError
 from models.tenor_messages import InstanceDenial
+from models.tenor_messages import FirstBoot
 from urlparse import urlparse
 
 from scp import SCPClient
@@ -262,6 +263,10 @@ class TenorNSI(object):
 
         if denied:
             self._state = 'DENIED'
+
+        fbms = FirstBoot.objects(service_instance_id=self._nsi_id)
+        if len(fbms) > 0:
+            self._state = 'UNKNOWN'
 
         result = {'service_instance_id': self._nsi_id,
                   'state': self._state,

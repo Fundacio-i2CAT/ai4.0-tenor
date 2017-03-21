@@ -35,3 +35,10 @@ class InstanceDenial(Document):
     service_instance_id = StringField(required=True)
     message = StringField(required=True)
     timestamp = DateTimeField(default=datetime.datetime.now)
+
+class FirstBoot(Document):
+    """First Boot Message"""
+
+    service_instance_id = StringField(required=True)
+    message = StringField(required=True)
+    timestamp = DateTimeField(default=datetime.datetime.now)
