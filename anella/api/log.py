@@ -47,6 +47,8 @@ class Log(flask_restful.Resource):
                     if code == 'ERROR_CREATING_INSTANCE':
                         if re.search('disk is too small', message):
                             code = 'FLAVOR_TOO_SMALL'
+                        if re.search('timeout', message):
+                            code = 'STACK_CREATION_TIMEOUT'
                 crite = CriticalError(service_instance_id=data['service_instance_id'],
                                       message=message, code=code)
                 crite.save()

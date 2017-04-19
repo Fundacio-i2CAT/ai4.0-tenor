@@ -625,6 +625,9 @@ class Provisioning < VnfProvisioning
                 # Request VIM to delete the stack
                 # response, errors = delete_stack_with_wait(stack_url, auth_token)
                 # logger.debug 'Response from VIM to destroy allocated resources: ' + response.to_json
+                if response['stack']['stack_status_reason'].to_s == 'Stack CREATE started'
+                    response['stack']['stack_status_reason'] = 'timeout'
+                end
                 logger.error 'VIM ERROR: ' + response['stack']['stack_status_reason'].to_s
                 vnfr.push(lifecycle_event_history: stack_info['stack']['stack_status'])
                 vnfr.update_attributes!(
