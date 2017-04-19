@@ -166,6 +166,7 @@ module ProvisioningHelper
                 puts max_retries.to_s
                 if max_retries < 0
                     response['stack']['stack_status'] = 'create_failed'
+                    response['stack']['stack_status_reason'] = 'timeout'
                     break
                 end
 
