@@ -150,7 +150,7 @@ module ProvisioningHelper
         # Check when stack change state
         thread = Thread.new do
             sleep_time = 10 # set wait time in seconds
-            max_retries = 8
+            max_retries = 32
             begin
                 auth_token = vim_info['token']
                 begin
