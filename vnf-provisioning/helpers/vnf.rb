@@ -150,7 +150,7 @@ module ProvisioningHelper
         # Check when stack change state
         thread = Thread.new do
             sleep_time = 10 # set wait time in seconds
-
+            max_retries = 32
             begin
                 auth_token = vim_info['token']
                 begin
@@ -162,6 +162,13 @@ module ProvisioningHelper
                 end
 
                 sleep sleep_time # wait x seconds
+                max_retries = max_retries-1
+                puts max_retries.to_s
+                if max_retries < 0
+                    response['stack']['stack_status'] = 'create_failed'
+                    response['stack']['stack_status_reason'] = 'timeout'
+                    break
+                end
 
             end while response['stack']['stack_status'].casecmp('create_in_progress').zero?
 
