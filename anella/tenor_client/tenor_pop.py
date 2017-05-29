@@ -43,7 +43,13 @@ class TenorPoP(object):
             raise ValueError('Decoding PoP response json response failed')
         pop = json.loads(resp.text)
         self._name = pop['name']
-        self._orch = pop['orch']
+        extra_info = pop['extra_info'].split()
+        heat_info = ''
+        for endpoint in extra_info:
+            endpoint_info = endpoint.split('=')
+            if endpoint_info[0] == 'heat':
+                self._orch = endpoint_info[1]
+        pop['heat'] = self._orch
         return pop
 
     def get_server_details(self):
