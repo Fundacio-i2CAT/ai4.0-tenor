@@ -47,7 +47,7 @@ class TenorPoP(object):
         heat_info = ''
         for endpoint in extra_info:
             endpoint_info = endpoint.split('=')
-            if endpoint_info[0] == 'heat':
+            if endpoint_info[0] == 'heat' or endpoint_info[0] == 'orch-endpoint':
                 self._orch = endpoint_info[1]
         pop['heat'] = self._orch
         return pop
