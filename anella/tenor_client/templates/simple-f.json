@@ -45,7 +45,7 @@
 		"networking_resources": "",
 		"monitoring_parameters_specific": [
 		],
-		"wc_notify": false,
+		"wc_notify": true,
 		"vm_image": "{{ vm_image }}",
 		"cached": {{ cached }},
 		"controller": true,
