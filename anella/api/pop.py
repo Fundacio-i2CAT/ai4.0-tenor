@@ -52,7 +52,7 @@ class PoP(flask_restful.Resource):
                     if not resource:
                         pop_info = tpop.retrieve()
                         return {'pop_id': pop_id, 'name': pop_info['name'],
-                                'orch': pop_info['orch']}
+                                'orch': pop_info['heat']}
                     if resource == 'flavors':
                         return {'flavors': tpop.get_flavor_details()}
                     if resource == 'quotas':
@@ -75,5 +75,5 @@ class PoP(flask_restful.Resource):
             pop_info = my_pop.retrieve()
             result.append({'pop_id': int(pop_sid),
                            'name': pop_info['name'],
-                           'orch': pop_info['orch']})
+                           'orch': pop_info['heat']})
         return result
